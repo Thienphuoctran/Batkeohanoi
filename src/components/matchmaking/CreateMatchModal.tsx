@@ -22,31 +22,85 @@ import {
   getZaloDeepLink,
 } from "@/lib/zalo";
 
+import {
+  AuthenticatedTeamProfile,
+  UserProfile,
+} from "@/hooks/useAuthTeam";
+
 interface CreateMatchModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreateMatch: (newMatch: MatchFeedItem) => void;
+  verifiedTeam?: AuthenticatedTeamProfile | null;
+  verifiedProfile?: UserProfile | null;
+  onRequireAuth?: () => void;
 }
 
 export function CreateMatchModal({
   isOpen,
   onClose,
   onCreateMatch,
+  verifiedTeam,
+  verifiedProfile,
+  onRequireAuth,
 }: CreateMatchModalProps) {
-  const [hostTeamName, setHostTeamName] = useState(MOCK_TEAMS[0].name);
-  const [captainName, setCaptainName] = useState(MOCK_TEAMS[0].captainName);
-  const [captainPhone, setCaptainPhone] = useState(MOCK_TEAMS[0].captainPhone);
+  const [hostTeamName, setHostTeamName] = useState(
+    verifiedTeam?.team_name || MOCK_TEAMS[0].name
+  );
+  const [captainName, setCaptainName] = useState(
+    verifiedProfile?.full_name ||
+      verifiedTeam?.captain_name ||
+      MOCK_TEAMS[0].captainName
+  );
+  const [captainPhone, setCaptainPhone] = useState(
+    verifiedProfile?.phone ||
+      verifiedTeam?.captain_phone ||
+      MOCK_TEAMS[0].captainPhone
+  );
   const [sameZaloAsPhone, setSameZaloAsPhone] = useState(true);
   const [customZaloPhone, setCustomZaloPhone] = useState("");
-  const [district, setDistrict] = useState<District>("Cầu Giấy");
+  const [district, setDistrict] = useState<District>(
+    verifiedTeam?.home_district === "NamTuLiem" ? "Nam Từ Liêm" : "Cầu Giấy"
+  );
   const [pitchId, setPitchId] = useState<string>("pitch-cg-01");
-  const [tier, setTier] = useState<SkillTier>(2);
+  const [isCustomPitch, setIsCustomPitch] = useState(false);
+  const [customPitchName, setCustomPitchName] = useState("");
+  const [customPitchAddress, setCustomPitchAddress] = useState("");
+  const [tier, setTier] = useState<SkillTier>(
+    ([1, 2, 3].includes(Number(verifiedTeam?.skill_tier))
+      ? Number(verifiedTeam?.skill_tier)
+      : 2) as SkillTier
+  );
   const [timeSlot, setTimeSlot] = useState("19:00 - 20:30");
   const [totalCost, setTotalCost] = useState(850000);
   const [isSOS, setIsSOS] = useState(false);
   const [notes, setNotes] = useState(
     "Đội văn minh, đúng giờ, giao lưu vui vẻ sau giờ làm."
   );
+
+  React.useEffect(() => {
+    if (verifiedTeam) {
+      setHostTeamName(verifiedTeam.team_name);
+      setCaptainName(
+        verifiedProfile?.full_name ||
+          verifiedTeam.captain_name ||
+          MOCK_TEAMS[0].captainName
+      );
+      setCaptainPhone(
+        verifiedProfile?.phone ||
+          verifiedTeam.captain_phone ||
+          MOCK_TEAMS[0].captainPhone
+      );
+      if ([1, 2, 3].includes(Number(verifiedTeam.skill_tier))) {
+        setTier(Number(verifiedTeam.skill_tier) as SkillTier);
+      }
+      if (verifiedTeam.home_district === "NamTuLiem") {
+        setDistrict("Nam Từ Liêm");
+      } else {
+        setDistrict("Cầu Giấy");
+      }
+    }
+  }, [verifiedTeam, verifiedProfile]);
 
   if (!isOpen) return null;
 
@@ -61,10 +115,12 @@ export function CreateMatchModal({
 
   const handleDistrictChange = (newDist: District) => {
     setDistrict(newDist);
-    const firstPitch = HANOI_PITCHES.find((p) => p.district === newDist);
-    if (firstPitch) {
-      setPitchId(firstPitch.id);
-      setTotalCost(firstPitch.typicalPeakPriceVnd);
+    if (!isCustomPitch) {
+      const firstPitch = HANOI_PITCHES.find((p) => p.district === newDist);
+      if (firstPitch) {
+        setPitchId(firstPitch.id);
+        setTotalCost(firstPitch.typicalPeakPriceVnd);
+      }
     }
   };
 
@@ -76,19 +132,34 @@ export function CreateMatchModal({
     const normalizedCallPhone = formatDisplayPhone(captainPhone);
     const normalizedZalo = normalizeVietnamPhone(effectiveZaloPhone);
 
+    const finalPitchName = isCustomPitch
+      ? customPitchName.trim() ||
+        (district === "Nam Từ Liêm"
+          ? "Sân Bóng Đá Đình Thôn"
+          : "Sân Cỏ Nhân Tạo")
+      : selectedPitch.name;
+    const finalPitchAddress = isCustomPitch
+      ? customPitchAddress.trim() || `Khu vực ${district}, Hà Nội`
+      : selectedPitch.address;
+
     const newMatch: MatchFeedItem = {
       id: `match-new-${Date.now()}`,
       hostTeam: {
         ...MOCK_TEAMS[0],
+        id: verifiedTeam?.id || MOCK_TEAMS[0].id,
         name: hostTeamName.trim() || MOCK_TEAMS[0].name,
         shortName: (hostTeamName.trim() || MOCK_TEAMS[0].shortName).slice(0, 12),
         captainName: captainName.trim() || MOCK_TEAMS[0].captainName,
         captainPhone: normalizedCallPhone,
         captainZalo: normalizedZalo,
+        credit: {
+          ...MOCK_TEAMS[0].credit,
+          score: verifiedTeam?.trust_score ?? 100,
+        },
       },
       district,
-      pitchName: selectedPitch.name,
-      pitchAddress: selectedPitch.address,
+      pitchName: finalPitchName,
+      pitchAddress: finalPitchAddress,
       matchDate: "Hôm nay",
       startTime: startTime || "19:00",
       endTime: endTime || "20:30",
@@ -133,6 +204,44 @@ export function CreateMatchModal({
           onSubmit={handleSubmit}
           className="p-5 overflow-y-auto space-y-4 text-xs"
         >
+          {/* Banner trạng thái Xác thực Đội trưởng chính chủ */}
+          {verifiedTeam ? (
+            <div className="rounded-xl bg-emerald-500/15 border border-emerald-500/40 p-3 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <div>
+                  <div className="text-xs font-extrabold text-emerald-300">
+                    Đội chính chủ: {verifiedTeam.team_name} ({verifiedTeam.trust_score}/100★)
+                  </div>
+                  <div className="text-[10px] text-slate-300">
+                    Thông tin Đội trưởng &amp; SĐT Zalo đã được khóa xác thực tự động.
+                  </div>
+                </div>
+              </div>
+              <span className="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 font-black text-[10px] shrink-0">
+                VERIFIED
+              </span>
+            </div>
+          ) : (
+            onRequireAuth && (
+              <div className="rounded-xl bg-amber-500/10 border border-amber-500/35 p-3 flex items-center justify-between gap-2">
+                <div className="text-[11px] text-amber-200 leading-snug">
+                  💡 <strong>Khuyên dùng:</strong> Đăng ký tài khoản Đội trưởng để gắn cố định 1 SĐT = 1 Đội và nhận Thẻ Căn Cước 100 điểm tín nhiệm!
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onRequireAuth();
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[11px] shrink-0 transition"
+                >
+                  Đăng ký Đội
+                </button>
+              </div>
+            )
+          )}
+
           {/* 0. Xác thực SĐT & Zalo Đội trưởng Chủ sân */}
           <div className="rounded-xl bg-slate-950/90 border border-sky-500/30 p-3.5 space-y-3">
             <div className="flex items-center justify-between">
@@ -282,26 +391,80 @@ export function CreateMatchModal({
           {/* 2. Chọn Cụm Sân & Giờ */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block font-semibold text-slate-300 mb-1.5">
-                2. Cụm sân
-              </label>
-              <select
-                value={pitchId}
-                onChange={(e) => {
-                  setPitchId(e.target.value);
-                  const found = HANOI_PITCHES.find(
-                    (p) => p.id === e.target.value
-                  );
-                  if (found) setTotalCost(found.typicalPeakPriceVnd);
-                }}
-                className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-white/[0.1] text-white"
-              >
-                {filteredPitches.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.shortName}
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="font-semibold text-slate-300">
+                  2. Cụm sân
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !isCustomPitch;
+                    setIsCustomPitch(next);
+                    if (next && !customPitchName) {
+                      setCustomPitchName(
+                        district === "Nam Từ Liêm"
+                          ? "Sân Bóng Đá Đình Thôn"
+                          : "Sân Cỏ Nhân Tạo Cầu Giấy"
+                      );
+                    }
+                  }}
+                  className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 underline"
+                >
+                  {isCustomPitch
+                    ? "← Chọn từ danh sách"
+                    : "✍️ Tự điền tên sân"}
+                </button>
+              </div>
+
+              {!isCustomPitch ? (
+                <select
+                  value={pitchId}
+                  onChange={(e) => {
+                    if (e.target.value === "custom") {
+                      setIsCustomPitch(true);
+                      setCustomPitchName(
+                        district === "Nam Từ Liêm"
+                          ? "Sân Bóng Đá Đình Thôn"
+                          : ""
+                      );
+                      return;
+                    }
+                    setPitchId(e.target.value);
+                    const found = HANOI_PITCHES.find(
+                      (p) => p.id === e.target.value
+                    );
+                    if (found) setTotalCost(found.typicalPeakPriceVnd);
+                  }}
+                  className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-white/[0.1] text-white"
+                >
+                  {filteredPitches.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.shortName}
+                    </option>
+                  ))}
+                  <option value="custom">
+                    ✍️ Tự nhập sân khác (VD: Sân Đình Thôn...)
                   </option>
-                ))}
-              </select>
+                </select>
+              ) : (
+                <div className="space-y-1.5">
+                  <input
+                    type="text"
+                    required
+                    value={customPitchName}
+                    onChange={(e) => setCustomPitchName(e.target.value)}
+                    placeholder="VD: Sân Bóng Đá Đình Thôn, Sân Phủi..."
+                    className="w-full h-10 px-3 rounded-xl bg-slate-900 border border-emerald-500/60 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-emerald-400"
+                  />
+                  <input
+                    type="text"
+                    value={customPitchAddress}
+                    onChange={(e) => setCustomPitchAddress(e.target.value)}
+                    placeholder="Địa chỉ cụ thể (VD: Ngõ 39 Đình Thôn, Nam Từ Liêm)"
+                    className="w-full h-8 px-3 rounded-lg bg-slate-900/80 border border-white/[0.08] text-white text-[11px] placeholder:text-slate-500 focus:outline-none focus:border-emerald-400"
+                  />
+                </div>
+              )}
             </div>
 
             <div>

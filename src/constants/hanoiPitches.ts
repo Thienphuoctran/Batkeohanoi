@@ -152,4 +152,17 @@ export const HANOI_PITCHES: PitchLocation[] = [
     typicalPeakPriceVnd: 750000,
     coordinates: { lat: 21.0252, lng: 105.7681 },
   },
+  {
+    id: "pitch-ntl-05",
+    name: "Sân Bóng Đá Đình Thôn",
+    shortName: "Sân Đình Thôn",
+    district: "Nam Từ Liêm",
+    address: "Đường Đình Thôn, Phường Mỹ Đình 1, Nam Từ Liêm, Hà Nội",
+    totalFields: 4,
+    surfaceQuality: "Cỏ tiêu chuẩn phong trào",
+    hasLighting: true,
+    hasParking: true,
+    typicalPeakPriceVnd: 800000,
+    coordinates: { lat: 21.0185, lng: 105.7745 },
+  },
 ];

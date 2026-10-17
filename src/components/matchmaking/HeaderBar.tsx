@@ -35,6 +35,11 @@ interface HeaderBarProps {
   onToggleWideLayout: () => void;
   onOpenCreateModal: () => void;
   onOpenBotDrawer: () => void;
+  isAuthenticated?: boolean;
+  hasTeam?: boolean;
+  currentTeamName?: string;
+  onOpenAuthModal?: () => void;
+  onOpenTeamOnboarding?: () => void;
 }
 
 const PITCH_WEATHER_DATA: Record<
@@ -84,6 +89,11 @@ export function HeaderBar({
   onToggleWideLayout,
   onOpenCreateModal,
   onOpenBotDrawer,
+  isAuthenticated,
+  hasTeam,
+  currentTeamName,
+  onOpenAuthModal,
+  onOpenTeamOnboarding,
 }: HeaderBarProps) {
   const [selectedPitch, setSelectedPitch] = useState(
     "Trung Kính Hạ (Cầu Giấy)"
@@ -171,7 +181,7 @@ export function HeaderBar({
 
             <button
               onClick={onOpenBotDrawer}
-              title="Telegram Bot Webhook Logs (@BatKeo7_AlertBot)"
+              title="Telegram Bot Webhook Logs (@BatkeoHanoi_bot)"
               className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
             >
               <Bell className="w-4 h-4 text-sky-400" />
@@ -181,6 +191,32 @@ export function HeaderBar({
                 </span>
               )}
             </button>
+
+            {!isAuthenticated ? (
+              <button
+                onClick={onOpenAuthModal}
+                className="h-9 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Đăng nhập / Tạo Đội</span>
+              </button>
+            ) : !hasTeam ? (
+              <button
+                onClick={onOpenTeamOnboarding}
+                className="h-9 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition animate-pulse"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span>Hoàn tất Tạo Đội</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setActiveTab("trust-profile")}
+                className="h-9 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition max-w-[140px]"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span className="truncate">{currentTeamName}</span>
+              </button>
+            )}
 
             <Button
               onClick={onOpenCreateModal}

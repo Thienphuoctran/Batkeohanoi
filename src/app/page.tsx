@@ -30,6 +30,11 @@ import {
   playNotificationChime,
 } from "@/lib/zalo";
 import { useRealtimeMatchFeed } from "@/hooks/useRealtimeMatches";
+import { useAuthTeam } from "@/hooks/useAuthTeam";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { TeamOnboardingModal } from "@/components/team/TeamOnboardingModal";
+import { DigitalTeamCard } from "@/components/team/DigitalTeamCard";
+import { signOutAction, createMatchInDatabaseAction } from "@/actions/auth";
 
 interface BotLogItem {
   id: string;
@@ -46,6 +51,17 @@ export default function HanoiMatchmakingPlatform() {
   const [isWideLayout, setIsWideLayout] = useState(true);
   const [myTrustScore, setMyTrustScore] = useState(100);
   const [syncedRollCallCount, setSyncedRollCallCount] = useState(8);
+
+  // Quản lý xác thực Đội trưởng & Hồ sơ Đội bóng chính chủ (1 SĐT = 1 Đội)
+  const {
+    profile,
+    team,
+    refreshAuth,
+    isAuthenticated,
+    hasTeam,
+  } = useAuthTeam();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isTeamOnboardingOpen, setIsTeamOnboardingOpen] = useState(false);
 
   // Bộ lọc đa chiều: Tìm kiếm + Khung giờ + Quận + 3 Tier
   const [searchQuery, setSearchQuery] = useState("");
@@ -214,6 +230,20 @@ export default function HanoiMatchmakingPlatform() {
     // Phát sóng Realtime sang các thiết bị khác đang mở bảng tin (Zero Reload)
     await broadcastNewMatch(newMatch);
 
+    // Nếu Đội trưởng đã đăng ký đội chính chủ trên Supabase, lưu kèo thẳng vào bảng public.matches
+    if (team?.id) {
+      await createMatchInDatabaseAction({
+        hostTeamId: team.id,
+        pitchCustomName: newMatch.pitchName,
+        district: newMatch.district,
+        timeSlotLabel: `${newMatch.startTime} - ${newMatch.endTime}`,
+        totalFee: newMatch.totalCostVnd,
+        splitFee: newMatch.shareCostVnd,
+        isSos: newMatch.isSOS,
+        notes: newMatch.notes,
+      });
+    }
+
     pushBotLog(
       newMatch.isSOS
         ? "🚨 Đã Phát Tín Hiệu Cứu Hộ SOS"
@@ -235,7 +265,6 @@ export default function HanoiMatchmakingPlatform() {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-[#0B1120] bg-stadium-grid text-slate-100 flex flex-col pb-16">
       <div
@@ -253,7 +282,7 @@ export default function HanoiMatchmakingPlatform() {
             matches.filter((m) => m.isSOS && m.status !== "MATCHED").length
           }
           openMatchCount={matches.filter((m) => m.status !== "MATCHED").length}
-          myTrustScore={myTrustScore}
+          myTrustScore={team?.trust_score ?? myTrustScore}
           unreadBotCount={unreadBotCount}
           isWideLayout={isWideLayout}
           onToggleWideLayout={() => setIsWideLayout(!isWideLayout)}
@@ -262,6 +291,11 @@ export default function HanoiMatchmakingPlatform() {
             setIsBotDrawerOpen(true);
             setUnreadBotCount(0);
           }}
+          isAuthenticated={isAuthenticated}
+          hasTeam={hasTeam}
+          currentTeamName={team?.team_name}
+          onOpenAuthModal={() => setIsAuthModalOpen(true)}
+          onOpenTeamOnboarding={() => setIsTeamOnboardingOpen(true)}
         />
 
         {/* Main Content Container */}
@@ -450,13 +484,61 @@ export default function HanoiMatchmakingPlatform() {
             <VietQrSplitter syncedPlayerCount={syncedRollCallCount} />
           )}
 
-          {/* WORKSPACE 6: HỒ SƠ ĐỘI TÔI & GIẢ LẬP CHẾ TÀI BẬC THANG */}
+          {/* WORKSPACE 6: HỒ SƠ ĐỘI TÔI & THẺ CĂN CƯỚC BÓNG ĐÁ SỐ */}
           {activeTab === "trust-profile" && (
-            <TeamTrustProfile
-              myTrustScore={myTrustScore}
-              setMyTrustScore={setMyTrustScore}
-              onPushBotLog={pushBotLog}
-            />
+            <div className="space-y-4">
+              {hasTeam && team ? (
+                <DigitalTeamCard
+                  team={team}
+                  profile={profile}
+                  onQuickCreateMatch={() => setIsCreateOpen(true)}
+                  onSignOut={async () => {
+                    await signOutAction();
+                    await refreshAuth();
+                  }}
+                />
+              ) : (
+                <div className="surface-card rounded-2xl border border-emerald-500/35 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                      Định danh minh bạch • 1 SĐT = 1 Đội
+                    </span>
+                    <h3 className="text-base font-extrabold text-white pt-1">
+                      {!isAuthenticated
+                        ? "Bạn chưa đăng nhập tài khoản Đội trưởng"
+                        : "Hoàn tất 3 bước tạo Hồ sơ Đội bóng của bạn"}
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      Cấp ngay <strong>Thẻ Căn Cước Bóng Đá Số</strong> kèm{" "}
+                      <strong className="text-emerald-400">
+                        100/100 điểm tín nhiệm
+                      </strong>{" "}
+                      (Miễn cọc tiền mặt) và khóa SĐT Zalo chính chủ chống bùng kèo.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        setIsAuthModalOpen(true);
+                      } else {
+                        setIsTeamOnboardingOpen(true);
+                      }
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs shrink-0 shadow-lg shadow-emerald-500/20 transition"
+                  >
+                    {!isAuthenticated
+                      ? "Đăng ký / Đăng nhập Đội trưởng"
+                      : "Thiết lập Đội bóng ngay"}
+                  </button>
+                </div>
+              )}
+
+              <TeamTrustProfile
+                myTrustScore={team?.trust_score ?? myTrustScore}
+                setMyTrustScore={setMyTrustScore}
+                onPushBotLog={pushBotLog}
+              />
+            </div>
           )}
         </main>
       </div>
@@ -464,7 +546,7 @@ export default function HanoiMatchmakingPlatform() {
       {/* Modal Khớp Kèo */}
       <MatchChallengeModal
         match={activeChallengeMatch}
-        myTrustScore={myTrustScore}
+        myTrustScore={team?.trust_score ?? myTrustScore}
         onClose={() => setActiveChallengeMatch(null)}
         onConfirmMatch={handleConfirmChallenge}
       />
@@ -474,6 +556,44 @@ export default function HanoiMatchmakingPlatform() {
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onCreateMatch={handleCreateNewMatch}
+        verifiedTeam={team}
+        verifiedProfile={profile}
+        onRequireAuth={() => {
+          if (!isAuthenticated) {
+            setIsAuthModalOpen(true);
+          } else {
+            setIsTeamOnboardingOpen(true);
+          }
+        }}
+      />
+
+      {/* Modal Đăng Nhập / Đăng Ký Đội Trưởng */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={async () => {
+          await refreshAuth();
+          setIsTeamOnboardingOpen(true);
+        }}
+      />
+
+      {/* Modal Wizard 3 Bước Tạo Hồ Sơ Đội Bóng Chính Chủ */}
+      <TeamOnboardingModal
+        isOpen={isTeamOnboardingOpen}
+        onClose={() => setIsTeamOnboardingOpen(false)}
+        initialCaptainName={profile?.full_name || ""}
+        initialPhone={profile?.phone || ""}
+        onSuccess={async (createdTeam) => {
+          await refreshAuth();
+          setActiveTab("trust-profile");
+          pushBotLog(
+            `🎉 Đã Cấp Thẻ Căn Cước Đội: ${createdTeam?.team_name || "Đội mới"}`,
+            `Đội bóng đã được xác thực chính chủ với 100/100 điểm tín nhiệm (Miễn cọc tiền mặt).`,
+            "100/100 ★",
+            profile?.phone,
+            profile?.full_name
+          );
+        }}
       />
 
       {/* Trung Tâm Chuông Thông Báo In-App & Liên Kết Zalo 1-Click */}
