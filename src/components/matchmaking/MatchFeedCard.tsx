@@ -104,10 +104,19 @@ export function MatchFeedCard({
           </div>
 
           <span
-            className={`px-2.5 py-1 rounded-lg border text-[10px] font-extrabold ${tierInfo.badgeColor}`}
+            className={`px-3 py-1 rounded-full text-[10px] font-black border shadow-sm ${
+              match.requiredTier === 1
+                ? "bg-[#1d4ed8] text-white border-blue-400/50"
+                : match.requiredTier === 2
+                ? "bg-[#15803d] text-white border-emerald-400/50"
+                : "bg-[#9a3412] text-white border-orange-400/50"
+            }`}
           >
-            Tier {match.requiredTier} • {tierInfo.name.split(" ")[0]}{" "}
-            {tierInfo.name.split(" ")[1]}
+            {match.requiredTier === 1
+              ? "Tier 1: Dưỡng sinh"
+              : match.requiredTier === 2
+              ? "Tier 2: Phong trào"
+              : "Tier 3: Phủi chiến"}
           </span>
         </div>
 
@@ -178,27 +187,27 @@ export function MatchFeedCard({
               href={hostZaloUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white text-[11px] font-bold transition shadow-md shadow-blue-600/20"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#d97706]/70 bg-[#78350f]/25 hover:bg-[#78350f]/45 text-[#f59e0b] text-xs font-black transition shadow-md shadow-amber-900/20 active:scale-95"
               title="Nhắn Zalo trực tiếp cho Đội trưởng chủ sân"
             >
-              <MessageSquare className="w-3.5 h-3.5 fill-current" />
+              <MessageSquare className="w-3.5 h-3.5" />
               <span>Zalo ĐT</span>
             </a>
             {onOpenBlindReview && (
               <button
                 onClick={() => onOpenBlindReview(host.name)}
-                className="px-2.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-[11px] font-bold transition"
+                className="px-3 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-105 text-slate-950 text-xs font-black transition shadow-md shadow-amber-500/20 active:scale-95"
               >
-                ★ Đánh giá mù
+                ★ Đánh giá kèo
               </button>
             )}
           </div>
         ) : (
           <Button
             onClick={() => onSelectMatch(match)}
-            className="h-9 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs gap-1.5 shadow-md shadow-emerald-500/15 active:scale-95 transition"
+            className="h-9 px-4 rounded-xl bg-[#2dd4bf] hover:bg-[#14b8a6] text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-teal-500/20 active:scale-95 transition-all"
           >
-            <Handshake className="w-3.5 h-3.5 stroke-[2.3]" />
+            <Handshake className="w-4 h-4 stroke-[2.5]" />
             <span>Nhận Kèo</span>
           </Button>
         )}

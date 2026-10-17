@@ -23,7 +23,7 @@ import { SosAlertCard } from "@/components/matchmaking/SosAlertCard";
 import { MatchFeedCard } from "@/components/matchmaking/MatchFeedCard";
 import { MatchChallengeModal } from "@/components/matchmaking/MatchChallengeModal";
 import { CreateMatchModal } from "@/components/matchmaking/CreateMatchModal";
-import { HeroPitchShowcase } from "@/components/matchmaking/HeroPitchShowcase";
+import { LiveMatchBar } from "@/components/matchmaking/LiveMatchBar";
 import { SubMarketAndRollCall } from "@/components/matchmaking/SubMarketAndRollCall";
 import { VietQrSplitter } from "@/components/matchmaking/VietQrSplitter";
 import { TeamTrustProfile } from "@/components/matchmaking/TeamTrustProfile";
@@ -266,9 +266,50 @@ export default function HanoiMatchmakingPlatform() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1120] bg-stadium-grid text-slate-100 flex flex-col pb-16">
+    <div className="min-h-screen bg-stadium-multi text-slate-100 flex flex-col pb-16 relative overflow-x-hidden">
+      {/* Dynamic Multi-Color Stadium Flares & Floating Sport Stickers */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        {/* Multi-Color Ambient Light Flares */}
+        <div className="absolute -top-32 left-1/4 w-[500px] h-[500px] bg-emerald-500/12 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/4 -right-28 w-[450px] h-[450px] bg-amber-500/12 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-1/3 -left-28 w-[400px] h-[400px] bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 right-1/4 w-[500px] h-[500px] bg-sky-500/12 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Floating Sport Stickers (3D Glassmorphism Badges) */}
+        <div className="absolute top-36 left-2 xl:left-8 animate-float-slow hidden md:inline-flex">
+          <span className="sport-sticker border-emerald-500/40 text-emerald-300">
+            <span className="text-base">⚽</span> Sân 7 Hà Nội
+          </span>
+        </div>
+        <div className="absolute top-56 right-3 xl:right-10 animate-float-reverse hidden md:inline-flex">
+          <span className="sport-sticker border-amber-500/40 text-amber-300">
+            <span className="text-base">⚡</span> Giờ Vàng 19h00
+          </span>
+        </div>
+        <div className="absolute top-[480px] left-3 xl:left-8 animate-float-reverse hidden lg:inline-flex">
+          <span className="sport-sticker border-sky-500/40 text-sky-300">
+            <span className="text-base">🧤</span> Thủ Môn Xuất Sắc
+          </span>
+        </div>
+        <div className="absolute top-[640px] right-3 xl:right-10 animate-float-slow hidden lg:inline-flex">
+          <span className="sport-sticker border-orange-500/40 text-orange-300">
+            <span className="text-base">🏆</span> Cúp Phủi Cầu Giấy
+          </span>
+        </div>
+        <div className="absolute bottom-40 left-4 xl:left-12 animate-float-slow hidden xl:inline-flex">
+          <span className="sport-sticker border-teal-500/40 text-teal-300">
+            <span className="text-base">👟</span> Đinh Dăm TF Chuẩn
+          </span>
+        </div>
+        <div className="absolute bottom-24 right-4 xl:right-14 animate-float-reverse hidden xl:inline-flex">
+          <span className="sport-sticker border-rose-500/40 text-rose-300">
+            <span className="text-base">🛡️</span> Cam Kết Không Bùng Kèo
+          </span>
+        </div>
+      </div>
+
       <div
-        className={`w-full mx-auto transition-all duration-300 ${
+        className={`w-full mx-auto transition-all duration-300 relative z-10 ${
           isWideLayout
             ? "max-w-6xl"
             : "max-w-md border-x border-slate-800/80 shadow-2xl"
@@ -303,13 +344,9 @@ export default function HanoiMatchmakingPlatform() {
           {/* WORKSPACE 1: BẢNG TIN KÈO ĐẤU */}
           {activeTab === "feed" && (
             <div className="space-y-4">
-              {/* HERO PITCH SHOWCASE & COMPONENT KIT PANEL (BatKeo7.vn) */}
-              <HeroPitchShowcase
+              {/* LIVE TELEMETRY STRIP (Đồng hồ đếm ngược + Thời tiết + Live HN + Sân 2D) */}
+              <LiveMatchBar
                 onOpenCreateModal={() => setIsCreateOpen(true)}
-                onSelectDistrict={(dist) => setSelectedDistrict(dist)}
-                selectedDistrict={selectedDistrict}
-                onSelectTier={(tier) => setSelectedTier(tier)}
-                selectedTier={selectedTier}
                 onSwitchTab={(tab) => setActiveTab(tab)}
                 sosCount={
                   matches.filter((m) => m.isSOS && m.status !== "MATCHED").length
@@ -317,10 +354,7 @@ export default function HanoiMatchmakingPlatform() {
                 openMatchCount={
                   matches.filter((m) => m.status !== "MATCHED").length
                 }
-                onScrollToFeed={() => {
-                  const el = document.getElementById("matches-feed-anchor");
-                  el?.scrollIntoView({ behavior: "smooth" });
-                }}
+                selectedDistrict={selectedDistrict}
               />
 
               {/* Thanh Tìm Kiếm + Chọn Ca Giờ + Quận + 3 Tier */}
