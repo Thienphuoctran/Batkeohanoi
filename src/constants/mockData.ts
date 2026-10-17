@@ -1,0 +1,143 @@
+import { Match, PitchComplex, TacticBoard } from "../types/football";
+
+export const MOCK_MATCHES: Match[] = [
+  {
+    id: "match-01",
+    homeTeam: {
+      id: "team-a",
+      name: "FC Phủi Sài Gòn",
+      shortName: "PSG",
+      primaryColor: "#ef4444",
+    },
+    awayTeam: {
+      id: "team-b",
+      name: "Hà Nội Capital FC",
+      shortName: "HNC",
+      primaryColor: "#3b82f6",
+    },
+    homeScore: 2,
+    awayScore: 1,
+    currentMinute: 68,
+    status: "LIVE",
+    startTime: "20:00 Hôm nay",
+    stadiumName: "Sân Chảo Lửa Tân Bình",
+    events: [
+      { id: "e1", minute: 15, type: "GOAL", playerName: "Văn Quyết", teamId: "team-a" },
+      { id: "e2", minute: 42, type: "GOAL", playerName: "Quang Hải", teamId: "team-b" },
+      { id: "e3", minute: 58, type: "GOAL", playerName: "Tuấn Anh", teamId: "team-a" },
+      { id: "e4", minute: 62, type: "YELLOW_CARD", playerName: "Duy Mạnh", teamId: "team-b" },
+    ],
+  },
+  {
+    id: "match-02",
+    homeTeam: {
+      id: "team-c",
+      name: "Thép Xanh Nam Định",
+      shortName: "TXN",
+      primaryColor: "#eab308",
+    },
+    awayTeam: {
+      id: "team-d",
+      name: "Công An Hà Nội",
+      shortName: "CAH",
+      primaryColor: "#dc2626",
+    },
+    homeScore: 0,
+    awayScore: 0,
+    status: "UPCOMING",
+    startTime: "21:30 Tối nay",
+    stadiumName: "Sân Vận Động Thiên Trường",
+  },
+  {
+    id: "match-03",
+    homeTeam: {
+      id: "team-e",
+      name: "Hoàng Anh Gia Lai",
+      shortName: "HAGL",
+      primaryColor: "#10b981",
+    },
+    awayTeam: {
+      id: "team-f",
+      name: "Becamex Bình Dương",
+      shortName: "BBD",
+      primaryColor: "#8b5cf6",
+    },
+    homeScore: 3,
+    awayScore: 2,
+    status: "FINISHED",
+    startTime: "17:30 Chiều nay",
+    stadiumName: "Sân Pleiku",
+  },
+];
+
+export const MOCK_PITCHES: PitchComplex[] = [
+  {
+    id: "pitch-01",
+    name: "Sân Bóng Đá Chảo Lửa Tân Bình",
+    address: "30 Phan Thúc Duyện, Phường 4",
+    district: "Quận Tân Bình",
+    city: "TP. Hồ Chí Minh",
+    pitchType: "7_A_SIDE",
+    pricePerHour: 350000,
+    rating: 4.8,
+    totalReviews: 240,
+    imageUrl: "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=800&auto=format&fit=crop&q=60",
+    amenities: ["Đèn chiếu sáng LED", "Bãi đỗ ô tô", "Phòng thay đồ", "Căng tin", "Trọng tài hỗ trợ"],
+    slots: [
+      { id: "s1", startTime: "17:30", endTime: "19:00", priceVnd: 500000, isBooked: true, bookedBy: "FC Tân Bình" },
+      { id: "s2", startTime: "19:00", endTime: "20:30", priceVnd: 600000, isBooked: false },
+      { id: "s3", startTime: "20:30", endTime: "22:00", priceVnd: 550000, isBooked: false },
+    ],
+  },
+  {
+    id: "pitch-02",
+    name: "Cụm Sân Cỏ Nhân Tạo K300",
+    address: "C30 Thành Thái, Phường 14",
+    district: "Quận 10",
+    city: "TP. Hồ Chí Minh",
+    pitchType: "5_A_SIDE",
+    pricePerHour: 280000,
+    rating: 4.6,
+    totalReviews: 180,
+    imageUrl: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop&q=60",
+    amenities: ["Nước uống miễn phí", "Wifi", "Bảo vệ 24/7", "Bóng mượn miễn phí"],
+    slots: [
+      { id: "s4", startTime: "18:00", endTime: "19:30", priceVnd: 450000, isBooked: true },
+      { id: "s5", startTime: "19:30", endTime: "21:00", priceVnd: 450000, isBooked: false },
+      { id: "s6", startTime: "21:00", endTime: "22:30", priceVnd: 380000, isBooked: false },
+    ],
+  },
+  {
+    id: "pitch-03",
+    name: "Sân Vận Động Thống Nhất Mini Arena",
+    address: "138 Đào Duy Từ, Phường 6",
+    district: "Quận 10",
+    city: "TP. Hồ Chí Minh",
+    pitchType: "7_A_SIDE",
+    pricePerHour: 400000,
+    rating: 4.9,
+    totalReviews: 312,
+    imageUrl: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&auto=format&fit=crop&q=60",
+    amenities: ["Cỏ nhân tạo chuẩn FIFA", "Tắm nước nóng", "Camera ghi hình tự động", "Bình luận viên"],
+    slots: [
+      { id: "s7", startTime: "17:00", endTime: "18:30", priceVnd: 550000, isBooked: false },
+      { id: "s8", startTime: "18:30", endTime: "20:00", priceVnd: 650000, isBooked: true },
+      { id: "s9", startTime: "20:00", endTime: "21:30", priceVnd: 650000, isBooked: false },
+    ],
+  },
+];
+
+export const MOCK_TACTIC_7_A_SIDE: TacticBoard = {
+  id: "tac-7",
+  teamName: "Đội Hình Chiến Thuật 7 Người (3-2-1)",
+  formation: "3-2-1",
+  players: [
+    { id: "p1", name: "Văn Lâm", number: 1, position: "GK", coordX: 50, coordY: 90 },
+    { id: "p2", name: "Ngọc Hải", number: 3, position: "DF", coordX: 20, coordY: 70 },
+    { id: "p3", name: "Tiến Dũng", number: 4, position: "DF", coordX: 50, coordY: 72 },
+    { id: "p4", name: "Thành Chung", number: 16, position: "DF", coordX: 80, coordY: 70 },
+    { id: "p5", name: "Hùng Dũng", number: 8, position: "MF", coordX: 35, coordY: 45 },
+    { id: "p6", name: "Hoàng Đức", number: 14, position: "MF", coordX: 65, coordY: 45 },
+    { id: "p7", name: "Tiến Linh", number: 22, position: "FW", coordX: 50, coordY: 20 },
+  ],
+};

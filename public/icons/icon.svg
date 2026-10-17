@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="50%" stop-color="#060911" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+    <linearGradient id="badge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#16a34a" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
+  <rect x="24" y="24" width="464" height="464" rx="92" fill="none" stroke="#10b981" stroke-width="6" stroke-opacity="0.35" />
+  <circle cx="256" cy="256" r="140" fill="none" stroke="#10b981" stroke-width="4" stroke-opacity="0.2" />
+  <line x1="256" y1="40" x2="256" y2="472" stroke="#10b981" stroke-width="4" stroke-opacity="0.2" />
+  <rect x="96" y="146" width="320" height="220" rx="48" fill="url(#badge)" />
+  <text x="256" y="290" font-family="system-ui, -apple-system, sans-serif" font-size="118" font-weight="900" fill="#060911" text-anchor="middle">7v7</text>
+</svg>

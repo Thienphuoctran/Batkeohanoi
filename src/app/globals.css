@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 97%;
+    --foreground: 224 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 47% 11%;
+    --primary: 152 69% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 224 47% 11%;
+    --muted: 220 14% 94%;
+    --muted-foreground: 215 16% 45%;
+    --accent: 220 14% 94%;
+    --accent-foreground: 224 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 90%;
+    --input: 220 13% 90%;
+    --ring: 152 69% 38%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222 47% 5%;
+    --foreground: 210 20% 98%;
+    --card: 222 40% 8%;
+    --card-foreground: 210 20% 98%;
+    --popover: 222 40% 8%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 152 68% 45%;
+    --primary-foreground: 222 47% 5%;
+    --secondary: 222 30% 13%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 222 30% 13%;
+    --muted-foreground: 215 18% 62%;
+    --accent: 222 30% 13%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 222 25% 15%;
+    --input: 222 25% 15%;
+    --ring: 152 68% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-[#090d16] text-slate-100 antialiased selection:bg-emerald-500/20 selection:text-emerald-300;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Tabular numbers cho đồng hồ đếm ngược, tỷ số và giá tiền */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle dot & turf grid background (Aceternity style với radial mask) */
+.bg-stadium-grid {
+  background-size: 32px 32px;
+  background-image:
+    linear-gradient(to right, rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+}
+
+/* Viền nổi 1px tinh tế + Aceternity Spotlight Hover Card */
+.surface-card,
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(11, 17, 32, 0.96) 100%);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 4px 20px -4px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    480px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(16, 185, 129, 0.11),
+    transparent 45%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+.spotlight-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Magic UI Live Marquee Ticker */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 32s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Hiệu ứng viền SOS khẩn cấp (Magic UI Border Glow tinh tế) */
+@keyframes sosPulseBorder {
+  0%, 100% {
+    border-color: rgba(244, 63, 94, 0.55);
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  }
+  50% {
+    border-color: rgba(251, 113, 133, 0.95);
+    box-shadow: 0 0 24px -4px rgba(244, 63, 94, 0.32), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  }
+}
+
+.sos-card-glow {
+  animation: sosPulseBorder 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+

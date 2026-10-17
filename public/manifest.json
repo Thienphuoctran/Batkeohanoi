@@ -1,0 +1,28 @@
+{
+  "name": "BắtKèo7 - Ghép Trận Sân 7 Hà Nội",
+  "short_name": "BắtKèo7",
+  "description": "Nền tảng ghép đối bóng đá sân 7 văn minh, chống bùng cọc tại Cầu Giấy & Nam Từ Liêm",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060911",
+  "theme_color": "#16a34a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
