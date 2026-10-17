@@ -129,8 +129,8 @@ export function HeaderBar({
           <div className="animate-marquee inline-flex items-center gap-8">
             <span>⚡ FC Vinaconex vừa mở kèo Sân Thành Phát (19:00 hôm nay)</span>
             <span>🛡️ Quy chế v2.0: Hủy sát giờ &lt;1h lần 2 gắn nhãn đỏ &amp; cọc 100%</span>
-            <span>🔥 Kèo Cứu Hộ SOS Sân ĐH Thương Mại giảm ngay 150k tiền sân + Tặng nước</span>
-            <span>🌤️ Thời tiết Cầu Giấy &amp; Nam Từ Liêm tối nay: 25-26°C, mặt cỏ khô ráo</span>
+            <span>🔥 Kèo Cứu Hộ SOS Sân ĐH Thương Mại giảm ngay 150k tiền sân hỗ trợ anh em</span>
+            <span>🌤️ Thời tiết Toàn Hà Nội tối nay: 25-26°C, mặt cỏ khô ráo đá cực đã</span>
             <span>⚡ FC Vinaconex vừa mở kèo Sân Thành Phát (19:00 hôm nay)</span>
             <span>🛡️ Quy chế v2.0: Hủy sát giờ &lt;1h lần 2 gắn nhãn đỏ &amp; cọc 100%</span>
           </div>
@@ -154,7 +154,7 @@ export function HeaderBar({
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">
-                Cầu Giấy &amp; Nam Từ Liêm • Chống Bùng Kèo
+                Toàn Hà Nội • Ghép Đối Sân 7 &amp; Chống Bùng Kèo
               </p>
             </div>
           </div>

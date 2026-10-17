@@ -44,6 +44,25 @@ export const DigitalTeamCard: React.FC<DigitalTeamCardProps> = ({
     profile?.full_name || team.captain_name || "Đội trưởng";
   const captainDisplayPhone = profile?.phone || team.captain_phone || "";
 
+  const DISTRICT_NAMES: Record<string, string> = {
+    CauGiay: "Quận Cầu Giấy",
+    NamTuLiem: "Quận Nam Từ Liêm",
+    BacTuLiem: "Quận Bắc Từ Liêm",
+    ThanhXuan: "Quận Thanh Xuân",
+    DongDa: "Quận Đống Đa",
+    HaDong: "Quận Hà Đông",
+    HoangMai: "Quận Hoàng Mai",
+    BaDinh: "Quận Ba Đình",
+    HaiBaTrung: "Quận Hai Bà Trưng",
+    TayHo: "Quận Tây Hồ",
+    LongBien: "Quận Long Biên",
+  };
+
+  const displayDistrict =
+    DISTRICT_NAMES[team.home_district] ||
+    team.home_district ||
+    "Hà Nội";
+
   const handleCopyCardText = () => {
     const appOrigin =
       typeof window !== "undefined"
@@ -54,9 +73,7 @@ export const DigitalTeamCard: React.FC<DigitalTeamCardProps> = ({
       `• Trình độ: ${tierName} (Tuổi TB: ${team.avg_age}t)\n` +
       `• Điểm tín nhiệm: ${team.trust_score}/100 ★ (Bảo chứng không bùng kèo)\n` +
       `• Đội trưởng: ${captainDisplayName} (${captainDisplayPhone})\n` +
-      `• Địa bàn: ${
-        team.home_district === "CauGiay" ? "Quận Cầu Giấy" : "Quận Nam Từ Liêm"
-      }\n` +
+      `• Địa bàn: ${displayDistrict}\n` +
       `👉 Giao lưu bắt kèo tại: ${appOrigin}`;
 
     navigator.clipboard.writeText(text);
@@ -125,7 +142,7 @@ export const DigitalTeamCard: React.FC<DigitalTeamCardProps> = ({
         <div>
           <span className="text-[10px] text-slate-500 block">Địa bàn</span>
           <span className="font-bold text-slate-200">
-            {team.home_district === "CauGiay" ? "Cầu Giấy" : "Nam Từ Liêm"}
+            {displayDistrict.replace("Quận ", "")}
           </span>
         </div>
         <div>

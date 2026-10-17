@@ -247,6 +247,16 @@ export const TeamOnboardingModal: React.FC<TeamOnboardingModalProps> = ({
                 >
                   <option value="CauGiay">Quận Cầu Giấy</option>
                   <option value="NamTuLiem">Quận Nam Từ Liêm</option>
+                  <option value="ThanhXuan">Quận Thanh Xuân</option>
+                  <option value="DongDa">Quận Đống Đa</option>
+                  <option value="HaDong">Quận Hà Đông</option>
+                  <option value="BacTuLiem">Quận Bắc Từ Liêm</option>
+                  <option value="HoangMai">Quận Hoàng Mai</option>
+                  <option value="BaDinh">Quận Ba Đình</option>
+                  <option value="HaiBaTrung">Quận Hai Bà Trưng</option>
+                  <option value="TayHo">Quận Tây Hồ</option>
+                  <option value="LongBien">Quận Long Biên</option>
+                  <option value="Other">Quận / Huyện khác (Hà Nội)</option>
                 </select>
               </div>
             </div>

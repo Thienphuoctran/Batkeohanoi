@@ -102,7 +102,7 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
           <div className="rounded-xl bg-rose-500/15 border border-rose-500/30 px-3 py-2 flex items-center gap-2 text-xs text-rose-200 font-semibold">
             <Gift className="w-4 h-4 text-rose-400 shrink-0" />
             <span>
-              Ưu đãi cứu hộ: Chủ sân giảm ngay 125.000đ tiền sân + Bao nước uống tại sân!
+              Ưu đãi cứu hộ: Chủ sân giảm ngay 125.000đ tiền sân hỗ trợ anh em bắt kèo!
             </span>
           </div>
         </div>

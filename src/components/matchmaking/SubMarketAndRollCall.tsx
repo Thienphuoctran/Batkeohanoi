@@ -21,8 +21,8 @@ export function SubMarketAndRollCall({
   const [showAddSub, setShowAddSub] = useState(false);
   const [newPos, setNewPos] = useState<SubPlayerPost["positionNeeded"]>("Thủ Môn (GK)");
   const [newTeamName, setNewTeamName] = useState("");
-  const [newPitch, setNewPitch] = useState("Sân Trung Kính Hạ (19:00 hôm nay)");
-  const [newFee, setNewFee] = useState("FREE 100% + Bao nước");
+  const [newPitch, setNewPitch] = useState("Sân Đình Thôn (19:00 hôm nay)");
+  const [newFee, setNewFee] = useState("FREE 100% (Miễn phí tiền sân)");
   const [newPhone, setNewPhone] = useState("");
 
   const filteredSubs = subPosts.filter((p) => {
@@ -149,7 +149,7 @@ export function SubMarketAndRollCall({
                 onChange={(e) => setNewFee(e.target.value)}
                 className="h-8 px-2.5 rounded-lg bg-slate-950 border border-slate-700 text-white text-xs"
               >
-                <option value="FREE 100% + Bao nước">FREE 100% (Miễn phí tiền sân + nước)</option>
+                <option value="FREE 100% (Miễn phí tiền sân)">FREE 100% (Miễn phí tiền sân)</option>
                 <option value="Share nhẹ 40.000đ / người">Share nhẹ 40.000đ / người</option>
                 <option value="Share 50.000đ / người">Share 50.000đ / người</option>
               </select>

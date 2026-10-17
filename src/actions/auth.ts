@@ -394,8 +394,7 @@ export async function createMatchInDatabaseAction(payload: {
       .insert({
         host_team_id: payload.hostTeamId,
         pitch_custom_name: payload.pitchCustomName,
-        district:
-          payload.district === "Nam Từ Liêm" ? "NamTuLiem" : "CauGiay",
+        district: payload.district || "Hà Nội",
         kickoff_time: new Date(Date.now() + 2 * 3600 * 1000).toISOString(),
         time_slot_label: payload.timeSlotLabel,
         total_fee: payload.totalFee,

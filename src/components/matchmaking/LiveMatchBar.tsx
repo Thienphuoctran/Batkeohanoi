@@ -79,7 +79,7 @@ export function LiveMatchBar({
         <div className="rounded-xl bg-slate-950/90 border border-slate-800 px-3 py-1.5 flex items-center gap-2 shrink-0">
           <CloudSun className="w-4 h-4 text-amber-400 shrink-0" />
           <span className="text-xs font-bold text-slate-200">
-            {selectedDistrict === "Nam Từ Liêm" ? "Nam Từ Liêm" : "Cầu Giấy"}:{" "}
+            {selectedDistrict === "ALL" ? "Hà Nội" : selectedDistrict}:{" "}
             <strong className="text-emerald-400">26°C</strong> • khô ráo TF
           </span>
         </div>

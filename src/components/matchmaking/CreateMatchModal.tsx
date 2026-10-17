@@ -27,6 +27,28 @@ import {
   UserProfile,
 } from "@/hooks/useAuthTeam";
 
+export const POPULAR_HANOI_DISTRICTS = [
+  "Cầu Giấy",
+  "Nam Từ Liêm",
+  "Thanh Xuân",
+  "Đống Đa",
+  "Hà Đông",
+  "Bắc Từ Liêm",
+  "Hoàng Mai",
+  "Ba Đình",
+  "Hai Bà Trưng",
+  "Tây Hồ",
+  "Long Biên",
+];
+
+export const GOLDEN_TIME_SLOTS = [
+  "17:30 - 19:00",
+  "19:00 - 20:30",
+  "19:30 - 21:00",
+  "20:00 - 21:30",
+  "20:30 - 22:00",
+];
+
 interface CreateMatchModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -62,10 +84,10 @@ export function CreateMatchModal({
   const [district, setDistrict] = useState<District>(
     verifiedTeam?.home_district === "NamTuLiem" ? "Nam Từ Liêm" : "Cầu Giấy"
   );
-  const [pitchId, setPitchId] = useState<string>("pitch-cg-01");
-  const [isCustomPitch, setIsCustomPitch] = useState(false);
-  const [customPitchName, setCustomPitchName] = useState("");
-  const [customPitchAddress, setCustomPitchAddress] = useState("");
+  const [pitchName, setPitchName] = useState("Sân Bóng Đá Đình Thôn");
+  const [pitchAddress, setPitchAddress] = useState(
+    "Ngõ 39 Đình Thôn, Nam Từ Liêm, Hà Nội"
+  );
   const [tier, setTier] = useState<SkillTier>(
     ([1, 2, 3].includes(Number(verifiedTeam?.skill_tier))
       ? Number(verifiedTeam?.skill_tier)
@@ -94,53 +116,54 @@ export function CreateMatchModal({
       if ([1, 2, 3].includes(Number(verifiedTeam.skill_tier))) {
         setTier(Number(verifiedTeam.skill_tier) as SkillTier);
       }
-      if (verifiedTeam.home_district === "NamTuLiem") {
-        setDistrict("Nam Từ Liêm");
-      } else {
-        setDistrict("Cầu Giấy");
+      if (verifiedTeam.home_district) {
+        const dMap: Record<string, string> = {
+          NamTuLiem: "Nam Từ Liêm",
+          CauGiay: "Cầu Giấy",
+          BacTuLiem: "Bắc Từ Liêm",
+          ThanhXuan: "Thanh Xuân",
+          DongDa: "Đống Đa",
+          HaDong: "Hà Đông",
+          HoangMai: "Hoàng Mai",
+          BaDinh: "Ba Đình",
+          HaiBaTrung: "Hai Bà Trưng",
+          TayHo: "Tây Hồ",
+          LongBien: "Long Biên",
+        };
+        setDistrict(dMap[verifiedTeam.home_district] || verifiedTeam.home_district);
       }
     }
   }, [verifiedTeam, verifiedProfile]);
 
   if (!isOpen) return null;
 
-  const filteredPitches = HANOI_PITCHES.filter((p) => p.district === district);
-  const selectedPitch =
-    HANOI_PITCHES.find((p) => p.id === pitchId) || filteredPitches[0];
-
   const effectiveZaloPhone = sameZaloAsPhone ? captainPhone : customZaloPhone;
   const isPhoneValid = isValidVietnamPhone(captainPhone);
   const isZaloValid = isValidVietnamPhone(effectiveZaloPhone);
   const previewZaloLink = getZaloDeepLink(captainPhone, effectiveZaloPhone);
 
-  const handleDistrictChange = (newDist: District) => {
-    setDistrict(newDist);
-    if (!isCustomPitch) {
-      const firstPitch = HANOI_PITCHES.find((p) => p.district === newDist);
-      if (firstPitch) {
-        setPitchId(firstPitch.id);
-        setTotalCost(firstPitch.typicalPeakPriceVnd);
-      }
-    }
+  const handleQuickSelectPitch = (pitch: (typeof HANOI_PITCHES)[0]) => {
+    setPitchName(pitch.name);
+    setPitchAddress(pitch.address);
+    setDistrict(pitch.district);
+    setTotalCost(pitch.typicalPeakPriceVnd);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isPhoneValid || !isZaloValid) return;
 
-    const [startTime, endTime] = timeSlot.split(" - ");
+    const timeParts = timeSlot.includes("-")
+      ? timeSlot.split("-").map((t) => t.trim())
+      : [timeSlot.trim(), ""];
+    const startTime = timeParts[0] || "19:00";
+    const endTime = timeParts[1] || "20:30";
     const normalizedCallPhone = formatDisplayPhone(captainPhone);
     const normalizedZalo = normalizeVietnamPhone(effectiveZaloPhone);
 
-    const finalPitchName = isCustomPitch
-      ? customPitchName.trim() ||
-        (district === "Nam Từ Liêm"
-          ? "Sân Bóng Đá Đình Thôn"
-          : "Sân Cỏ Nhân Tạo")
-      : selectedPitch.name;
-    const finalPitchAddress = isCustomPitch
-      ? customPitchAddress.trim() || `Khu vực ${district}, Hà Nội`
-      : selectedPitch.address;
+    const finalPitchName = pitchName.trim() || "Sân Cỏ Nhân Tạo";
+    const finalPitchAddress =
+      pitchAddress.trim() || `Khu vực ${district.trim() || "Hà Nội"}`;
 
     const newMatch: MatchFeedItem = {
       id: `match-new-${Date.now()}`,
@@ -365,128 +388,132 @@ export function CreateMatchModal({
             )}
           </div>
 
-          {/* 1. Chọn Quận */}
+          {/* 1. Chọn / Tự điền Quận (Toàn Hà Nội) */}
           <div>
-            <label className="block font-semibold text-slate-300 mb-1.5">
-              1. Khu vực sân bóng
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {(["Cầu Giấy", "Nam Từ Liêm"] as District[]).map((dist) => (
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="font-semibold text-slate-300 flex items-center gap-1.5">
+                <span>1. Khu vực / Quận Huyện (Toàn Hà Nội)</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">
+                  Toàn Hà Nội
+                </span>
+              </label>
+              <span className="text-[10px] text-slate-400">
+                Tự điền hoặc bấm chọn nhanh
+              </span>
+            </div>
+            <input
+              type="text"
+              required
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+              placeholder="VD: Cầu Giấy, Nam Từ Liêm, Thanh Xuân, Hà Đông, Đống Đa..."
+              className="w-full h-10 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white text-xs font-bold placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 mb-2"
+            />
+            {/* Quick chips gợi ý quận */}
+            <div className="flex flex-wrap gap-1.5">
+              {POPULAR_HANOI_DISTRICTS.map((d) => (
                 <button
                   type="button"
-                  key={dist}
-                  onClick={() => handleDistrictChange(dist)}
-                  className={`py-2.5 px-3 rounded-xl font-bold border transition-all ${
-                    district === dist
-                      ? "bg-emerald-500/15 border-emerald-500 text-emerald-300"
-                      : "bg-slate-950 border-white/[0.08] text-slate-400 hover:text-white"
+                  key={d}
+                  onClick={() => setDistrict(d)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition border ${
+                    district.trim().toLowerCase() === d.toLowerCase()
+                      ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 ring-1 ring-emerald-400"
+                      : "bg-slate-950/80 border-white/[0.07] text-slate-400 hover:text-white"
                   }`}
                 >
-                  Quận {dist}
+                  {d}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* 2. Chọn Cụm Sân & Giờ */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* 2. Cụm Sân & Khung Giờ Đá (Tự điền) */}
+          <div className="space-y-3">
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="font-semibold text-slate-300">
-                  2. Cụm sân
+                  2. Tên cụm sân &amp; Địa chỉ (Tự điền)
                 </label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = !isCustomPitch;
-                    setIsCustomPitch(next);
-                    if (next && !customPitchName) {
-                      setCustomPitchName(
-                        district === "Nam Từ Liêm"
-                          ? "Sân Bóng Đá Đình Thôn"
-                          : "Sân Cỏ Nhân Tạo Cầu Giấy"
-                      );
-                    }
-                  }}
-                  className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 underline"
-                >
-                  {isCustomPitch
-                    ? "← Chọn từ danh sách"
-                    : "✍️ Tự điền tên sân"}
-                </button>
-              </div>
-
-              {!isCustomPitch ? (
+                {/* Dropdown chọn nhanh sân mẫu */}
                 <select
-                  value={pitchId}
+                  aria-label="Chọn nhanh sân bóng mẫu"
                   onChange={(e) => {
-                    if (e.target.value === "custom") {
-                      setIsCustomPitch(true);
-                      setCustomPitchName(
-                        district === "Nam Từ Liêm"
-                          ? "Sân Bóng Đá Đình Thôn"
-                          : ""
-                      );
-                      return;
-                    }
-                    setPitchId(e.target.value);
-                    const found = HANOI_PITCHES.find(
-                      (p) => p.id === e.target.value
-                    );
-                    if (found) setTotalCost(found.typicalPeakPriceVnd);
+                    const found = HANOI_PITCHES.find((p) => p.id === e.target.value);
+                    if (found) handleQuickSelectPitch(found);
                   }}
-                  className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-white/[0.1] text-white"
+                  defaultValue=""
+                  className="text-[10px] bg-slate-950 border border-white/[0.1] text-emerald-400 rounded-lg px-2 py-0.5 focus:outline-none"
                 >
-                  {filteredPitches.map((p) => (
+                  <option value="" disabled>⚡ Gợi ý sân bóng mẫu...</option>
+                  {HANOI_PITCHES.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.shortName}
+                      {p.shortName} ({p.district})
                     </option>
                   ))}
-                  <option value="custom">
-                    ✍️ Tự nhập sân khác (VD: Sân Đình Thôn...)
-                  </option>
                 </select>
-              ) : (
-                <div className="space-y-1.5">
-                  <input
-                    type="text"
-                    required
-                    value={customPitchName}
-                    onChange={(e) => setCustomPitchName(e.target.value)}
-                    placeholder="VD: Sân Bóng Đá Đình Thôn, Sân Phủi..."
-                    className="w-full h-10 px-3 rounded-xl bg-slate-900 border border-emerald-500/60 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-emerald-400"
-                  />
-                  <input
-                    type="text"
-                    value={customPitchAddress}
-                    onChange={(e) => setCustomPitchAddress(e.target.value)}
-                    placeholder="Địa chỉ cụ thể (VD: Ngõ 39 Đình Thôn, Nam Từ Liêm)"
-                    className="w-full h-8 px-3 rounded-lg bg-slate-900/80 border border-white/[0.08] text-white text-[11px] placeholder:text-slate-500 focus:outline-none focus:border-emerald-400"
-                  />
-                </div>
-              )}
+              </div>
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  required
+                  value={pitchName}
+                  onChange={(e) => setPitchName(e.target.value)}
+                  placeholder="Nhập tên sân (VD: Sân Đình Thôn, Sân C500, Sân Mễ Trì, Sân Mic...)"
+                  className="w-full h-10 px-3 rounded-xl bg-slate-900 border border-emerald-500/50 text-white text-xs font-bold placeholder:text-slate-500 focus:outline-none focus:border-emerald-400"
+                />
+                <input
+                  type="text"
+                  value={pitchAddress}
+                  onChange={(e) => setPitchAddress(e.target.value)}
+                  placeholder="Địa chỉ sân (VD: Ngõ 39 Đình Thôn, Nam Từ Liêm / Đường Nguyễn Trãi...)"
+                  className="w-full h-8 px-3 rounded-lg bg-slate-900/80 border border-white/[0.08] text-white text-[11px] placeholder:text-slate-500 focus:outline-none focus:border-emerald-400"
+                />
+              </div>
             </div>
 
+            {/* Khung giờ tự điền */}
             <div>
-              <label className="block font-semibold text-slate-300 mb-1.5">
-                Khung giờ (90 phút)
-              </label>
-              <select
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="font-semibold text-slate-300">
+                  3. Thời gian thi đấu (Tự điền linh hoạt)
+                </label>
+                <span className="text-[10px] text-slate-400">
+                  Trận 90 phút hoặc tùy chỉnh
+                </span>
+              </div>
+              <input
+                type="text"
+                required
                 value={timeSlot}
                 onChange={(e) => setTimeSlot(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-white/[0.1] text-white tabular-nums"
-              >
-                <option value="17:30 - 19:00">17:30 - 19:00</option>
-                <option value="19:00 - 20:30">19:00 - 20:30 (Giờ vàng)</option>
-                <option value="20:30 - 22:00">20:30 - 22:00</option>
-              </select>
+                placeholder="VD: 19:00 - 20:30, 19:30 - 21:00, 20:00 - 21:30..."
+                className="w-full h-10 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white font-mono text-xs font-bold placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 mb-2"
+              />
+              {/* Quick chips gợi ý ca giờ vàng */}
+              <div className="flex flex-wrap gap-1.5">
+                {GOLDEN_TIME_SLOTS.map((slot) => (
+                  <button
+                    type="button"
+                    key={slot}
+                    onClick={() => setTimeSlot(slot)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition border ${
+                      timeSlot === slot
+                        ? "bg-amber-500/20 border-amber-400 text-amber-300 ring-1 ring-amber-400"
+                        : "bg-slate-950/80 border-white/[0.07] text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* 3. Chọn Tier trình độ */}
+          {/* 4. Chọn Tier trình độ */}
           <div>
             <label className="block font-semibold text-slate-300 mb-1.5">
-              3. Phân tầng trình độ mong muốn (Chống lệch trình)
+              4. Phân tầng trình độ mong muốn (Chống lệch trình)
             </label>
             <div className="grid grid-cols-3 gap-2">
               {([1, 2, 3] as SkillTier[]).map((t) => {
@@ -512,11 +539,11 @@ export function CreateMatchModal({
             </div>
           </div>
 
-          {/* 4. Tiền sân & Chế độ SOS */}
+          {/* 5. Tiền sân & Chế độ SOS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
             <div>
               <label className="block font-semibold text-slate-300 mb-1">
-                Tổng tiền sân (VNĐ)
+                5. Tổng tiền sân (VNĐ)
               </label>
               <input
                 type="number"
@@ -549,10 +576,10 @@ export function CreateMatchModal({
             </label>
           </div>
 
-          {/* 5. Ghi chú */}
+          {/* 6. Ghi chú */}
           <div>
             <label className="block font-semibold text-slate-300 mb-1">
-              Lời nhắn cho đối thủ
+              6. Lời nhắn cho đối thủ
             </label>
             <textarea
               rows={2}

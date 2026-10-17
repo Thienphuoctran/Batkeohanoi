@@ -30,7 +30,6 @@ export function VietQrSplitter({ syncedPlayerCount = 8 }: VietQrSplitterProps) {
     "OPPONENT_50_50"
   );
   const [pitchCost, setPitchCost] = useState(800000);
-  const [waterCost, setWaterCost] = useState(120000);
   const [ratio, setRatio] = useState<"50_50" | "60_40" | "40_60">("50_50");
   const [playerCount, setPlayerCount] = useState(syncedPlayerCount);
 
@@ -43,7 +42,7 @@ export function VietQrSplitter({ syncedPlayerCount = 8 }: VietQrSplitterProps) {
   const [accountName, setAccountName] = useState("TRAN QUOC THIEN PHUOC");
   const [copiedAmount, setCopiedAmount] = useState(false);
 
-  const totalMatchBill = pitchCost + waterCost;
+  const totalMatchBill = pitchCost;
 
   const opponentShare =
     ratio === "50_50"
@@ -60,8 +59,8 @@ export function VietQrSplitter({ syncedPlayerCount = 8 }: VietQrSplitterProps) {
     splitMode === "OPPONENT_50_50" ? opponentShare : perMemberAmount;
   const qrMemo =
     splitMode === "OPPONENT_50_50"
-      ? "BATKEO7 CHIA TIEN SAN 50 50"
-      : `QUY DOI SAN 7 (${playerCount} ANH EM)`;
+      ? "BATKEO7 CHIA TIEN SAN"
+      : `TIEN SAN 7 (${playerCount} NGUOI)`;
 
   const qrUrl = generateVietQRQuickUrl({
     bankBin,
@@ -73,12 +72,12 @@ export function VietQrSplitter({ syncedPlayerCount = 8 }: VietQrSplitterProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-      {/* Left 7 Cols: Máy tính chia tiền sân + nước */}
+      {/* Left 7 Cols: Máy tính chia tiền sân */}
       <div className="lg:col-span-7 surface-card rounded-2xl border border-white/[0.08] p-4 sm:p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-white/[0.07]">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
-              Thanh Toán Tại Quầy Nước Trong 5 Giây
+              Thanh Toán Tiền Sân Tức Thì
             </span>
             <h2 className="text-base font-extrabold text-white mt-0.5 flex items-center gap-2">
               <Calculator className="w-4 h-4 text-emerald-400" />
@@ -114,74 +113,38 @@ export function VietQrSplitter({ syncedPlayerCount = 8 }: VietQrSplitterProps) {
           </div>
         </div>
 
-        {/* 1. Nhập nhanh Tiền sân & Tiền nước */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div className="rounded-xl bg-slate-950/75 border border-white/[0.06] p-3 space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-300">
-                1. Tiền thuê sân (VNĐ)
-              </label>
-              <span className="text-xs font-extrabold text-emerald-400 tabular-nums">
-                {pitchCost.toLocaleString("vi-VN")}đ
-              </span>
-            </div>
-            <input
-              type="number"
-              step={50000}
-              value={pitchCost}
-              onChange={(e) => setPitchCost(Number(e.target.value))}
-              className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white font-bold text-sm tabular-nums"
-            />
-            <div className="flex flex-wrap gap-1">
-              {[750000, 800000, 850000, 900000].map((val) => (
-                <button
-                  key={val}
-                  type="button"
-                  onClick={() => setPitchCost(val)}
-                  className={`px-2 py-1 rounded-lg text-[10px] font-bold tabular-nums border ${
-                    pitchCost === val
-                      ? "bg-emerald-500/20 border-emerald-500 text-emerald-300"
-                      : "bg-white/[0.04] border-white/[0.06] text-slate-400"
-                  }`}
-                >
-                  {val / 1000}k
-                </button>
-              ))}
-            </div>
+        {/* 1. Nhập Tiền thuê sân (VNĐ) */}
+        <div className="rounded-xl bg-slate-950/75 border border-white/[0.06] p-3.5 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-300">
+              Tiền thuê sân bóng (VNĐ)
+            </label>
+            <span className="text-sm font-extrabold text-emerald-400 tabular-nums">
+              {pitchCost.toLocaleString("vi-VN")}đ
+            </span>
           </div>
-
-          <div className="rounded-xl bg-slate-950/75 border border-white/[0.06] p-3 space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-300">
-                2. Tiền nước / Trọng tài
-              </label>
-              <span className="text-xs font-extrabold text-amber-400 tabular-nums">
-                {waterCost.toLocaleString("vi-VN")}đ
-              </span>
-            </div>
-            <input
-              type="number"
-              step={10000}
-              value={waterCost}
-              onChange={(e) => setWaterCost(Number(e.target.value))}
-              className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white font-bold text-sm tabular-nums"
-            />
-            <div className="flex flex-wrap gap-1">
-              {[0, 100000, 120000, 180000].map((val) => (
-                <button
-                  key={val}
-                  type="button"
-                  onClick={() => setWaterCost(val)}
-                  className={`px-2 py-1 rounded-lg text-[10px] font-bold tabular-nums border ${
-                    waterCost === val
-                      ? "bg-amber-500/20 border-amber-500 text-amber-300"
-                      : "bg-white/[0.04] border-white/[0.06] text-slate-400"
-                  }`}
-                >
-                  {val === 0 ? "0đ" : `${val / 1000}k`}
-                </button>
-              ))}
-            </div>
+          <input
+            type="number"
+            step={50000}
+            value={pitchCost}
+            onChange={(e) => setPitchCost(Number(e.target.value))}
+            className="w-full h-10 px-3.5 rounded-xl bg-slate-900 border border-white/[0.1] text-white font-bold text-sm tabular-nums focus:outline-none focus:border-emerald-500"
+          />
+          <div className="flex flex-wrap gap-1.5 pt-0.5">
+            {[600000, 700000, 750000, 800000, 850000, 900000, 1000000].map((val) => (
+              <button
+                key={val}
+                type="button"
+                onClick={() => setPitchCost(val)}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold tabular-nums border transition ${
+                  pitchCost === val
+                    ? "bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-1 ring-emerald-400"
+                    : "bg-white/[0.04] border-white/[0.06] text-slate-400 hover:text-white"
+                }`}
+              >
+                {val >= 1000000 ? `${val / 1000000}tr` : `${val / 1000}k`}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -297,7 +260,7 @@ export function VietQrSplitter({ syncedPlayerCount = 8 }: VietQrSplitterProps) {
             {finalQrAmount.toLocaleString("vi-VN")}đ
           </div>
           <div className="text-[11px] text-slate-400 tabular-nums">
-            Tổng bill sân + nước: {totalMatchBill.toLocaleString("vi-VN")}đ
+            Tổng tiền thuê sân: {totalMatchBill.toLocaleString("vi-VN")}đ
           </div>
         </div>
 

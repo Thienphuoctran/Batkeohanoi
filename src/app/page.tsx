@@ -131,7 +131,9 @@ export default function HanoiMatchmakingPlatform() {
   const filteredMatches = useMemo(() => {
     return matches.filter((m) => {
       const passDistrict =
-        selectedDistrict === "ALL" || m.district === selectedDistrict;
+        selectedDistrict === "ALL" ||
+        m.district.toLowerCase().includes(selectedDistrict.toLowerCase()) ||
+        selectedDistrict.toLowerCase().includes(m.district.toLowerCase());
       const passTier =
         selectedTier === "ALL" || m.requiredTier === selectedTier;
       const passTime =
@@ -140,6 +142,8 @@ export default function HanoiMatchmakingPlatform() {
       const passSearch =
         !q ||
         m.pitchName.toLowerCase().includes(q) ||
+        m.pitchAddress.toLowerCase().includes(q) ||
+        m.district.toLowerCase().includes(q) ||
         m.hostTeam.name.toLowerCase().includes(q) ||
         m.hostTeam.captainName.toLowerCase().includes(q);
       return passDistrict && passTier && passTime && passSearch;
@@ -388,31 +392,35 @@ export default function HanoiMatchmakingPlatform() {
                 </div>
 
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pt-1 border-t border-white/[0.05]">
-                  {/* Quận */}
+                  {/* Khu vực Toàn Hà Nội */}
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1 mr-1">
                       <MapPin className="w-3 h-3 text-emerald-400" />
-                      Quận:
+                      Khu vực:
                     </span>
-                    {(["ALL", "Cầu Giấy", "Nam Từ Liêm"] as const).map(
-                      (dist) => (
-                        <button
-                          key={dist}
-                          onClick={() => setSelectedDistrict(dist)}
-                          className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all active:scale-95 ${
-                            selectedDistrict === dist
-                              ? dist === "Cầu Giấy"
-                                ? "bg-sky-500/25 text-sky-200 border border-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.35)] ring-1 ring-sky-400"
-                                : dist === "Nam Từ Liêm"
-                                ? "bg-amber-500/25 text-amber-200 border border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.35)] ring-1 ring-amber-400"
-                                : "bg-emerald-500/25 text-emerald-200 border border-emerald-400 ring-1 ring-emerald-400"
-                              : "bg-slate-950/80 text-slate-400 hover:text-white border border-white/[0.07]"
-                          }`}
-                        >
-                          {dist === "ALL" ? "Tất cả (2 Quận)" : dist}
-                        </button>
-                      )
-                    )}
+                    {[
+                      "ALL",
+                      "Cầu Giấy",
+                      "Nam Từ Liêm",
+                      "Thanh Xuân",
+                      "Đống Đa",
+                      "Hà Đông",
+                      "Bắc Từ Liêm",
+                      "Hoàng Mai",
+                      "Ba Đình",
+                    ].map((dist) => (
+                      <button
+                        key={dist}
+                        onClick={() => setSelectedDistrict(dist as any)}
+                        className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all active:scale-95 ${
+                          selectedDistrict === dist
+                            ? "bg-emerald-500/25 text-emerald-200 border border-emerald-400 ring-1 ring-emerald-400 shadow-md"
+                            : "bg-slate-950/80 text-slate-400 hover:text-white border border-white/[0.07]"
+                        }`}
+                      >
+                        {dist === "ALL" ? "Tất cả Hà Nội" : dist}
+                      </button>
+                    ))}
                   </div>
 
                   {/* 3 Tier */}

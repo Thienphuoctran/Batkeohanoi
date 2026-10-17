@@ -1,6 +1,6 @@
-// Hợp đồng dữ liệu chuẩn cho Nền tảng Ghép trận bóng đá sân 7 Hà Nội (Cầu Giấy & Nam Từ Liêm)
+// Hợp đồng dữ liệu chuẩn cho Nền tảng Ghép trận bóng đá sân 7 Toàn Hà Nội
 
-export type District = "Cầu Giấy" | "Nam Từ Liêm";
+export type District = string;
 
 export type SkillTier = 1 | 2 | 3;
 
