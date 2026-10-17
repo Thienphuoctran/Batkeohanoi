@@ -12,6 +12,8 @@ import {
   MessageSquare,
   Phone,
   Volume2,
+  Trophy,
+  Plus,
 } from "lucide-react";
 import { MOCK_MATCH_FEEDS, MOCK_TEAMS } from "@/constants/mockMatchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
@@ -21,6 +23,7 @@ import { SosAlertCard } from "@/components/matchmaking/SosAlertCard";
 import { MatchFeedCard } from "@/components/matchmaking/MatchFeedCard";
 import { MatchChallengeModal } from "@/components/matchmaking/MatchChallengeModal";
 import { CreateMatchModal } from "@/components/matchmaking/CreateMatchModal";
+import { HeroPitchShowcase } from "@/components/matchmaking/HeroPitchShowcase";
 import { SubMarketAndRollCall } from "@/components/matchmaking/SubMarketAndRollCall";
 import { VietQrSplitter } from "@/components/matchmaking/VietQrSplitter";
 import { TeamTrustProfile } from "@/components/matchmaking/TeamTrustProfile";
@@ -50,7 +53,6 @@ export default function HanoiMatchmakingPlatform() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("feed");
   const [isWideLayout, setIsWideLayout] = useState(true);
   const [myTrustScore, setMyTrustScore] = useState(100);
-  const [syncedRollCallCount, setSyncedRollCallCount] = useState(8);
 
   // Quản lý xác thực Đội trưởng & Hồ sơ Đội bóng chính chủ (1 SĐT = 1 Đội)
   const {
@@ -76,21 +78,19 @@ export default function HanoiMatchmakingPlatform() {
     useState<MatchFeedItem | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isBotDrawerOpen, setIsBotDrawerOpen] = useState(false);
-  const [unreadBotCount, setUnreadBotCount] = useState(2);
+  const [unreadBotCount, setUnreadBotCount] = useState(1);
   const [botLogs, setBotLogs] = useState<BotLogItem[]>([
     {
       id: "log-1",
-      title: "🚨 Kèo SOS Mới tại Sân Thành Phát (Cầu Giấy)",
-      msg: "Ca 19:00 hôm nay vừa có đối hủy gấp. Chủ sân giảm ngay 125.000đ tiền sân + Bao nước uống!",
-      badge: "SOS Khẩn Cấp",
+      title: "⚽ Chào mừng bạn đến với BắtKèo7 Hà Nội",
+      msg: "Hệ thống hỗ trợ ghép đối sân 7 Cầu Giấy & Nam Từ Liêm. Đăng ký tài khoản Đội trưởng để nhận Thẻ Căn Cước Bóng Đá Số và bảo vệ lịch đấu.",
+      badge: "Hệ Thống",
       time: "Vừa xong",
-      zaloPhone: "0912345678",
-      captainName: "Anh Hoàng (FC Thành Phát)",
     },
     {
       id: "log-2",
-      title: "💬 Đã tích hợp Liên kết Zalo 1-Chạm & Chuông Web",
-      msg: "Đội trưởng các đội KHÔNG CẦN cài Telegram. Khi chốt kèo, hệ thống tự mở khóa nút Chat Zalo trực tiếp theo SĐT 10 số đã xác thực.",
+      title: "💬 Liên kết Zalo 1-Chạm & Chuông Web",
+      msg: "Đội trưởng các đội không cần cài Telegram. Khi có đối bắt kèo, hệ thống tự mở khóa liên kết Zalo trực tiếp theo SĐT chính chủ.",
       badge: "Zalo Verified",
       time: "5 phút trước",
     },
@@ -303,8 +303,28 @@ export default function HanoiMatchmakingPlatform() {
           {/* WORKSPACE 1: BẢNG TIN KÈO ĐẤU */}
           {activeTab === "feed" && (
             <div className="space-y-4">
+              {/* HERO PITCH SHOWCASE & COMPONENT KIT PANEL (BatKeo7.vn) */}
+              <HeroPitchShowcase
+                onOpenCreateModal={() => setIsCreateOpen(true)}
+                onSelectDistrict={(dist) => setSelectedDistrict(dist)}
+                selectedDistrict={selectedDistrict}
+                onSelectTier={(tier) => setSelectedTier(tier)}
+                selectedTier={selectedTier}
+                onSwitchTab={(tab) => setActiveTab(tab)}
+                sosCount={
+                  matches.filter((m) => m.isSOS && m.status !== "MATCHED").length
+                }
+                openMatchCount={
+                  matches.filter((m) => m.status !== "MATCHED").length
+                }
+                onScrollToFeed={() => {
+                  const el = document.getElementById("matches-feed-anchor");
+                  el?.scrollIntoView({ behavior: "smooth" });
+                }}
+              />
+
               {/* Thanh Tìm Kiếm + Chọn Ca Giờ + Quận + 3 Tier */}
-              <section className="surface-card rounded-2xl border border-white/[0.08] p-3.5 space-y-3">
+              <section id="matches-feed-anchor" className="surface-card rounded-2xl border border-white/[0.08] p-3.5 space-y-3">
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="relative flex-1">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -312,7 +332,7 @@ export default function HanoiMatchmakingPlatform() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Tìm theo tên sân (Thành Phát, Mễ Trì...), tên FC, đội trưởng..."
+                      placeholder="Tìm theo tên sân (Thành Phát, Mễ Trì, Đình Thôn...), tên FC, đội trưởng..."
                       className="w-full h-9 pl-9 pr-3 rounded-xl bg-slate-950/90 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
                     />
                   </div>
@@ -345,9 +365,13 @@ export default function HanoiMatchmakingPlatform() {
                         <button
                           key={dist}
                           onClick={() => setSelectedDistrict(dist)}
-                          className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all ${
+                          className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all active:scale-95 ${
                             selectedDistrict === dist
-                              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                              ? dist === "Cầu Giấy"
+                                ? "bg-sky-500/25 text-sky-200 border border-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.35)] ring-1 ring-sky-400"
+                                : dist === "Nam Từ Liêm"
+                                ? "bg-amber-500/25 text-amber-200 border border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.35)] ring-1 ring-amber-400"
+                                : "bg-emerald-500/25 text-emerald-200 border border-emerald-400 ring-1 ring-emerald-400"
                               : "bg-slate-950/80 text-slate-400 hover:text-white border border-white/[0.07]"
                           }`}
                         >
@@ -367,27 +391,29 @@ export default function HanoiMatchmakingPlatform() {
                       onClick={() => setSelectedTier("ALL")}
                       className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all ${
                         selectedTier === "ALL"
-                          ? "bg-slate-200 text-slate-950"
+                          ? "bg-slate-200 text-slate-950 font-black"
                           : "bg-slate-950/80 text-slate-400 hover:text-white border border-white/[0.07]"
                       }`}
                     >
                       Mọi Tier
                     </button>
                     {([1, 2, 3] as SkillTier[]).map((t) => {
-                      const info = SKILL_TIERS_CONFIG[t];
                       const active = selectedTier === t;
                       return (
                         <button
                           key={t}
                           onClick={() => setSelectedTier(t)}
-                          className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border transition-all ${
+                          className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border transition-all active:scale-95 ${
                             active
-                              ? info.badgeColor + " ring-1 ring-current"
+                              ? t === 1
+                                ? "bg-[#1d4ed8] text-white border-blue-300 shadow-md ring-1 ring-blue-400"
+                                : t === 2
+                                ? "bg-[#15803d] text-white border-emerald-300 shadow-md ring-1 ring-emerald-400"
+                                : "bg-[#9a3412] text-white border-orange-300 shadow-md ring-1 ring-orange-400"
                               : "bg-slate-950/80 border-white/[0.07] text-slate-400 hover:text-slate-200"
                           }`}
                         >
-                          T{t}: {info.name.split(" ")[0]}{" "}
-                          {info.name.split(" ")[1]}
+                          {t === 1 ? "Tier 1: Dưỡng sinh" : t === 2 ? "Tier 2: Phong trào" : "Tier 3: Phủi chiến"}
                         </button>
                       );
                     })}
@@ -409,20 +435,41 @@ export default function HanoiMatchmakingPlatform() {
               )}
 
               {/* Danh sách Kèo Thường */}
-              <div
-                className={`grid grid-cols-1 ${
-                  isWideLayout ? "md:grid-cols-2" : ""
-                } gap-3.5`}
-              >
-                {regularMatches.map((match) => (
-                  <MatchFeedCard
-                    key={match.id}
-                    match={match}
-                    onSelectMatch={(m) => setActiveChallengeMatch(m)}
-                    onOpenBlindReview={() => setActiveTab("trust-profile")}
-                  />
-                ))}
-              </div>
+              {filteredMatches.length === 0 ? (
+                <div className="surface-card rounded-2xl border border-white/[0.08] p-10 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 mx-auto flex items-center justify-center">
+                    <Trophy className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white">Chưa có kèo đấu nào đang mở</h3>
+                    <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+                      Hãy là đội đầu tiên mở kèo giao lưu hôm nay hoặc bấm tạo kèo để tìm đối thủ ngay!
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsCreateOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs shadow-md shadow-emerald-500/15 transition"
+                  >
+                    <Plus className="w-4 h-4 stroke-[2.5]" />
+                    <span>Tạo Kèo Mới Ngay</span>
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className={`grid grid-cols-1 ${
+                    isWideLayout ? "md:grid-cols-2" : ""
+                  } gap-3.5`}
+                >
+                  {regularMatches.map((match) => (
+                    <MatchFeedCard
+                      key={match.id}
+                      match={match}
+                      onSelectMatch={(m) => setActiveChallengeMatch(m)}
+                      onOpenBlindReview={() => setActiveTab("trust-profile")}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -456,7 +503,7 @@ export default function HanoiMatchmakingPlatform() {
                 </div>
               ) : (
                 <div className="surface-card rounded-2xl border border-white/[0.08] p-8 text-center text-xs text-slate-400">
-                  Hiện tại các kèo SOS đã được giải cứu hết!
+                  Hiện tại không có kèo SOS nào cần cứu hộ. Hãy kiểm tra lại sau hoặc mở kèo mới!
                 </div>
               )}
             </div>
@@ -467,21 +514,9 @@ export default function HanoiMatchmakingPlatform() {
             <SubMarketAndRollCall viewMode="sub-market" />
           )}
 
-          {/* WORKSPACE 4: ĐIỂM DANH 1-CHẠM */}
-          {activeTab === "roll-call" && (
-            <SubMarketAndRollCall
-              viewMode="roll-call"
-              onSwitchToSubMarket={() => setActiveTab("sub-market")}
-              onSyncToVietQr={(count) => {
-                setSyncedRollCallCount(count);
-                setActiveTab("vietqr");
-              }}
-            />
-          )}
-
-          {/* WORKSPACE 5: MÁY TÍNH VIETQR */}
+          {/* WORKSPACE 4: MÁY TÍNH VIETQR */}
           {activeTab === "vietqr" && (
-            <VietQrSplitter syncedPlayerCount={syncedRollCallCount} />
+            <VietQrSplitter />
           )}
 
           {/* WORKSPACE 6: HỒ SƠ ĐỘI TÔI & THẺ CĂN CƯỚC BÓNG ĐÁ SỐ */}

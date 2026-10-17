@@ -11,7 +11,6 @@ import {
   Bell,
   Maximize2,
   Minimize2,
-  ClipboardCheck,
   Trophy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ export type ActiveTab =
   | "feed"
   | "sos"
   | "sub-market"
-  | "roll-call"
   | "vietqr"
   | "trust-profile";
 
@@ -116,11 +114,6 @@ export function HeaderBar({
       isSos: true,
     },
     { id: "sub-market", label: "Chợ Cầu", icon: <Users className="w-3.5 h-3.5" /> },
-    {
-      id: "roll-call",
-      label: "Điểm Danh",
-      icon: <ClipboardCheck className="w-3.5 h-3.5" />,
-    },
     { id: "vietqr", label: "VietQR", icon: <QrCode className="w-3.5 h-3.5" /> },
   ];
 
@@ -220,9 +213,9 @@ export function HeaderBar({
 
             <Button
               onClick={onOpenCreateModal}
-              className="h-9 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs gap-1.5 shadow-lg shadow-emerald-500/20"
+              className="h-9 px-3.5 rounded-xl bg-[#22c55e] hover:bg-[#16a34a] text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-emerald-500/25 active:scale-95 transition-all"
             >
-              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Tạo Kèo</span>
             </Button>
           </div>
@@ -268,7 +261,7 @@ export function HeaderBar({
         </div>
 
         {/* 4. 5-Tab Navigation Bar + Trust Profile Pill */}
-        <div className="grid grid-cols-6 gap-1 bg-slate-900/95 p-1 rounded-xl border border-slate-800/90 text-[11px] font-semibold">
+        <div className="grid grid-cols-5 gap-1 bg-slate-900/95 p-1 rounded-xl border border-slate-800/90 text-[11px] font-semibold">
           {navTabs.map((tab) => {
             const active = activeTab === tab.id;
             return (

@@ -125,10 +125,10 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
 
           <Button
             onClick={() => onSelectMatch(match)}
-            className="w-full sm:w-auto md:w-full h-10 px-5 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-extrabold text-xs tracking-wide shadow-lg shadow-rose-500/25 flex items-center justify-center gap-1.5 active:scale-95 transition"
+            className="w-full sm:w-auto md:w-full h-10 px-5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 hover:brightness-110 text-white font-black text-xs tracking-wide shadow-lg shadow-red-600/30 flex items-center justify-center gap-1.5 active:scale-95 transition"
           >
-            <Handshake className="w-4 h-4" />
             <span>Giải Cứu Kèo Ngay</span>
+            <span>📣</span>
           </Button>
         </div>
       </div>

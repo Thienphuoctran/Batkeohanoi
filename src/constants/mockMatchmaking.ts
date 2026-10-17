@@ -120,164 +120,18 @@ export const MOCK_TEAMS: TeamProfile[] = [
   },
 ];
 
-export const MOCK_MATCH_FEEDS: MatchFeedItem[] = [
-  // 1. KÈO SOS KHẨN CẤP (<2h, Viền đỏ phát sáng, ưu tiên cứu hộ)
-  {
-    id: "match-sos-01",
-    hostTeam: MOCK_TEAMS[1], // UTC FC
-    district: "Cầu Giấy",
-    pitchName: "Sân Bóng Đá Thành Phát (Sân 3)",
-    pitchAddress: "Số 2 Hoàng Minh Giám, Cầu Giấy, Hà Nội",
-    matchDate: "Hôm nay",
-    startTime: "19:00",
-    endTime: "20:30",
-    totalCostVnd: 900000,
-    shareCostVnd: 450000,
-    requiredTier: 2,
-    status: "SOS",
-    isSOS: true,
-    sosCountdownSeconds: 3240, // ~54 phút
-    cancellationReason: "Đối thủ hủy gấp trước 1h vì bận họp đột xuất",
-    notes: "Đội đã có mặt sớm, bóng nước đầy đủ, cần đối đá văn minh, giao lưu bia cỏ sau trận!",
-    createdAt: "Vừa xong",
-  },
+export const MOCK_MATCH_FEEDS: MatchFeedItem[] = [];
 
-  // 2. KÈO DƯỠNG SINH TIER 1 - CẦU GIẤY
-  {
-    id: "match-feed-02",
-    hostTeam: MOCK_TEAMS[0], // FC Duy Tân
-    district: "Cầu Giấy",
-    pitchName: "Sân Bóng Đá Trung Kính Hạ (Sân 1)",
-    pitchAddress: "Ngõ 29 Mạc Thái Tổ, Yên Hòa, Cầu Giấy",
-    matchDate: "Hôm nay",
-    startTime: "20:30",
-    endTime: "22:00",
-    totalCostVnd: 850000,
-    shareCostVnd: 425000,
-    requiredTier: 1,
-    status: "OPEN",
-    isSOS: false,
-    notes: "Kèo dưỡng sinh anh em IT văn phòng 3x tuổi, đá rèn sức khỏe, tuyệt đối cấm xoạc bóng!",
-    createdAt: "15 phút trước",
-  },
-
-  // 3. KÈO PHỦI CHIẾN TIER 3 - NAM TỪ LIÊM
-  {
-    id: "match-feed-03",
-    hostTeam: MOCK_TEAMS[2], // FC Phủi 36
-    district: "Nam Từ Liêm",
-    pitchName: "Sân Bóng Đá Mễ Trì Hạ (Sân VIP)",
-    pitchAddress: "Đường Mễ Trì Hạ, Nam Từ Liêm (Gần The Garden)",
-    matchDate: "Hôm nay",
-    startTime: "19:30",
-    endTime: "21:00",
-    totalCostVnd: 800000,
-    shareCostVnd: 400000,
-    requiredTier: 3,
-    status: "OPEN",
-    isSOS: false,
-    notes: "Đội tập luyện chuẩn bị đá giải quận, cần đối cứng thể lực tốt, đá nhanh pressing cao.",
-    createdAt: "30 phút trước",
-  },
-
-  // 4. KÈO PHONG TRÀO TIER 2 - NAM TỪ LIÊM
-  {
-    id: "match-feed-04",
-    hostTeam: {
-      ...MOCK_TEAMS[1],
-      id: "team-ntl-sub",
-      name: "FC Thanh Niên Phú Đô",
-      shortName: "Phú Đô FC",
-      district: "Nam Từ Liêm",
-    },
-    district: "Nam Từ Liêm",
-    pitchName: "Sân Bóng Mỹ Đình Pearl Sports",
-    pitchAddress: "Số 1 Châu Văn Liêm, Nam Từ Liêm",
-    matchDate: "Ngày mai",
-    startTime: "17:30",
-    endTime: "19:00",
-    totalCostVnd: 950000,
-    shareCostVnd: 475000,
-    requiredTier: 2,
-    status: "OPEN",
-    isSOS: false,
-    notes: "Đá cống hiến giờ sớm sau giờ làm, sân cỏ đẹp chuẩn quốc tế.",
-    createdAt: "1 giờ trước",
-  },
-
-  // 5. KÈO ĐÃ KHỚP (MATCHED)
-  {
-    id: "match-feed-05",
-    hostTeam: MOCK_TEAMS[0],
-    guestTeam: MOCK_TEAMS[1],
-    district: "Cầu Giấy",
-    pitchName: "Sân Bóng D30 Tôn Thất Thuyết",
-    pitchAddress: "Số 1 Tôn Thất Thuyết, Cầu Giấy",
-    matchDate: "Hôm qua",
-    startTime: "19:00",
-    endTime: "20:30",
-    totalCostVnd: 800000,
-    shareCostVnd: 400000,
-    requiredTier: 1,
-    status: "MATCHED",
-    isSOS: false,
-    matchedAt: "18:20",
-    createdAt: "2 giờ trước",
-  },
-];
-
-export const MOCK_SUB_PLAYERS: SubPlayerPost[] = [
-  {
-    id: "sub-01",
-    teamId: "team-cg-01",
-    teamName: "FC Dưỡng Sinh Duy Tân",
-    positionNeeded: "Thủ Môn (GK)",
-    quantity: 1,
-    matchTime: "19:00 - 20:30 Hôm nay",
-    pitchName: "Sân Trung Kính Hạ (Cầu Giấy)",
-    district: "Cầu Giấy",
-    shareCostDescription: "Miễn phí 100% tiền sân + Mời nước tăng lực",
-    contactPhone: "0982.345.678",
-    contactZalo: "0982345678",
-    status: "ACTIVE",
-    createdAt: "10 phút trước",
-  },
-  {
-    id: "sub-02",
-    teamId: "team-ntl-01",
-    teamName: "FC Phủi 36 Mễ Trì",
-    positionNeeded: "Trung Vệ (CB)",
-    quantity: 1,
-    matchTime: "19:30 - 21:00 Hôm nay",
-    pitchName: "Sân Mễ Trì Hạ (Nam Từ Liêm)",
-    district: "Nam Từ Liêm",
-    shareCostDescription: "Hỗ trợ share nhẹ 40k, anh em hòa đồng vui vẻ",
-    contactPhone: "0977.111.222",
-    contactZalo: "0977111222",
-    status: "ACTIVE",
-    createdAt: "25 phút trước",
-  },
-];
+export const MOCK_SUB_PLAYERS: SubPlayerPost[] = [];
 
 export const MOCK_ROLL_CALL: RollCallSession = {
-  id: "rc-session-01",
-  matchId: "match-sos-01",
-  teamId: "team-cg-02",
-  pitchName: "Sân Thành Phát (Cầu Giấy)",
-  matchTime: "19:00 - 20:30 Hôm nay",
-  sharePerPlayerVnd: 45000,
-  members: [
-    { id: "m1", name: "Quang Hùng (Cap)", number: 10, status: "JOIN", hasPaid: true, updatedAt: "15:30" },
-    { id: "m2", name: "Minh Đức", number: 7, status: "JOIN", hasPaid: true, updatedAt: "15:45" },
-    { id: "m3", name: "Văn Hậu", number: 5, status: "JOIN", hasPaid: false, updatedAt: "16:10" },
-    { id: "m4", name: "Hoàng Long", number: 9, status: "JOIN", hasPaid: true, updatedAt: "16:20" },
-    { id: "m5", name: "Đình Trọng", number: 21, status: "JOIN", hasPaid: false, updatedAt: "16:30" },
-    { id: "m6", name: "Tuấn Hải", number: 18, status: "JOIN", hasPaid: false, updatedAt: "16:45" },
-    { id: "m7", name: "Văn Lâm (GK)", number: 1, status: "JOIN", hasPaid: true, updatedAt: "17:00" },
-    { id: "m8", name: "Tiến Dũng", number: 4, status: "JOIN", hasPaid: false, updatedAt: "17:15" },
-    { id: "m9", name: "Công Phượng", number: 11, status: "BUSY", hasPaid: false, updatedAt: "16:00" },
-    { id: "m10", name: "Xuân Trường", number: 6, status: "PENDING", hasPaid: false, updatedAt: "Chưa phản hồi" },
-  ],
+  id: "rc-session-empty",
+  matchId: "",
+  teamId: "",
+  pitchName: "",
+  matchTime: "",
+  sharePerPlayerVnd: 0,
+  members: [],
 };
 
 // Hàm tiện ích sinh link ảnh mã VietQR Napas247 tức thì

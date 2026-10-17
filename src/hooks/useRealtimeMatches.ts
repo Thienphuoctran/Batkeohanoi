@@ -159,6 +159,34 @@ export function useRealtimeMatchFeed(
   const channelRef = useRef<RealtimeChannel | null>(null);
 
   useEffect(() => {
+    // 0. Tải các trận đấu thực tế đã lưu trong CSDL Supabase
+    const fetchExistingMatches = async () => {
+      try {
+        const { data: dbData, error } = await supabase
+          .from("matches")
+          .select(
+            "*, teams:host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
+          )
+          .order("created_at", { ascending: false });
+
+        if (!error && dbData && dbData.length > 0) {
+          const mapped = dbData.map((d) => mapDbMatchToFeedItem(d as MatchItem));
+          setMatches((prev) => {
+            const map = new Map<string, MatchFeedItem>();
+            mapped.forEach((m) => map.set(m.id, m));
+            prev.forEach((m) => {
+              if (!map.has(m.id)) map.set(m.id, m);
+            });
+            return Array.from(map.values());
+          });
+        }
+      } catch (err) {
+        console.error("fetchExistingMatches error:", err);
+      }
+    };
+
+    fetchExistingMatches();
+
     const channel = supabase
       .channel("realtime-matches-channel", {
         config: { broadcast: { self: false } },
