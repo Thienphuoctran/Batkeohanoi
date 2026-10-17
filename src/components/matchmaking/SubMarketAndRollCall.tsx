@@ -30,7 +30,7 @@ export function SubMarketAndRollCall({
   const [subPosts, setSubPosts] = useState<SubPlayerPost[]>(MOCK_SUB_PLAYERS);
   const [posFilter, setPosFilter] = useState<"ALL" | "GK" | "DF" | "FW">("ALL");
   const [showAddSub, setShowAddSub] = useState(false);
-  const [newPos, setNewPos] = useState("Thủ Môn (GK)");
+  const [newPos, setNewPos] = useState<SubPlayerPost["positionNeeded"]>("Thủ Môn (GK)");
   const [newPitch, setNewPitch] = useState("Sân Trung Kính Hạ (19:00 hôm nay)");
   const [newFee, setNewFee] = useState("FREE 100% + Bao nước");
 
@@ -149,7 +149,9 @@ export function SubMarketAndRollCall({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
                 <select
                   value={newPos}
-                  onChange={(e) => setNewPos(e.target.value)}
+                  onChange={(e) =>
+                    setNewPos(e.target.value as SubPlayerPost["positionNeeded"])
+                  }
                   className="h-9 px-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white"
                 >
                   <option value="Thủ Môn (GK)">🧤 Cần Thủ Môn (GK)</option>

@@ -73,12 +73,16 @@ export async function verifyEscrowDeposit(depositId: string) {
     return { success: false, message: "Không thể xác thực giao dịch cọc." };
   }
 
+  const rawEscrow = escrow as any;
+  const teamName = rawEscrow?.teams?.team_name || "Đội bóng";
+  const pitchName = rawEscrow?.matches?.pitch_custom_name || "Sân cỏ nhân tạo";
+
   // Bắn thông báo Telegram xác nhận tiền về
   await sendTelegramAlert(
     `💰 <b>XÁC NHẬN KÝ QUỸ THÀNH CÔNG!</b>\n` +
-      `• Đội: <b>${escrow.teams?.team_name || "Đội bóng"}</b>\n` +
+      `• Đội: <b>${teamName}</b>\n` +
       `• Số tiền: <b>200.000 VNĐ</b> (MB Bank - TRAN QUOC THIEN PHUOC)\n` +
-      `• Trận: ${escrow.matches?.pitch_custom_name || "Sân cỏ nhân tạo"}\n` +
+      `• Trận: ${pitchName}\n` +
       `👉 Kèo đã được mở khóa bắt đối an toàn!`
   );
 
