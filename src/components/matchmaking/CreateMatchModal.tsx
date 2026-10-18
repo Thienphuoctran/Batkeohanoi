@@ -112,6 +112,8 @@ export function CreateMatchModal({
   // Google Maps Integration
   const [isGmapsIntegrated, setIsGmapsIntegrated] = useState(true);
   const [customGmapsUrl, setCustomGmapsUrl] = useState("");
+  // Honeypot Chống Bot (Mục 13)
+  const [botHoneypot, setBotHoneypot] = useState("");
 
   const effectiveGmapsUrl = React.useMemo(() => {
     if (!isGmapsIntegrated) return undefined;
@@ -206,6 +208,7 @@ export function CreateMatchModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (botHoneypot && botHoneypot.trim().length > 0) return; // Chặn bot âm thầm
     if (!isPhoneValid || !isZaloValid || isEscrowLocked) return;
 
     const timeParts = timeSlot.includes("-")
@@ -291,6 +294,18 @@ export function CreateMatchModal({
           onSubmit={handleSubmit}
           className="p-5 overflow-y-auto space-y-4 text-xs"
         >
+          {/* Honeypot Chống Bot (Mục 13) - Người thật không thấy, bot tự động sẽ điền */}
+          <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
+            <input
+              type="text"
+              name="website_url_honeypot"
+              tabIndex={-1}
+              autoComplete="off"
+              value={botHoneypot}
+              onChange={(e) => setBotHoneypot(e.target.value)}
+            />
+          </div>
+
           {/* Banner Cảnh Báo Khóa Ký Quỹ nếu uy tín < 70đ & ví < 200k */}
           {isEscrowLocked && (
             <div className="rounded-xl bg-rose-500/15 border border-rose-500/40 p-3.5 space-y-2">

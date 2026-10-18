@@ -377,6 +377,8 @@ export async function createTeamOnboardingAction(formData: FormData) {
 }
 
 // 6. Lưu kèo đấu thật vào bảng public.matches trên Supabase khi Đội trưởng tạo kèo
+const matchCreationRateLimitMap = new Map<string, number[]>();
+
 export async function createMatchInDatabaseAction(payload: {
   hostTeamId: string;
   pitchCustomName: string;
@@ -388,8 +390,28 @@ export async function createMatchInDatabaseAction(payload: {
   notes?: string;
   gmapsUrl?: string;
   isGmapsIntegrated?: boolean;
+  botHoneypot?: string;
 }) {
   try {
+    // 1. Chống Bot (Mục 13): Nếu trường ẩn honeypot có dữ liệu, hủy yêu cầu ngay lập tức
+    if (payload.botHoneypot && payload.botHoneypot.trim().length > 0) {
+      console.warn("[Bot Protection Triggered] Honeypot field filled:", payload.botHoneypot);
+      return { success: false, error: "Yêu cầu bị từ chối do phát hiện bot tự động." };
+    }
+
+    // 2. Giới hạn tần suất tạo kèo (Mục 12 - Rate Limiting): Tối đa 5 kèo/phút cho 1 đội
+    const now = Date.now();
+    const timestamps = matchCreationRateLimitMap.get(payload.hostTeamId) || [];
+    const recent = timestamps.filter((t) => now - t < 60000);
+    if (recent.length >= 5) {
+      return {
+        success: false,
+        error: "Bạn đang thao tác quá nhanh. Vui lòng đợi 1 phút trước khi mở thêm kèo mới!",
+      };
+    }
+    recent.push(now);
+    matchCreationRateLimitMap.set(payload.hostTeamId, recent);
+
     const adminClient = getAdminClient();
     const insertObj: Record<string, any> = {
       host_team_id: payload.hostTeamId,
