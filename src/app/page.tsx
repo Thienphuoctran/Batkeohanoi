@@ -16,6 +16,7 @@ import {
   Trophy,
   Plus,
   Lock,
+  Bot,
 } from "lucide-react";
 import { MOCK_MATCH_FEEDS, MOCK_TEAMS } from "@/constants/mockMatchmaking";
 import { District, MatchFeedItem, SkillTier, EscrowWallet, BankWithdrawInfo } from "@/types/matchmaking";
@@ -26,6 +27,7 @@ import { MatchChallengeModal } from "@/components/matchmaking/MatchChallengeModa
 import { CreateMatchModal } from "@/components/matchmaking/CreateMatchModal";
 import { EditMatchModal } from "@/components/matchmaking/EditMatchModal";
 import { CancelMatchAppealModal } from "@/components/matchmaking/CancelMatchAppealModal";
+import { CustomerSupportModal } from "@/components/support/CustomerSupportModal";
 import { LiveMatchBar } from "@/components/matchmaking/LiveMatchBar";
 import { EscrowWalletModal } from "@/components/escrow/EscrowWalletModal";
 import { HandshakeModal } from "@/components/matchmaking/HandshakeModal";
@@ -95,6 +97,7 @@ export default function HanoiMatchmakingPlatform() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isBotDrawerOpen, setIsBotDrawerOpen] = useState(false);
   const [unreadBotCount, setUnreadBotCount] = useState(1);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   // Quản lý Ví Ký Quỹ Nội Bộ (In-App Escrow Balance) & Mã Bắt Tay Sân
   const effectiveTrustScore = team?.trust_score ?? myTrustScore;
@@ -1177,6 +1180,35 @@ export default function HanoiMatchmakingPlatform() {
           </div>
         </div>
       )}
+
+      {/* Nút Nổi Tư Vấn Khách Hàng (AI Agent & Zalo BQT) */}
+      <div className="fixed bottom-5 right-4 sm:right-6 z-40">
+        <button
+          onClick={() => setIsSupportOpen(true)}
+          className="group relative flex items-center gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all duration-200 border border-emerald-300/40"
+          title="Tư vấn khách hàng & Trợ lý AI BắtKèo7"
+        >
+          <div className="relative">
+            <Bot className="w-5 h-5 fill-current" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500" />
+          </div>
+          <div className="flex flex-col items-start leading-tight">
+            <span className="tracking-tight">Tư Vấn Khách Hàng</span>
+            <span className="text-[10px] text-slate-900/80 font-bold hidden sm:inline">
+              AI Trợ Lý &amp; Zalo BQT
+            </span>
+          </div>
+        </button>
+      </div>
+
+      {/* Modal Tư Vấn Khách Hàng Thông Minh (AI Agent + Zalo 1-Chạm) */}
+      <CustomerSupportModal
+        isOpen={isSupportOpen}
+        onClose={() => setIsSupportOpen(false)}
+        onOpenWallet={() => setIsEscrowModalOpen(true)}
+        onSelectTab={(tab) => setActiveTab(tab as ActiveTab)}
+      />
 
     </div>
   );
