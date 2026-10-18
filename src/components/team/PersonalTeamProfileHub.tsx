@@ -25,6 +25,12 @@ import {
   Sparkles,
   RotateCcw,
   Medal,
+  Camera,
+  Upload,
+  Award,
+  Link2,
+  Copy,
+  ExternalLink,
 } from "lucide-react";
 import { AuthenticatedTeamProfile, UserProfile } from "@/hooks/useAuthTeam";
 import { SkillTier, EscrowWallet } from "@/types/matchmaking";
@@ -47,6 +53,14 @@ export interface TeamMatchStats {
   draws: number;
   losses: number;
   recentForm: ("W" | "D" | "L")[];
+}
+
+export interface TeamTrophy {
+  id: string;
+  name: string;
+  type: "cup_gold" | "medal_gold" | "medal_silver" | "medal_bronze" | "shield";
+  year: string;
+  notes?: string;
 }
 
 export interface PersonalTeamProfileHubProps {
@@ -72,7 +86,20 @@ const PRESET_DNA_TAGS = [
   "🎂 Liên Hoan Sinh Nhật Anh Em Đội",
 ];
 
-const getStorageKey = (teamId: string) => `football_profile_team_v2_${teamId}`;
+const PRESET_BADGES = [
+  { id: "lion", label: "Sư Tử Vàng", icon: "🦁", bg: "from-amber-500 to-yellow-600" },
+  { id: "dragon", label: "Rồng Lửa", icon: "🐉", bg: "from-red-600 to-orange-600" },
+  { id: "lightning", label: "Tia Chớp", icon: "⚡", bg: "from-yellow-400 to-amber-600" },
+  { id: "eagle", label: "Đại Bàng", icon: "🦅", bg: "from-blue-600 to-indigo-700" },
+  { id: "wolf", label: "Sói Xám", icon: "🐺", bg: "from-slate-600 to-slate-800" },
+  { id: "tiger", label: "Hổ Phủi", icon: "🐯", bg: "from-orange-500 to-amber-700" },
+  { id: "shield", label: "Khiên Thép", icon: "🛡️", bg: "from-emerald-600 to-teal-800" },
+  { id: "crown", label: "Vương Miện", icon: "👑", bg: "from-yellow-500 to-amber-500" },
+  { id: "ball", label: "Bóng Vàng", icon: "⚽", bg: "from-emerald-500 to-teal-600" },
+  { id: "rocket", label: "Tên Lửa", icon: "🚀", bg: "from-cyan-500 to-blue-600" },
+];
+
+const getStorageKey = (teamId: string) => `football_profile_team_v3_${teamId}`;
 
 export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
   team,
@@ -87,6 +114,9 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [isLogMatchModalOpen, setIsLogMatchModalOpen] = useState(false);
+  const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
+  const [isAddTrophyModalOpen, setIsAddTrophyModalOpen] = useState(false);
+  const [isJoinLinkModalOpen, setIsJoinLinkModalOpen] = useState(false);
 
   // Editable Profile States (Trống hoàn toàn mặc định cho từng tài khoản tự điền)
   const [teamName, setTeamName] = useState(team.team_name || "");
@@ -108,6 +138,9 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
   const [homePitch, setHomePitch] = useState("");
   const [fixedSchedule, setFixedSchedule] = useState("");
   const [slogan, setSlogan] = useState("");
+
+  // TÍNH NĂNG 1: Ảnh Logo / Avatar Đội Bóng
+  const [logoUrl, setLogoUrl] = useState<string>("");
 
   // Danh Sách Cầu Thủ Đội Bóng: Mặc định chỉ có DUY NHẤT 1 người là Đội trưởng chính chủ
   const [members, setMembers] = useState<TeamMember[]>([
@@ -150,6 +183,17 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
   const [logOpponent, setLogOpponent] = useState("");
   const [logScore, setLogScore] = useState("");
 
+  // TÍNH NĂNG 2: Tủ Cúp & Danh Hiệu Của Đội
+  const [trophies, setTrophies] = useState<TeamTrophy[]>([]);
+  const [newTrophyName, setNewTrophyName] = useState("");
+  const [newTrophyType, setNewTrophyType] = useState<TeamTrophy["type"]>("cup_gold");
+  const [newTrophyYear, setNewTrophyYear] = useState("2026");
+  const [newTrophyNotes, setNewTrophyNotes] = useState("");
+
+  // TÍNH NĂNG 3: Link Mời & QR Code
+  const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
+  const [inviteMsgCopied, setInviteMsgCopied] = useState(false);
+
   // Lưu trữ cục bộ theo từng team.id (Persistent Local Hub per Team)
   const persistData = (updates: Record<string, any>) => {
     if (typeof window === "undefined" || !team?.id) return;
@@ -175,6 +219,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
         if (data.awayJerseyColor !== undefined)
           setAwayJerseyColor(data.awayJerseyColor);
         if (data.slogan !== undefined) setSlogan(data.slogan);
+        if (data.logoUrl !== undefined) setLogoUrl(data.logoUrl);
         if (data.members !== undefined && Array.isArray(data.members)) {
           setMembers(data.members);
         }
@@ -182,6 +227,9 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
           setDnaTags(data.dnaTags);
         }
         if (data.matchStats !== undefined) setMatchStats(data.matchStats);
+        if (data.trophies !== undefined && Array.isArray(data.trophies)) {
+          setTrophies(data.trophies);
+        }
       }
     } catch (e) {
       console.error("Failed to read team profile from storage", e);
@@ -205,6 +253,62 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
   const tierInfo = SKILL_TIERS_CONFIG[skillTier];
 
+  // Render Logo / Avatar Đội
+  const renderTeamLogo = () => {
+    if (logoUrl?.startsWith("data:image") || logoUrl?.startsWith("http")) {
+      return (
+        <img
+          src={logoUrl}
+          alt={teamName}
+          className="w-16 h-16 rounded-2xl object-cover shadow-lg border-2 border-white/20 shrink-0"
+        />
+      );
+    }
+    if (logoUrl?.startsWith("preset:")) {
+      const parts = logoUrl.split(":");
+      const icon = parts[2] || "⚽";
+      const bg = parts[3] || "from-emerald-500 to-teal-400";
+      return (
+        <div
+          className={`w-16 h-16 rounded-2xl bg-gradient-to-tr ${bg} flex items-center justify-center text-3xl shadow-lg border-2 border-white/20 shrink-0`}
+        >
+          {icon}
+        </div>
+      );
+    }
+    return (
+      <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 text-2xl font-black shadow-lg border-2 border-white/20 shrink-0">
+        {teamName ? teamName.slice(0, 2).toUpperCase() : "FC"}
+      </div>
+    );
+  };
+
+  // Xử lý upload ảnh logo từ máy
+  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Dung lượng ảnh tối đa là 2MB. Vui lòng chọn ảnh nhẹ hơn.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setLogoUrl(base64);
+      persistData({ logoUrl: base64 });
+      setIsLogoModalOpen(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Xử lý chọn huy hiệu mẫu
+  const handleSelectPresetBadge = (badge: (typeof PRESET_BADGES)[0]) => {
+    const badgeVal = `preset:${badge.id}:${badge.icon}:${badge.bg}`;
+    setLogoUrl(badgeVal);
+    persistData({ logoUrl: badgeVal });
+    setIsLogoModalOpen(false);
+  };
+
   // Sao chép Thẻ Căn Cước Bóng Đá Số
   const handleCopyCardText = () => {
     const text =
@@ -223,6 +327,31 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  // Link mời thành viên vào đội
+  const inviteUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}?joinTeam=${team.id}&teamName=${encodeURIComponent(
+          teamName
+        )}`
+      : `https://batkeohanoi-wh64.vercel.app?joinTeam=${team.id}`;
+
+  const handleCopyInviteLink = () => {
+    navigator.clipboard.writeText(inviteUrl);
+    setInviteLinkCopied(true);
+    setTimeout(() => setInviteLinkCopied(false), 2500);
+  };
+
+  const handleCopyZaloInviteMsg = () => {
+    const msg =
+      `⚽ LỜI MỜI GIA NHẬP ĐỘI: ${teamName}\n` +
+      `Anh em ơi, đội mình đã chính thức xác thực Thẻ Căn Cước Bóng Đá Số tại BắtKèo7!\n` +
+      `👉 Bấm vào link dưới đây để đăng ký tên, số áo và vị trí vào danh sách đội nhé:\n` +
+      `${inviteUrl}`;
+    navigator.clipboard.writeText(msg);
+    setInviteMsgCopied(true);
+    setTimeout(() => setInviteMsgCopied(false), 2500);
   };
 
   // Lưu thông tin hồ sơ đội bóng
@@ -350,11 +479,92 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
     }
   };
 
+  // Thêm Cúp / Danh hiệu mới
+  const handleAddTrophy = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTrophyName.trim()) return;
+    const newTrophy: TeamTrophy = {
+      id: `trophy-${Date.now()}`,
+      name: newTrophyName.trim(),
+      type: newTrophyType,
+      year: newTrophyYear.trim() || "2026",
+      notes: newTrophyNotes.trim() || undefined,
+    };
+    const nextTrophies = [newTrophy, ...trophies];
+    setTrophies(nextTrophies);
+    persistData({ trophies: nextTrophies });
+
+    setNewTrophyName("");
+    setNewTrophyNotes("");
+    setIsAddTrophyModalOpen(false);
+  };
+
+  // Xóa Cúp
+  const handleDeleteTrophy = (id: string) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa danh hiệu này?")) {
+      const nextTrophies = trophies.filter((t) => t.id !== id);
+      setTrophies(nextTrophies);
+      persistData({ trophies: nextTrophies });
+    }
+  };
+
+  // Helper render biểu tượng cúp
+  const getTrophyIcon = (type: TeamTrophy["type"]) => {
+    switch (type) {
+      case "cup_gold":
+        return "🏆";
+      case "medal_gold":
+        return "🥇";
+      case "medal_silver":
+        return "🥈";
+      case "medal_bronze":
+        return "🥉";
+      case "shield":
+        return "🛡️";
+      default:
+        return "🏆";
+    }
+  };
+
   // Thống kê thành phần quân số
   const gkCount = members.filter((m) => m.position === "GK").length;
   const dfCount = members.filter((m) => m.position === "DF").length;
   const mfCount = members.filter((m) => m.position === "MF").length;
   const fwCount = members.filter((m) => m.position === "FW").length;
+
+  // Tính toán các huy hiệu kỷ lục tự động mở khóa
+  const autoBadges = [
+    {
+      title: "Bảo Chứng 100/100",
+      desc: "Ký quỹ uy tín tuyệt đối",
+      icon: "🛡️",
+      achieved: team.trust_score >= 100,
+    },
+    {
+      title: "Đúng Hẹn Vàng",
+      desc: "100% đến sân trước 15 phút",
+      icon: "⚡",
+      achieved: team.late_cancels_count === 0,
+    },
+    {
+      title: "Quý Ông Fair-play",
+      desc: "Văn minh, không quẹt bóng",
+      icon: "🤝",
+      achieved: true,
+    },
+    {
+      title: "Chiến Thắng Liên Tiếp",
+      desc: "Tích lũy từ 3 trận thắng trở lên",
+      icon: "🔥",
+      achieved: matchStats.wins >= 3,
+    },
+    {
+      title: "Chiến Binh Phủi Sân 7",
+      desc: "Thi đấu từ 5 trận giao lưu",
+      icon: "⚔️",
+      achieved: matchStats.total >= 5,
+    },
+  ];
 
   return (
     <div className="space-y-4">
@@ -366,9 +576,17 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 relative z-10">
           <div className="flex items-start space-x-3.5">
-            {/* Logo Đội Bóng */}
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 text-2xl font-black shadow-lg border-2 border-white/20 shrink-0">
-              {teamName ? teamName.slice(0, 2).toUpperCase() : "FC"}
+            {/* TÍNH NĂNG 1: Avatar / Logo Đội Bóng Có Thể Upload & Chọn Mẫu */}
+            <div className="relative group shrink-0">
+              {renderTeamLogo()}
+              <button
+                type="button"
+                onClick={() => setIsLogoModalOpen(true)}
+                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-slate-950/90 hover:bg-emerald-500 border border-white/20 hover:border-emerald-400 text-slate-300 hover:text-slate-950 flex items-center justify-center text-xs shadow-md transition-all active:scale-95"
+                title="Thay đổi ảnh Logo đội bóng"
+              >
+                <Camera className="w-3.5 h-3.5" />
+              </button>
             </div>
 
             <div className="space-y-1">
@@ -492,6 +710,15 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             >
               <Edit3 className="w-3.5 h-3.5 text-amber-400" />
               <span>Sửa Hồ Sơ</span>
+            </button>
+
+            {/* TÍNH NĂNG 3: Nút Mời Vào Đội (Mã QR & Link Zalo) */}
+            <button
+              onClick={() => setIsJoinLinkModalOpen(true)}
+              className="px-3 py-1.5 bg-gradient-to-r from-sky-500/20 to-blue-500/20 hover:from-sky-500/30 hover:to-blue-500/30 text-sky-300 border border-sky-400/40 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm active:scale-95"
+            >
+              <QrCode className="w-3.5 h-3.5 text-sky-400" />
+              <span>Mời Vào Đội (QR &amp; Link)</span>
             </button>
 
             {/* Nút Đăng Kèo Nhanh */}
@@ -788,6 +1015,122 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
         </div>
       </div>
 
+      {/* TÍNH NĂNG 2: TỦ CÚP & HUY HIỆU DANH DỰ (TROPHY CABINET & RECORD BADGES) */}
+      <div className="surface-card rounded-2xl border border-amber-500/30 bg-gradient-to-br from-slate-900/90 via-[#181308]/60 to-slate-950 p-4 sm:p-5 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-amber-500/20">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>Tủ Cúp &amp; Huy Hiệu Danh Dự Của Đội</span>
+              </h3>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                {trophies.length} Cúp / Danh hiệu
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Vinh danh các danh hiệu cúp giao lưu, giải phủi và huy hiệu uy tín
+              của đội
+            </p>
+          </div>
+
+          <Button
+            onClick={() => setIsAddTrophyModalOpen(true)}
+            className="h-8 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs gap-1 shadow-sm shadow-amber-500/20 active:scale-95"
+          >
+            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>+ Thêm Cúp / Danh Hiệu</span>
+          </Button>
+        </div>
+
+        {/* 1. Các Huy Hiệu Kỷ Lục Tự Động */}
+        <div className="space-y-1.5">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+            ⭐ Huy Hiệu Kỷ Lục Uy Tín (Bảo Chứng BắtKèo7):
+          </span>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+            {autoBadges.map((badge, idx) => (
+              <div
+                key={idx}
+                className={`p-2.5 rounded-xl border text-center transition flex flex-col items-center justify-center space-y-1 ${
+                  badge.achieved
+                    ? "bg-slate-950/80 border-amber-500/35 text-white"
+                    : "bg-slate-950/40 border-white/[0.05] text-slate-600 opacity-60"
+                }`}
+              >
+                <span className="text-2xl">{badge.icon}</span>
+                <span className="text-xs font-bold leading-tight line-clamp-1">
+                  {badge.title}
+                </span>
+                <span className="text-[9px] text-slate-400 leading-tight line-clamp-1">
+                  {badge.desc}
+                </span>
+                {badge.achieved && (
+                  <span className="text-[8px] font-black uppercase text-amber-400 mt-0.5">
+                    ✓ Đã Mở Khóa
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 2. Danh Sách Cúp Giao Lưu Do Đội Tự Thêm */}
+        <div className="space-y-2 pt-2 border-t border-white/[0.06]">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+            🏆 Cúp &amp; Giải Đấu Từng Đạt Được:
+          </span>
+
+          {trophies.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+              {trophies.map((trophy) => (
+                <div
+                  key={trophy.id}
+                  className="p-3 rounded-xl bg-slate-950/90 border border-amber-500/30 flex items-center justify-between gap-2.5 shadow-sm"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="text-2xl shrink-0">
+                      {getTrophyIcon(trophy.type)}
+                    </span>
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-black text-white truncate">
+                        {trophy.name}
+                      </h4>
+                      <p className="text-[10px] text-amber-300 font-bold">
+                        Năm {trophy.year}
+                        {trophy.notes ? ` • ${trophy.notes}` : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteTrophy(trophy.id)}
+                    className="p-1 text-slate-500 hover:text-rose-400 transition shrink-0"
+                    title="Xóa danh hiệu"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-4 rounded-xl border border-dashed border-amber-500/20 bg-slate-950/40 text-center space-y-1">
+              <p className="text-xs text-amber-200/80 font-bold">
+                Tủ cúp của đội hiện đang chờ chiếc cúp đầu tiên!
+              </p>
+              <p className="text-[11px] text-slate-400">
+                Hãy bấm{" "}
+                <strong className="text-amber-300">
+                  + Thêm Cúp / Danh Hiệu
+                </strong>{" "}
+                để ghi danh cúp tứ hùng, giải phong trào hoặc kỷ niệm chương của
+                anh em!
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* 4. QUẢN LÝ ĐỘI HÌNH & DANH SÁCH CẦU THỦ */}
       <div className="surface-card rounded-2xl border border-white/[0.08] p-4 sm:p-5 space-y-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-white/[0.07]">
@@ -806,13 +1149,23 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             </p>
           </div>
 
-          <Button
-            onClick={() => setIsAddMemberModalOpen(true)}
-            className="h-8 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs gap-1 shadow-sm active:scale-95"
-          >
-            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Thêm Cầu Thủ</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => setIsJoinLinkModalOpen(true)}
+              variant="outline"
+              className="h-8 px-3 rounded-xl border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 font-bold text-xs gap-1"
+            >
+              <Link2 className="w-3.5 h-3.5" />
+              <span>Link Mời Anh Em</span>
+            </Button>
+            <Button
+              onClick={() => setIsAddMemberModalOpen(true)}
+              className="h-8 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs gap-1 shadow-sm active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Thêm Cầu Thủ</span>
+            </Button>
+          </div>
         </div>
 
         {/* Danh sách cầu thủ */}
@@ -885,7 +1238,9 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                 <strong className="text-emerald-400 font-semibold">
                   + Thêm Cầu Thủ
                 </strong>{" "}
-                để ghi danh anh em trong đội, số áo và phân chia vị trí thi đấu!
+                hoặc gửi{" "}
+                <strong className="text-sky-400 font-semibold">Link Mời</strong>{" "}
+                vào nhóm Zalo để anh em tự đăng ký số áo và vị trí!
               </p>
             </div>
           )}
@@ -1400,6 +1755,334 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* TÍNH NĂNG 1: MODAL ĐỔI ẢNH LOGO / AVATAR ĐỘI BÓNG */}
+      {isLogoModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-[#0f172a] border border-white/10 shadow-2xl p-5 space-y-4 text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <div>
+                <span className="text-[10px] font-black uppercase text-emerald-400">
+                  Nhận Diện Đội Bóng
+                </span>
+                <h3 className="text-sm font-extrabold text-white mt-0.5">
+                  Đổi Ảnh Logo / Avatar Đội
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsLogoModalOpen(false)}
+                className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Xem trước Logo hiện tại */}
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-950 border border-white/10">
+              {renderTeamLogo()}
+              <div>
+                <h4 className="text-xs font-bold text-white">Logo hiện tại</h4>
+                <p className="text-[10px] text-slate-400">
+                  Logo hiển thị trên Thẻ Căn Cước, Thẻ Ghép Kèo và BXH
+                </p>
+                {logoUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLogoUrl("");
+                      persistData({ logoUrl: "" });
+                    }}
+                    className="text-[10px] text-rose-400 hover:underline mt-1 font-bold"
+                  >
+                    Gỡ logo (Dùng 2 chữ cái đầu)
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Cách 1: Tải ảnh từ thiết bị */}
+            <div className="space-y-1.5">
+              <label className="block font-semibold text-slate-300">
+                1. Tải ảnh từ điện thoại / máy tính:
+              </label>
+              <label className="flex flex-col items-center justify-center p-4 rounded-xl border border-dashed border-emerald-500/40 bg-emerald-500/5 hover:bg-emerald-500/10 cursor-pointer transition text-center space-y-1">
+                <Upload className="w-5 h-5 text-emerald-400" />
+                <span className="text-xs font-bold text-white">
+                  Chọn tệp ảnh logo (PNG, JPG, WebP)
+                </span>
+                <span className="text-[10px] text-slate-400">
+                  Tối đa 2MB • Tỉ lệ vuông đẹp nhất
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoFileUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            {/* Cách 2: Chọn từ Bộ Huy Hiệu Phủi Có Sẵn */}
+            <div className="space-y-1.5 pt-2 border-t border-white/10">
+              <label className="block font-semibold text-slate-300">
+                2. Hoặc chọn nhanh từ Bộ Huy Hiệu Phủi Độc Quyền:
+              </label>
+              <div className="grid grid-cols-5 gap-2">
+                {PRESET_BADGES.map((b) => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => handleSelectPresetBadge(b)}
+                    className="p-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-white/10 hover:border-amber-400/50 flex flex-col items-center justify-center gap-1 transition active:scale-95 group"
+                    title={b.label}
+                  >
+                    <span className="text-2xl group-hover:scale-110 transition">
+                      {b.icon}
+                    </span>
+                    <span className="text-[9px] font-bold text-slate-300 text-center leading-tight">
+                      {b.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-slate-800">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsLogoModalOpen(false)}
+                className="h-8 text-xs text-slate-400"
+              >
+                Đóng
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TÍNH NĂNG 2: MODAL THÊM CÚP / DANH HIỆU */}
+      {isAddTrophyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-[#0f172a] border border-amber-500/30 shadow-2xl p-5 space-y-3.5 text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <div>
+                <span className="text-[10px] font-black uppercase text-amber-400">
+                  Vinh Danh Thành Tích
+                </span>
+                <h3 className="text-sm font-extrabold text-white mt-0.5">
+                  Thêm Cúp / Danh Hiệu
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsAddTrophyModalOpen(false)}
+                className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddTrophy} className="space-y-3">
+              <div>
+                <label className="block font-semibold text-slate-300 mb-1">
+                  Biểu tượng danh hiệu
+                </label>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {[
+                    { type: "cup_gold", icon: "🏆", label: "Cúp Vàng" },
+                    { type: "medal_gold", icon: "🥇", label: "HC Vàng" },
+                    { type: "medal_silver", icon: "🥈", label: "HC Bạc" },
+                    { type: "medal_bronze", icon: "🥉", label: "HC Đồng" },
+                    { type: "shield", icon: "🛡️", label: "Kỷ Niệm" },
+                  ].map((item) => (
+                    <button
+                      key={item.type}
+                      type="button"
+                      onClick={() =>
+                        setNewTrophyType(item.type as TeamTrophy["type"])
+                      }
+                      className={`p-2 rounded-xl border text-center transition ${
+                        newTrophyType === item.type
+                          ? "bg-amber-500/25 border-amber-400 text-amber-300 font-bold ring-1 ring-amber-400"
+                          : "bg-slate-950 border-white/10 text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      <div className="text-xl">{item.icon}</div>
+                      <div className="text-[9px] mt-0.5">{item.label}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-300 mb-1">
+                  Tên giải đấu / Cúp đạt được
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newTrophyName}
+                  onChange={(e) => setNewTrophyName(e.target.value)}
+                  placeholder="VD: Vô Địch Giải Tứ Hùng Cầu Giấy..."
+                  className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-semibold text-slate-300 mb-1">
+                    Năm / Mùa giải
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newTrophyYear}
+                    onChange={(e) => setNewTrophyYear(e.target.value)}
+                    placeholder="VD: 2026, Mùa Hè 2025"
+                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-300 mb-1">
+                    Ghi chú thêm (Tùy chọn)
+                  </label>
+                  <input
+                    type="text"
+                    value={newTrophyNotes}
+                    onChange={(e) => setNewTrophyNotes(e.target.value)}
+                    placeholder="VD: Bất bại 5 trận..."
+                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsAddTrophyModalOpen(false)}
+                  className="h-8 text-xs text-slate-400"
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="submit"
+                  className="h-8 px-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs"
+                >
+                  Lưu Vào Tủ Cúp
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* TÍNH NĂNG 3: MODAL MÃ QR & LINK MỜI THÀNH VIÊN VÀO ĐỘI */}
+      {isJoinLinkModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-[#0f172a] border border-sky-500/40 shadow-2xl p-5 space-y-4 text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <div>
+                <span className="text-[10px] font-black uppercase text-sky-400">
+                  Kết Nối Anh Em Đội Bóng
+                </span>
+                <h3 className="text-sm font-extrabold text-white mt-0.5">
+                  Mã QR &amp; Link Mời Cầu Thủ Vào Đội
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsJoinLinkModalOpen(false)}
+                className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Khối Mã QR 2D */}
+            <div className="p-4 rounded-2xl bg-slate-950 border border-white/10 text-center space-y-2">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                  inviteUrl
+                )}&bgcolor=020617&color=10b981`}
+                alt="Mã QR Mời Đội"
+                className="w-36 h-36 rounded-xl border border-emerald-500/30 p-1 bg-slate-950 mx-auto shadow-lg"
+              />
+              <p className="text-[11px] font-bold text-white">
+                Mã QR Gia Nhập {teamName || "Đội Bóng"}
+              </p>
+              <p className="text-[10px] text-slate-400">
+                Mở camera điện thoại hoặc Zalo quét mã để tự đăng ký số áo &amp; vị trí
+              </p>
+            </div>
+
+            {/* Link mời trực tiếp */}
+            <div className="space-y-1">
+              <label className="block font-semibold text-slate-300">
+                Link tham gia trực tiếp:
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={inviteUrl}
+                  className="flex-1 h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-sky-300 font-mono text-[11px] truncate"
+                />
+                <Button
+                  type="button"
+                  onClick={handleCopyInviteLink}
+                  className="h-9 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs gap-1 shrink-0"
+                >
+                  {inviteLinkCopied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Đã chép!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Sao chép</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Soạn sẵn tin nhắn gửi nhóm Zalo */}
+            <div className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-2">
+              <span className="text-[10px] font-bold text-slate-300 flex items-center justify-between">
+                <span>💬 Tin nhắn mẫu gửi Nhóm Chat Zalo Đội:</span>
+                {inviteMsgCopied && (
+                  <span className="text-emerald-400 font-bold">
+                    ✓ Đã chép tin nhắn!
+                  </span>
+                )}
+              </span>
+              <p className="text-[11px] text-slate-300 italic bg-slate-900/80 p-2 rounded-lg border border-white/5">
+                “⚽ Anh em ơi, đội mình {teamName} đã có Thẻ Căn Cước Bóng Đá Số tại BắtKèo7! Anh em bấm vào link này để đăng ký tên, số áo và vị trí vào đội nhé: {inviteUrl}”
+              </p>
+              <Button
+                type="button"
+                onClick={handleCopyZaloInviteMsg}
+                className="w-full h-8 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-extrabold text-xs gap-1.5 shadow-md shadow-blue-600/20"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>Sao Chép Tin Nhắn Mẫu Gửi Nhóm Zalo</span>
+              </Button>
+            </div>
+
+            <div className="flex justify-end pt-1">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsJoinLinkModalOpen(false)}
+                className="h-8 text-xs text-slate-400"
+              >
+                Đóng
+              </Button>
+            </div>
           </div>
         </div>
       )}
