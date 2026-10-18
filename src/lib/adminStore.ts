@@ -265,13 +265,13 @@ export function addStoredBroadcast(item: EmergencyBroadcastItem): EmergencyBroad
 export interface RefundReceiptItem {
   id: string;
   teamName: string;
-  captainName: string;
+  captainName?: string;
   captainPhone: string;
   amount: number;
-  bankShortName: string;
-  bankAccountNo: string;
-  bankAccountName: string;
-  transferCode: string;
+  bankShortName?: string;
+  bankAccountNo?: string;
+  bankAccountName?: string;
+  transferCode?: string;
   refundedAt: string;
   note?: string;
 }

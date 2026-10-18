@@ -296,15 +296,15 @@ export function EscrowWalletModal({
                 </div>
                 <div className="flex justify-between items-center text-slate-300">
                   <span className="text-slate-400">Ngân hàng nhận:</span>
-                  <strong className="text-white">{refundReceipt.bankShortName}</strong>
+                  <strong className="text-white">{refundReceipt.bankShortName || "MBBank"}</strong>
                 </div>
                 <div className="flex justify-between items-center text-slate-300">
                   <span className="text-slate-400">Số tài khoản:</span>
-                  <strong className="text-white font-mono">{refundReceipt.bankAccountNo}</strong>
+                  <strong className="text-white font-mono">{refundReceipt.bankAccountNo || "—"}</strong>
                 </div>
                 <div className="flex justify-between items-center text-slate-300">
                   <span className="text-slate-400">Chủ tài khoản:</span>
-                  <strong className="text-white uppercase">{refundReceipt.bankAccountName}</strong>
+                  <strong className="text-white uppercase">{refundReceipt.bankAccountName || "CHỦ TÀI KHOẢN"}</strong>
                 </div>
                 <div className="flex justify-between items-center text-slate-300 border-t border-slate-800 pt-1.5">
                   <span className="text-slate-400">Thời gian BQT gửi:</span>
