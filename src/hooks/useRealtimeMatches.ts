@@ -254,15 +254,26 @@ export function useRealtimeMatchFeed(
         } else {
           const { data: dbData, error } = await supabase
             .from("matches")
-            .select(
-              "*, teams:host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
-            )
+            .select("*")
             .neq("status", "cancelled")
             .neq("status", "expired")
             .order("created_at", { ascending: false })
             .limit(50);
           if (!error && dbData && dbData.length > 0) {
-            rawMatches = dbData;
+            const hostTeamIds = Array.from(new Set(dbData.map((m: any) => m.host_team_id).filter(Boolean)));
+            if (hostTeamIds.length > 0) {
+              const { data: teamsList } = await supabase
+                .from("teams")
+                .select("id, team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo")
+                .in("id", hostTeamIds);
+              const teamMap = new Map(teamsList?.map((t: any) => [t.id, t]) || []);
+              rawMatches = dbData.map((m: any) => ({
+                ...m,
+                teams: teamMap.get(m.host_team_id) || undefined,
+              }));
+            } else {
+              rawMatches = dbData;
+            }
           }
         }
 
@@ -280,15 +291,17 @@ export function useRealtimeMatchFeed(
             prev.forEach((m) => {
               // Bỏ qua kèo ảo / kèo mẫu seed
               if (m.id?.startsWith("seed-") || m.id?.startsWith("mock-")) return;
+              if (m.status === "CANCELLED" || m.status === "EXPIRED") return;
 
               // 🛡️ CHỐNG TỰ SINH 2 KÈO: Bỏ qua kèo tạm nếu CSDL đã tải về kèo thật cùng sân & giờ
               const isDuplicateOfDb = mapped.some(
                 (dbM) =>
-                  dbM.pitchName === m.pitchName &&
-                  dbM.startTime === m.startTime &&
-                  dbM.hostTeam.name === m.hostTeam.name
+                  dbM.id === m.id ||
+                  (dbM.pitchName.trim().toLowerCase() === m.pitchName.trim().toLowerCase() &&
+                   dbM.startTime.trim() === m.startTime.trim() &&
+                   (dbM.matchDateIso === m.matchDateIso || dbM.matchDate === m.matchDate))
               );
-              if (!map.has(m.id) && !isDuplicateOfDb && m.status !== "CANCELLED" && m.status !== "EXPIRED") {
+              if (!map.has(m.id) && !isDuplicateOfDb) {
                 map.set(m.id, m);
               }
             });
@@ -334,18 +347,19 @@ export function useRealtimeMatchFeed(
         "postgres_changes",
         { event: "*", schema: "public", table: "matches" },
         async (payload) => {
-          if (payload.eventType === "INSERT") {
-            const { data: newRow } = await supabase
-              .from("matches")
-              .select(
-                "*, teams:host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
-              )
-              .eq("id", payload.new.id)
-              .single();
+            let newRow: any = payload.new;
+            if (payload.new?.host_team_id) {
+              const { data: teamData } = await supabase
+                .from("teams")
+                .select("id, team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo")
+                .eq("id", payload.new.host_team_id)
+                .maybeSingle();
+              if (teamData) {
+                newRow = { ...payload.new, teams: teamData };
+              }
+            }
 
-            const mapped = mapDbMatchToFeedItem(
-              (newRow || payload.new) as MatchItem
-            );
+            const mapped = mapDbMatchToFeedItem(newRow as MatchItem);
             if (mapped.status === "CANCELLED" || mapped.status === "EXPIRED") return;
             setMatches((prev) => {
               if (prev.some((item) => item.id === mapped.id)) return prev;
@@ -354,10 +368,11 @@ export function useRealtimeMatchFeed(
               // Thay thế kèo tạm thời do client tạo bằng bản ghi chuẩn từ CSDL với UUID chính xác
               const tempMatchIdx = prev.findIndex(
                 (item) =>
-                  (item.id.startsWith("match-new-") || item.id.startsWith("m-") || item.isCreatedByCurrentUser) &&
-                  item.pitchName === mapped.pitchName &&
-                  item.startTime === mapped.startTime &&
-                  item.hostTeam.name === mapped.hostTeam.name
+                  item.id === mapped.id ||
+                  ((item.id.startsWith("match-new-") || item.id.startsWith("m-") || item.isCreatedByCurrentUser) &&
+                   item.pitchName.trim().toLowerCase() === mapped.pitchName.trim().toLowerCase() &&
+                   item.startTime.trim() === mapped.startTime.trim() &&
+                   (item.matchDateIso === mapped.matchDateIso || item.matchDate === mapped.matchDate))
               );
 
               if (tempMatchIdx !== -1) {
@@ -418,6 +433,21 @@ export function useRealtimeMatchFeed(
         if (!incoming?.id) return;
         setMatches((prev) => {
           if (prev.some((item) => item.id === incoming.id)) return prev;
+          const tempMatchIdx = prev.findIndex(
+            (item) =>
+              (item.id.startsWith("match-new-") || item.id.startsWith("m-") || item.isCreatedByCurrentUser) &&
+              item.pitchName.trim().toLowerCase() === incoming.pitchName.trim().toLowerCase() &&
+              item.startTime.trim() === incoming.startTime.trim() &&
+              (item.matchDateIso === incoming.matchDateIso || item.matchDate === incoming.matchDate)
+          );
+          if (tempMatchIdx !== -1) {
+            const updated = [...prev];
+            updated[tempMatchIdx] = {
+              ...incoming,
+              isCreatedByCurrentUser: prev[tempMatchIdx].isCreatedByCurrentUser,
+            };
+            return updated;
+          }
           return [incoming, ...prev];
         });
         playNotificationChime();

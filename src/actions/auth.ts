@@ -652,6 +652,11 @@ const matchCreationRateLimitMap = new Map<string, number[]>();
 
 export async function createMatchInDatabaseAction(payload: {
   hostTeamId: string;
+  hostTeamName?: string;
+  captainName?: string;
+  captainPhone?: string;
+  captainZalo?: string;
+  skillTier?: number;
   pitchCustomName: string;
   district: string;
   timeSlotLabel: string;
@@ -711,29 +716,45 @@ export async function createMatchInDatabaseAction(payload: {
       );
 
     if (!isValidUuid) {
-      const { data: firstTeam } = await adminClient
-        .from("teams")
-        .select("id")
-        .limit(1)
-        .maybeSingle();
-      if (firstTeam?.id) {
-        hostTeamId = firstTeam.id;
-      } else {
-        const { data: newTeam } = await adminClient
+      if (payload.hostTeamName) {
+        const { data: teamByName } = await adminClient
           .from("teams")
-          .insert({
-            team_name: "FC Cầu Giấy Phủi",
-            captain_name: "Đội Trưởng Mẫu",
-            captain_phone: "0988666888",
-            captain_zalo: "0988666888",
-            home_district: "CauGiay",
-            skill_tier: 2,
-            trust_score: 100,
-          })
           .select("id")
-          .single();
-        if (newTeam?.id) {
-          hostTeamId = newTeam.id;
+          .eq("team_name", payload.hostTeamName.trim())
+          .maybeSingle();
+        if (teamByName?.id) {
+          hostTeamId = teamByName.id;
+        }
+      }
+
+      if (!hostTeamId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(hostTeamId)) {
+        const { data: firstTeam } = await adminClient
+          .from("teams")
+          .select("id")
+          .limit(1)
+          .maybeSingle();
+        if (firstTeam?.id) {
+          hostTeamId = firstTeam.id;
+        } else {
+          const teamName = payload.hostTeamName?.trim() || "FC Phủi Hà Nội";
+          const captainName = payload.captainName?.trim() || "Đội Trưởng";
+          const phone = payload.captainPhone?.trim() || "0988666888";
+          const { data: newTeam } = await adminClient
+            .from("teams")
+            .insert({
+              team_name: teamName,
+              captain_name: captainName,
+              captain_phone: phone,
+              captain_zalo: payload.captainZalo?.trim() || phone,
+              home_district: payload.district || "CauGiay",
+              skill_tier: payload.skillTier || 2,
+              trust_score: 100,
+            })
+            .select("id")
+            .single();
+          if (newTeam?.id) {
+            hostTeamId = newTeam.id;
+          }
         }
       }
     }
@@ -764,7 +785,7 @@ export async function createMatchInDatabaseAction(payload: {
     let { data, error } = await adminClient
       .from("matches")
       .insert(insertObj)
-      .select("*, teams:host_team_id(team_name, trust_score)")
+      .select()
       .single();
 
     // Fallback nếu CSDL chưa thêm cột gmaps, expires_at hoặc pitch_address hoặc lỗi host_team_id foreign key
@@ -809,7 +830,7 @@ export async function createMatchInDatabaseAction(payload: {
       const retry = await adminClient
         .from("matches")
         .insert(insertObj)
-        .select("*, teams:host_team_id(team_name, trust_score)")
+        .select()
         .single();
       data = retry.data;
       error = retry.error;
@@ -818,6 +839,29 @@ export async function createMatchInDatabaseAction(payload: {
     if (error) {
       console.error("[createMatchInDatabaseAction Error]", error);
       return { success: false, error: error.message };
+    }
+
+    // Gắn thông tin đội bóng vào match trả về để đồng bộ giao diện
+    if (data && data.host_team_id) {
+      const { data: teamData } = await adminClient
+        .from("teams")
+        .select("id, team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo")
+        .eq("id", data.host_team_id)
+        .maybeSingle();
+      if (teamData) {
+        data.teams = teamData;
+      }
+    }
+    if (data && !data.teams && payload.hostTeamName) {
+      data.teams = {
+        team_name: payload.hostTeamName,
+        captain_name: payload.captainName || "Đội trưởng",
+        captain_phone: payload.captainPhone || "",
+        captain_zalo: payload.captainZalo || payload.captainPhone || "",
+        trust_score: 100,
+        skill_tier: payload.skillTier || 2,
+        has_warning_badge: false,
+      };
     }
 
     revalidatePath("/");
@@ -1194,22 +1238,77 @@ export async function guestWithdrawFromMatchAction(payload: {
 export async function getRealtimeMatchesFromDatabaseAction() {
   try {
     const adminClient = getAdminClient();
-    const { data, error } = await adminClient
+    let data: any[] | null = null;
+    let error: any = null;
+
+    // TẦNG 1: Thử join chuẩn PostgREST qua foreign key column: teams!host_team_id
+    const res1 = await adminClient
       .from("matches")
       .select(
-        "*, teams:host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
+        "*, teams!host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
       )
       .neq("status", "cancelled")
       .neq("status", "expired")
       .order("created_at", { ascending: false })
       .limit(50);
 
-    if (error) {
-      console.warn("[getRealtimeMatchesFromDatabaseAction Warning]", error.message);
+    if (!res1.error && res1.data) {
+      data = res1.data;
+    } else {
+      console.warn("[getRealtimeMatches] Tier 1 join failed, trying Tier 2 (teams):", res1.error?.message);
+      // TẦNG 2: Thử join không chỉ định tên cột: teams(...)
+      const res2 = await adminClient
+        .from("matches")
+        .select(
+          "*, teams(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
+        )
+        .neq("status", "cancelled")
+        .neq("status", "expired")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (!res2.error && res2.data) {
+        data = res2.data;
+      } else {
+        console.warn("[getRealtimeMatches] Tier 2 join failed, trying Tier 3 (select '*' + manual teams map):", res2.error?.message);
+        // TẦNG 3: Bất khả chiến bại: select('*') trực tiếp từ bảng matches, không bao giờ lỗi join
+        const res3 = await adminClient
+          .from("matches")
+          .select("*")
+          .neq("status", "cancelled")
+          .neq("status", "expired")
+          .order("created_at", { ascending: false })
+          .limit(50);
+
+        if (!res3.error && res3.data) {
+          data = res3.data;
+          const hostTeamIds = Array.from(new Set(data.map((m: any) => m.host_team_id).filter(Boolean)));
+          if (hostTeamIds.length > 0) {
+            const { data: teamsList } = await adminClient
+              .from("teams")
+              .select("id, team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo")
+              .in("id", hostTeamIds);
+
+            if (teamsList && teamsList.length > 0) {
+              const teamMap = new Map<string, any>(teamsList.map((t: any) => [t.id, t]));
+              data = data.map((m: any) => ({
+                ...m,
+                teams: teamMap.get(m.host_team_id) || undefined,
+              }));
+            }
+          }
+        } else {
+          error = res3.error;
+        }
+      }
+    }
+
+    if (error || !data) {
+      console.error("[getRealtimeMatchesFromDatabaseAction Error]", error?.message);
       return { success: false, data: [] };
     }
 
-    return { success: true, data: data || [] };
+    return { success: true, data };
   } catch (err: any) {
     console.error("[getRealtimeMatchesFromDatabaseAction Error]", err);
     return { success: false, data: [] };

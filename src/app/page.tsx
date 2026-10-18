@@ -641,6 +641,11 @@ export default function HanoiMatchmakingPlatform() {
     const hostTeamIdToSave = team?.id || "team-cg-01";
     const dbRes = await createMatchInDatabaseAction({
       hostTeamId: hostTeamIdToSave,
+      hostTeamName: newMatch.hostTeam.name,
+      captainName: newMatch.hostTeam.captainName,
+      captainPhone: newMatch.hostTeam.captainPhone,
+      captainZalo: newMatch.hostTeam.captainZalo,
+      skillTier: newMatch.requiredTier,
       pitchCustomName: newMatch.pitchName,
       district: newMatch.district,
       timeSlotLabel: `${newMatch.startTime} - ${newMatch.endTime}`,
@@ -657,12 +662,16 @@ export default function HanoiMatchmakingPlatform() {
 
     // 🛡️ CHỐNG TỰ SINH 2 KÈO: Cập nhật ngay ID chính thức từ Supabase cho kèo vừa tạo
     if (dbRes?.success && dbRes.match?.id) {
+      const officialId = dbRes.match.id;
       setMatches((prev) =>
         prev.map((m) =>
-          m.id === newMatch.id
+          m.id === newMatch.id ||
+          (m.pitchName.trim().toLowerCase() === newMatch.pitchName.trim().toLowerCase() &&
+           m.startTime === newMatch.startTime &&
+           (m.matchDateIso === newMatch.matchDateIso || m.matchDate === newMatch.matchDate))
             ? {
                 ...m,
-                id: dbRes.match.id,
+                id: officialId,
                 isCreatedByCurrentUser: true,
                 pitchAddress: newMatch.pitchAddress,
                 gmapsUrl: newMatch.gmapsUrl,
@@ -671,6 +680,12 @@ export default function HanoiMatchmakingPlatform() {
             : m
         )
       );
+
+      // Đồng bộ phát sóng với ID chính thức
+      await broadcastNewMatch({
+        ...newMatch,
+        id: officialId,
+      });
     }
 
     pushBotLog(
