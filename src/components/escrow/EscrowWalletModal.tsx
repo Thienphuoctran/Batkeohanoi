@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { generateVietQRQuickUrl } from "@/constants/mockMatchmaking";
-import { EscrowWallet } from "@/types/matchmaking";
+import { EscrowWallet, BankWithdrawInfo } from "@/types/matchmaking";
 
 interface EscrowWalletModalProps {
   isOpen: boolean;
@@ -28,10 +28,7 @@ interface EscrowWalletModalProps {
   teamName?: string;
   captainPhone?: string;
   onDepositSuccess: (amount: number) => void;
-  onWithdrawSuccess: (
-    amount: number,
-    bankInfo: { bankName?: string; accountNumber?: string; accountName?: string; bank?: string; account?: string; name?: string }
-  ) => void;
+  onWithdrawSuccess: (amount: number, bankInfo: BankWithdrawInfo) => void;
 }
 
 export function EscrowWalletModal({
@@ -80,6 +77,9 @@ export function EscrowWalletModal({
     e.preventDefault();
     if (!canWithdraw || wallet.availableBalance <= 0) return;
     onWithdrawSuccess(wallet.availableBalance, {
+      bankName: withdrawBank,
+      accountNumber: withdrawAccount,
+      accountName: withdrawName,
       bank: withdrawBank,
       account: withdrawAccount,
       name: withdrawName,

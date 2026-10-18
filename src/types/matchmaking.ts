@@ -141,3 +141,12 @@ export interface RollCallSession {
   members: RollCallMember[];
   sharePerPlayerVnd?: number;
 }
+
+export interface BankWithdrawInfo {
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  bank?: string;
+  account?: string;
+  name?: string;
+}

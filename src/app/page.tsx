@@ -16,8 +16,7 @@ import {
   Plus,
 } from "lucide-react";
 import { MOCK_MATCH_FEEDS, MOCK_TEAMS } from "@/constants/mockMatchmaking";
-import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
-import { District, MatchFeedItem, SkillTier, EscrowWallet } from "@/types/matchmaking";
+import { District, MatchFeedItem, SkillTier, EscrowWallet, BankWithdrawInfo } from "@/types/matchmaking";
 import { HeaderBar, ActiveTab } from "@/components/matchmaking/HeaderBar";
 import { SosAlertCard } from "@/components/matchmaking/SosAlertCard";
 import { MatchFeedCard } from "@/components/matchmaking/MatchFeedCard";
@@ -215,7 +214,7 @@ export default function HanoiMatchmakingPlatform() {
   // Xử lý rút tiền ký quỹ về tài khoản ngân hàng (chỉ mở khi uy tín >= 70)
   const handleWithdrawEscrow = (
     amount: number,
-    bankInfo: { bankName: string; accountNumber: string; accountName: string }
+    bankInfo: BankWithdrawInfo
   ) => {
     setEscrowWallet((prev) => {
       const newBal = Math.max(0, prev.balance - amount);
@@ -225,9 +224,12 @@ export default function HanoiMatchmakingPlatform() {
         availableBalance: Math.max(0, newBal - prev.lockedAmount),
       };
     });
+    const bankName = bankInfo.bankName || bankInfo.bank || "Ngân hàng";
+    const accNumber = bankInfo.accountNumber || bankInfo.account || "";
+    const accName = bankInfo.accountName || bankInfo.name || "";
     pushBotLog(
       `🏦 Hoàn Tiền Ký Quỹ Thành Công (-${amount.toLocaleString("vi-VN")}đ)`,
-      `Hệ thống đã chuyển ${amount.toLocaleString("vi-VN")}đ về tài khoản ${bankInfo.bankName} - ${bankInfo.accountNumber} (${bankInfo.accountName}). Giao dịch xử lý tự động hoàn tất.`,
+      `Hệ thống đã chuyển ${amount.toLocaleString("vi-VN")}đ về tài khoản ${bankName} - ${accNumber} (${accName}). Giao dịch xử lý tự động hoàn tất.`,
       "Hoàn Cọc 24/7"
     );
   };
