@@ -109,13 +109,13 @@ export function AppGuideModal({
             <div className="space-y-4 animate-in fade-in duration-150">
               <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/30 space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
-                  Sứ mệnh BắtKèo7 Hà Nội
+                  Sứ mệnh GiaoHuu.vn Hà Nội
                 </span>
                 <h3 className="text-sm font-extrabold text-white">
                   Chấm Dứt 100% Nạn "Bùng Kèo Phủi" &amp; Ghép Đối Chuẩn Trình Độ Sân 7
                 </h3>
                 <p className="text-slate-300">
-                  BắtKèo7.vn là nền tảng công nghệ thể thao đầu tiên áp dụng cơ chế <strong>Bảo Chứng Ký Quỹ VietQR Napas247</strong> kết hợp <strong>Mã Bắt Tay 4 Số và Định Vị GPS</strong> tại các cụm sân cỏ nhân tạo Hà Nội.
+                  GiaoHuu.vn là nền tảng công nghệ thể thao đầu tiên áp dụng cơ chế <strong>Bảo Chứng Ký Quỹ VietQR Napas247</strong> kết hợp <strong>Mã Bắt Tay 4 Số và Định Vị GPS</strong> tại các cụm sân cỏ nhân tạo Hà Nội.
                 </p>
               </div>
 

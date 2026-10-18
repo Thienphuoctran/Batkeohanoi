@@ -54,6 +54,8 @@ import {
   PhuiStamp,
   StarRibbon,
   RollingFootballPitch,
+  PhuiSticker,
+  PhuiStickerCanvas,
 } from "@/components/phui";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { TeamOnboardingModal } from "@/components/team/TeamOnboardingModal";
@@ -621,42 +623,11 @@ export default function HanoiMatchmakingPlatform() {
 
   return (
     <div className="min-h-screen bg-stadium-multi text-slate-100 flex flex-col pb-16 relative overflow-x-hidden">
-      {/* 🏟️ CẢNH NỀN SÂN ĐÈN CAO ÁP ĐÊM (Concept 2 Chuẩn) */}
+      {/* 🏟️ LAYER 0: CẢNH NỀN SÂN ĐÈN CAO ÁP ĐÊM (Vignette + Dark overlay 85%) */}
       <StadiumNightScenery />
 
-      {/* Floating Sport Stickers (3D Glassmorphism Badges) */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute top-36 left-2 xl:left-8 animate-float-slow hidden md:inline-flex">
-          <span className="sport-sticker border-emerald-500/40 text-emerald-300">
-            <span className="text-base">⚽</span> Sân 7 Hà Nội
-          </span>
-        </div>
-        <div className="absolute top-56 right-3 xl:right-10 animate-float-reverse hidden md:inline-flex">
-          <span className="sport-sticker border-amber-500/40 text-amber-300">
-            <span className="text-base">⚡</span> Giờ Vàng 19h00
-          </span>
-        </div>
-        <div className="absolute top-[480px] left-3 xl:left-8 animate-float-reverse hidden lg:inline-flex">
-          <span className="sport-sticker border-sky-500/40 text-sky-300">
-            <span className="text-base">🧤</span> Thủ Môn Xuất Sắc
-          </span>
-        </div>
-        <div className="absolute top-[640px] right-3 xl:right-10 animate-float-slow hidden lg:inline-flex">
-          <span className="sport-sticker border-orange-500/40 text-orange-300">
-            <span className="text-base">🏆</span> Cúp Phủi Cầu Giấy
-          </span>
-        </div>
-        <div className="absolute bottom-40 left-4 xl:left-12 animate-float-slow hidden xl:inline-flex">
-          <span className="sport-sticker border-teal-500/40 text-teal-300">
-            <span className="text-base">👟</span> Đinh Dăm TF Chuẩn
-          </span>
-        </div>
-        <div className="absolute bottom-24 right-4 xl:right-14 animate-float-reverse hidden xl:inline-flex">
-          <span className="sport-sticker border-rose-500/40 text-rose-300">
-            <span className="text-base">🛡️</span> Cam Kết Không Bùng Kèo
-          </span>
-        </div>
-      </div>
+      {/* 🎨 LAYER 1: LỚP STICKER & HOẠ TIẾT TRANG TRÍ PHỦI (3-Layer Rule) */}
+      <PhuiStickerCanvas />
 
       <div
         className={`w-full mx-auto transition-all duration-300 relative z-10 ${
@@ -740,6 +711,7 @@ export default function HanoiMatchmakingPlatform() {
                     <h2 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap">
                       <span>SÀN BẮT ĐỐI SÂN 7</span>
                       <ShinyText text="CHỐNG BÙNG KÈO" speed={3} className="text-emerald-400" />
+                      <PhuiSticker variant="chong-bung-keo" size={135} angle={-2} className="hidden md:inline-block ml-1" />
                     </h2>
                     <p className="text-xs text-slate-300/80 mt-1 max-w-xl leading-relaxed">
                       Cọc bảo chứng 200k • Hủy sát giờ &lt; 1h đền 100% tiền sân • Xác thực mã bắt tay OTP 4 số tại cổng sân.
@@ -983,9 +955,12 @@ export default function HanoiMatchmakingPlatform() {
                     Cứu kèo giúp sân không bị bỏ trống • Thưởng +8 điểm tín nhiệm &amp; Bảo chứng an toàn 100%
                   </p>
                 </div>
-                <span className="px-2.5 py-1 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-black">
-                  Ưu tiên số 1
-                </span>
+                <div className="flex items-center gap-2">
+                  <PhuiSticker variant="the-phat" size={70} angle={6} className="hidden sm:inline-block shrink-0" />
+                  <span className="px-2.5 py-1 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-black">
+                    Ưu tiên số 1
+                  </span>
+                </div>
               </div>
 
               {sosMatches.length > 0 ? (
