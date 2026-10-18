@@ -114,18 +114,53 @@ export interface BlindReview {
   createdAt: string;
 }
 
+export type SoloPosition = "GK" | "DF" | "MF" | "FW";
+
+export interface FreeAgentScoutCard {
+  id: string;
+  playerName: string; // VD: Tuấn "Cò"
+  age: number; // VD: 27
+  preferredFoot: "Chân phải" | "Chân trái" | "Hai chân";
+  position: SoloPosition;
+  positionLabel: string; // VD: "Thủ Môn (GK)", "Hậu Vệ (DF)", "Tiền Vệ (MF)", "Tiền Đạo (FW)"
+  skillTier: SkillTier; // 1 | 2 | 3
+  districts: string[]; // VD: ["Cầu Giấy", "Nam Từ Liêm"]
+  availableTimeSlots: string[]; // VD: ["19:00", "20:30"]
+  feeContribution: string; // VD: "Miễn phí tiền sân (Thủ môn)", "Sẵn sàng share 50k", "Bao nước ngọt"
+  trustRating: number; // VD: 4.9 (thang 5.0 ★)
+  matchesJoined: number;
+  futStats: {
+    ovr: number;
+    pac: number; // Thể lực / Tốc độ
+    tec: number; // Kỹ thuật
+    pas: number; // Chuyền bóng
+    def: number; // Phòng ngự
+    fpl: number; // Fair-play
+  };
+  phone: string;
+  zaloPhone?: string;
+  bio?: string;
+  hasFirstTimerVoucher?: boolean;
+  isCreatedByCurrentUser?: boolean;
+  createdAt: string;
+}
+
 export interface SubPlayerPost {
   id: string;
   teamId: string;
   teamName: string;
   positionNeeded: "Thủ Môn (GK)" | "Trung Vệ (CB)" | "Tiền Vệ (MF)" | "Tiền Đạo (FW)";
+  positionCode?: SoloPosition;
   quantity: number;
   matchTime: string; // VD: "19:00 - 20:30 Hôm nay"
   pitchName: string;
   district: District;
-  shareCostDescription: string; // VD: "Miễn phí 100% cho GK", "Share 50k tiền nước"
+  skillTier?: SkillTier;
+  shareCostDescription: string; // VD: "Miễn phí 100% cho GK", "Share 50k"
   contactPhone: string;
   contactZalo?: string;
+  notes?: string;
+  isCreatedByCurrentUser?: boolean;
   status: "ACTIVE" | "FILLED";
   createdAt: string;
 }
