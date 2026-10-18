@@ -316,7 +316,7 @@ function getSmartOfflineResponse(query: string): AiAssistantResponse {
   ) {
     return {
       success: true,
-      reply: `🚨 **Kèo Cứu Hộ SOS - Đặc Quyền Chống Bể Trận:**\n\n• Khi một đội bị đối thủ hủy sát giờ hoặc cần ghép đối gấp trong vòng 60-90 phút trước giờ lăn bóng, trận đấu chuyển sang trạng thái **Kèo SOS**.\n• **Đội nhận kèo SOS:** Được hệ thống **TÀI TRỢ 100.000đ tiền nước ngọt** ngay tại trận!\n• Hai đội bắt buộc ký quỹ cọc 200k để bảo chứng không xảy ra tình trạng bỏ sân.`,
+      reply: `🚨 **Kèo Cứu Hộ SOS - Đặc Quyền Chống Bể Trận:**\n\n• Khi một đội bị đối thủ hủy sát giờ hoặc cần ghép đối gấp trong vòng 60-90 phút trước giờ lăn bóng, trận đấu chuyển sang trạng thái **Kèo SOS**.\n• **Đội nhận kèo SOS:** Được ưu tiên nổi bật trên đầu bảng tin và cộng thưởng **+8 điểm Uy Tín** tín nhiệm sau trận!\n• Hai đội bắt buộc ký quỹ cọc 200k để bảo chứng không xảy ra tình trạng bỏ sân.`,
       suggestedActions: [
         { label: "🚨 Nhận Kèo SOS Giờ Vàng", actionType: "OPEN_SOS" },
       ],

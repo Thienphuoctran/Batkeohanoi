@@ -45,7 +45,7 @@ const QUICK_PROMPTS = [
   "🏟️ Sân bóng nào ở Cầu Giấy?",
   "⚽ Luật ném biên hay đá biên sân 7?",
   "👟 Sân cỏ nhân tạo đi giày đinh gì?",
-  "🔥 Kèo SOS nhận được tặng gì?",
+  "🔥 Kèo SOS hoạt động ra sao?",
   "📋 Sơ đồ chiến thuật 3-2-1 đá sao?",
   "⭐ Làm sao tăng điểm Uy Tín lên 100đ?",
   "🤝 Mã bắt tay 4 số dùng thế nào?",

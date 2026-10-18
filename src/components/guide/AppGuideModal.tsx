@@ -146,7 +146,7 @@ export function AppGuideModal({
                     <span>Kèo SOS Cứu Hộ</span>
                   </div>
                   <p className="text-slate-400 text-[11px]">
-                    Giải cứu trận đấu bị hủy sát giờ. Đội nhận kèo cứu hộ được tài trợ 100k tiền nước.
+                    Giải cứu trận đấu bị hủy sát giờ. Đội nhận kèo cứu hộ được cộng thưởng +8 điểm Uy Tín tín nhiệm.
                   </p>
                 </div>
 
@@ -260,8 +260,8 @@ export function AppGuideModal({
 
               <div className="space-y-2 text-[11px]">
                 <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                  <span className="text-slate-300">🎁 Tài trợ tiền nước:</span>
-                  <span className="text-emerald-400 font-bold">+100.000đ nước ngọt cho đội nhận kèo</span>
+                  <span className="text-slate-300">⭐ Thưởng điểm Uy Tín:</span>
+                  <span className="text-emerald-400 font-bold">+8 điểm tín nhiệm cộng thẳng vào hồ sơ</span>
                 </div>
                 <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
                   <span className="text-slate-300">⏱️ Thời gian cứu hộ:</span>

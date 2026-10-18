@@ -105,7 +105,6 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
   const [timeSlot, setTimeSlot] = useState("19:00 - 20:30");
   const [phone, setPhone] = useState("");
   const [bioOrNotes, setBioOrNotes] = useState("");
-  const [hasVoucher, setHasVoucher] = useState(true);
 
   // Riêng cho Đội tuyển người
   const [teamName, setTeamName] = useState("");
@@ -230,7 +229,6 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     setTimeSlot(agent.availableTimeSlots.join(", ") || "19:00");
     setPhone(agent.phone);
     setBioOrNotes(agent.bio || "");
-    setHasVoucher(Boolean(agent.hasFirstTimerVoucher));
     setIsPostModalOpen(true);
   };
 
@@ -304,7 +302,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
         bio:
           bioOrNotes.trim() ||
           "Đá nhiệt tình, văn minh, đúng giờ, tìm đội giao lưu lâu dài.",
-        hasFirstTimerVoucher: hasVoucher,
+        hasFirstTimerVoucher: false,
         isCreatedByCurrentUser: true,
         createdAt: editingAgentId ? "Đã cập nhật" : "Vừa xong",
       };
@@ -374,7 +372,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                 Chợ Cầu 2 Chiều • Toàn Hà Nội
               </span>
               <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-[10px] font-black text-amber-300">
-                🥤 Tặng Voucher Nước Mía Lần Đầu
+                ⚡ Ghép Đối &amp; Tuyển Quân 24/7
               </span>
             </div>
             <h2 className="text-base sm:text-lg font-black text-white mt-1.5 flex items-center gap-2">
@@ -691,12 +689,6 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-300">
                               <ShieldCheck className="w-3 h-3" />
                               Cầu thủ uy tín ({agent.matchesJoined} trận)
-                            </span>
-                          )}
-                          {agent.hasFirstTimerVoucher && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-[10px] font-bold text-sky-300">
-                              <Gift className="w-3 h-3" />
-                              Voucher Nước Mía / -20k
                             </span>
                           )}
                         </div>
