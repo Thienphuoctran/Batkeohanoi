@@ -746,7 +746,7 @@ export default function HanoiMatchmakingPlatform() {
             <SubMarketAndRollCall viewMode="sub-market" />
           )}
 
-          {/* WORKSPACE 4: BẢN ĐỒ CỤM SÂN & TIỆN ÍCH KÈO ĐỆ TAM (0 ĐỒNG KINH PHÍ) */}
+          {/* WORKSPACE 4: BẢN ĐỒ CỤM SÂN BÓNG ĐÁ HÀ NỘI & CHỈ ĐƯỜNG 1-CHẠM */}
           {activeTab === "pitch-map" && (
             <div className="space-y-4">
               <PitchMapSection />
