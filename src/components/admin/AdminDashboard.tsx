@@ -798,9 +798,14 @@ export function AdminDashboard() {
 
               <CardContent className="p-4 space-y-3">
                 {escrowRecords.map((rec) => {
-                  const vietQrUrl = `https://img.vietqr.io/image/${rec.bankBin}-${rec.bankAccountNo}-compact2.png?amount=${rec.amount}&addInfo=${encodeURIComponent(
-                    `HOAN COC ${rec.transferCode}`
-                  )}&accountName=${encodeURIComponent(rec.bankAccountName)}`;
+                  const bin = rec.bankBin || rec.bankCode || '970422';
+                  const accNo = rec.bankAccountNo || rec.accountNumber || '07440948327598';
+                  const code = rec.transferCode || rec.id;
+                  const accName = rec.bankAccountName || rec.accountName || 'CHU TAI KHOAN';
+
+                  const vietQrUrl = `https://img.vietqr.io/image/${bin}-${accNo}-compact2.png?amount=${rec.amount}&addInfo=${encodeURIComponent(
+                    `HOAN COC ${code}`
+                  )}&accountName=${encodeURIComponent(accName)}`;
 
                   return (
                     <div
@@ -914,13 +919,13 @@ export function AdminDashboard() {
                                 Mã QR Chuyển Khoản Hoàn Cọc 200.000đ
                               </p>
                               <p className="text-slate-300">
-                                • Ngân hàng thụ hưởng: <strong>{rec.bankShortName}</strong>
+                                • Ngân hàng thụ hưởng: <strong>{rec.bankShortName || rec.bankName || 'MBBank'}</strong>
                               </p>
                               <p className="text-slate-300">
-                                • Số tài khoản: <code>{rec.bankAccountNo}</code>
+                                • Số tài khoản: <code>{rec.bankAccountNo || rec.accountNumber || '—'}</code>
                               </p>
                               <p className="text-slate-300">
-                                • Chủ tài khoản: <strong>{rec.bankAccountName}</strong>
+                                • Chủ tài khoản: <strong>{rec.bankAccountName || rec.accountName || 'CHU TAI KHOAN'}</strong>
                               </p>
                               <p className="text-[11px] text-slate-400">
                                 Mở app MB Bank của Admin quét mã trên để tự điền đúng 200.000đ, sau đó bấm <strong>&quot;Bước 2: Xác Nhận Đã Hoàn 100%&quot;</strong>.
