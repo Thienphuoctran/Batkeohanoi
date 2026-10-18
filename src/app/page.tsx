@@ -509,7 +509,7 @@ export default function HanoiMatchmakingPlatform() {
         ? "🚨 Đã Phát Tín Hiệu Cứu Hộ SOS"
         : "⚽ Đã Đăng Kèo Mới Lên Bảng Tin",
       `${newMatch.hostTeam.name} tìm đối tại ${newMatch.pitchName} (${newMatch.startTime}). Đã gắn định tuyến Zalo (${newMatch.hostTeam.captainPhone}).`,
-      newMatch.isSOS ? "SOS < 2h" : "Kèo Mới",
+      newMatch.isSOS ? "SOS < 1h" : "Kèo Mới",
       newMatch.hostTeam.captainZalo || newMatch.hostTeam.captainPhone,
       `${newMatch.hostTeam.captainName} (${newMatch.hostTeam.shortName})`
     );
