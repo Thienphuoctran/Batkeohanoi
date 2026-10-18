@@ -347,6 +347,7 @@ export function useRealtimeMatchFeed(
         "postgres_changes",
         { event: "*", schema: "public", table: "matches" },
         async (payload) => {
+          if (payload.eventType === "INSERT") {
             let newRow: any = payload.new;
             if (payload.new?.host_team_id) {
               const { data: teamData } = await supabase
