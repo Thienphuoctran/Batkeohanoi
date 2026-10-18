@@ -126,7 +126,7 @@ export interface FreeAgentScoutCard {
   skillTier: SkillTier; // 1 | 2 | 3
   districts: string[]; // VD: ["Cầu Giấy", "Nam Từ Liêm"]
   availableTimeSlots: string[]; // VD: ["19:00", "20:30"]
-  feeContribution: string; // VD: "Miễn phí tiền sân (Thủ môn)", "Sẵn sàng share 50k", "Bao nước ngọt"
+  feeContribution?: string; // Tùy chọn (trao đổi trực tiếp qua Zalo)
   trustRating: number; // VD: 4.9 (thang 5.0 ★)
   matchesJoined: number;
   futStats: {
@@ -156,7 +156,7 @@ export interface SubPlayerPost {
   pitchName: string;
   district: District;
   skillTier?: SkillTier;
-  shareCostDescription: string; // VD: "Miễn phí 100% cho GK", "Share 50k"
+  shareCostDescription?: string; // Tùy chọn (trao đổi trực tiếp qua Zalo)
   contactPhone: string;
   contactZalo?: string;
   notes?: string;

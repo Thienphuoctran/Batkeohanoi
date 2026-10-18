@@ -101,9 +101,6 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
   const [skillTier, setSkillTier] = useState<SkillTier>(2);
   const [district, setDistrict] = useState<District>("Cầu Giấy");
   const [timeSlot, setTimeSlot] = useState("19:00 - 20:30");
-  const [feeContribution, setFeeContribution] = useState(
-    "Sẵn sàng share 50k"
-  );
   const [phone, setPhone] = useState("");
   const [bioOrNotes, setBioOrNotes] = useState("");
   const [hasVoucher, setHasVoucher] = useState(true);
@@ -209,7 +206,6 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     setSkillTier(2);
     setDistrict("Cầu Giấy");
     setTimeSlot("19:00 - 20:30");
-    setFeeContribution("Sẵn sàng share 50k");
     setPhone("");
     setBioOrNotes("");
     setTeamName("");
@@ -230,7 +226,6 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     setSkillTier(agent.skillTier);
     setDistrict(agent.districts[0] || "Cầu Giấy");
     setTimeSlot(agent.availableTimeSlots.join(", ") || "19:00");
-    setFeeContribution(agent.feeContribution);
     setPhone(agent.phone);
     setBioOrNotes(agent.bio || "");
     setHasVoucher(Boolean(agent.hasFirstTimerVoucher));
@@ -249,7 +244,6 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     setQuantity(post.quantity);
     setSkillTier(post.skillTier || 2);
     setPositionCode(post.positionCode || "GK");
-    setFeeContribution(post.shareCostDescription);
     setPhone(post.contactPhone);
     setBioOrNotes(post.notes || "");
     setIsPostModalOpen(true);
@@ -291,9 +285,6 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean),
-        feeContribution: isGK
-          ? feeContribution || "Miễn phí tiền sân (Thủ môn)"
-          : feeContribution,
         trustRating: 5.0,
         matchesJoined: editingAgentId
           ? freeAgents.find((a) => a.id === editingAgentId)?.matchesJoined || 1
@@ -347,7 +338,6 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
         pitchName: pitchName.trim() || "Sân Cỏ Nhân Tạo",
         district,
         skillTier,
-        shareCostDescription: feeContribution,
         contactPhone: phone.trim() || "0988.765.432",
         contactZalo: normalizeVietnamPhone(phone.trim() || "0988765432"),
         notes:
@@ -571,7 +561,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
             }`}
           >
             <Flame className="w-3.5 h-3.5 fill-current" />
-            <span>🧤 GK Hotline (Miễn Phí Sân 100%)</span>
+            <span>🧤 GK Hotline (Ưu Tiên Thủ Môn)</span>
           </button>
         </div>
 
@@ -725,16 +715,10 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                           Ca: {agent.availableTimeSlots.join(", ")}
                         </span>
                       </div>
-                      <div className="pt-1 border-t border-slate-800/80 flex items-center justify-between">
-                        <span className="text-slate-400 text-[11px]">
-                          Đóng góp kinh phí:
-                        </span>
-                        <span
-                          className={`font-extrabold ${
-                            isGK ? "text-amber-300" : "text-emerald-400"
-                          }`}
-                        >
-                          💰 {agent.feeContribution}
+                      <div className="pt-1 border-t border-slate-800/80 flex items-center justify-between text-slate-400 text-[11px]">
+                        <span>Kinh phí &amp; Màu áo:</span>
+                        <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                          💬 Trao đổi qua Zalo
                         </span>
                       </div>
                     </div>
@@ -797,14 +781,23 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
             })
           ) : (
             <div className="md:col-span-2 surface-card rounded-2xl border border-white/[0.08] p-10 text-center space-y-3">
-              <p className="text-sm font-bold text-white">
-                Chưa có cầu thủ tự do nào khớp bộ lọc này
-              </p>
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-xl">
+                🏃
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-extrabold text-white">
+                  Chưa có cầu thủ tự do nào đăng hồ sơ
+                </p>
+                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                  Bạn đang tìm đội đá bóng tối nay hoặc cố định hàng tuần? Tạo hồ sơ để các đội bóng khu vực của bạn kết nối Zalo ngay!
+                </p>
+              </div>
               <Button
                 onClick={() => handleOpenCreateModal("free-agents")}
-                className="h-9 px-4 rounded-xl bg-emerald-500 text-slate-950 font-black text-xs"
+                className="h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-emerald-500/20"
               >
-                + Đăng Hồ Sơ Cầu Thủ Tự Do Ngay
+                <Plus className="w-4 h-4 stroke-[2.5]" />
+                <span>+ Đăng Hồ Sơ Cầu Thủ Tự Do Ngay</span>
               </Button>
             </div>
           )}
@@ -862,8 +855,8 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       <span className="text-emerald-300">{post.pitchName}</span>
                     </h3>
 
-                    <p className="text-xs text-emerald-400 font-bold">
-                      💰 Đóng góp: {post.shareCostDescription}
+                    <p className="text-xs text-slate-400 font-medium flex items-center gap-1">
+                      💬 Kinh phí &amp; trang phục trao đổi trực tiếp qua Zalo
                     </p>
 
                     {post.notes && (
@@ -919,14 +912,23 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
             })
           ) : (
             <div className="surface-card rounded-2xl border border-white/[0.08] p-10 text-center space-y-3">
-              <p className="text-sm font-bold text-white">
-                Chưa có đội bóng nào đăng tuyển vị trí này
-              </p>
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-xl">
+                🛡️
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-extrabold text-white">
+                  Chưa có đội bóng nào đăng tuyển vị trí này
+                </p>
+                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                  Đội của bạn đang thiếu vị trí (Thủ môn, Hậu vệ, Tiền vệ, Tiền đạo) trước giờ bóng lăn? Đăng tin để tìm cầu thủ xung quanh khu vực sân!
+                </p>
+              </div>
               <Button
                 onClick={() => handleOpenCreateModal("team-recruit")}
-                className="h-9 px-4 rounded-xl bg-amber-400 text-slate-950 font-black text-xs"
+                className="h-10 px-5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-amber-500/20"
               >
-                + Đăng Tin Tuyển Người Ngay
+                <Plus className="w-4 h-4 stroke-[2.5]" />
+                <span>+ Đăng Tin Tuyển Người Ngay</span>
               </Button>
             </div>
           )}
@@ -1054,19 +1056,14 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               {/* Chọn Vị Trí Thi Đấu */}
               <div>
                 <label className="block font-semibold text-slate-300 mb-1.5">
-                  Vị trí thi đấu (Chọn GK để kích hoạt Huy hiệu Hàng Hiếm &amp; Miễn phí sân)
+                  Vị trí thi đấu (Chọn GK để kích hoạt Huy hiệu Hàng Hiếm Thủ Môn)
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {POSITION_OPTIONS.map((p) => (
                     <button
                       key={p.code}
                       type="button"
-                      onClick={() => {
-                        setPositionCode(p.code);
-                        if (p.code === "GK") {
-                          setFeeContribution("Miễn phí tiền sân (Thủ môn)");
-                        }
-                      }}
+                      onClick={() => setPositionCode(p.code)}
                       className={`p-2.5 rounded-xl border text-center transition ${
                         positionCode === p.code
                           ? p.code === "GK"
@@ -1144,7 +1141,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                 )}
               </div>
 
-              {/* Chọn Tier & Đóng góp kinh phí */}
+              {/* Chọn Tier & Ghi chú trao đổi kinh phí */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label className="block font-semibold text-slate-300 mb-1">
@@ -1163,28 +1160,13 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
-                    Đóng góp kinh phí
-                  </label>
-                  <select
-                    value={feeContribution}
-                    onChange={(e) => setFeeContribution(e.target.value)}
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-emerald-300 font-bold"
-                  >
-                    <option value="Miễn phí tiền sân (Thủ môn)">
-                      Miễn phí tiền sân (Thủ môn)
-                    </option>
-                    <option value="Sẵn sàng share 50k">
-                      Sẵn sàng share 50k
-                    </option>
-                    <option value="Share nhẹ 40k / người">
-                      Share nhẹ 40k / người
-                    </option>
-                    <option value="Bao nước ngọt giao lưu">
-                      Bao nước ngọt giao lưu
-                    </option>
-                  </select>
+                <div className="flex flex-col justify-end">
+                  <div className="p-2.5 rounded-xl bg-slate-950/80 border border-emerald-500/20 text-[11px] text-slate-300 flex items-center gap-2">
+                    <span className="text-base">💬</span>
+                    <span>
+                      <strong className="text-emerald-400">Trao đổi qua Zalo:</strong> Tiền sân, nước uống và màu áo hai bên chủ động thống nhất khi kết nối.
+                    </span>
+                  </div>
                 </div>
               </div>
 

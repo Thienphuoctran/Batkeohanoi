@@ -28,7 +28,7 @@ export function FutCardModal({ player, onClose }: FutCardModalProps) {
   const isGK = player.position === "GK";
 
   const handleCopyShare = () => {
-    const shareText = `⚽ THẺ CẦU THỦ BẮTKÈO7 FUT CARD: ${player.playerName} (${player.age}t • ${player.position}) | OVR ${player.futStats.ovr} | Uy tín ${player.trustRating.toFixed(1)}★ | Khu vực: ${player.districts.join(", ")} | Đóng góp: ${player.feeContribution}. Mời đá ngay tại BắtKèo7.vn!`;
+    const shareText = `⚽ THẺ CẦU THỦ BẮTKÈO7 FUT CARD: ${player.playerName} (${player.age}t • ${player.position}) | OVR ${player.futStats.ovr} | Uy tín ${player.trustRating.toFixed(1)}★ | Khu vực: ${player.districts.join(", ")} | Kết nối Zalo mời đá ngay tại BắtKèo7.vn!`;
     navigator.clipboard.writeText(shareText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
@@ -174,13 +174,10 @@ export function FutCardModal({ player, onClose }: FutCardModalProps) {
             </div>
           </div>
 
-          {/* Cam kết kinh phí */}
+          {/* Trao đổi chi phí qua Zalo */}
           <div className="rounded-xl bg-slate-950/85 border border-white/10 p-2.5 text-center relative z-10">
-            <span className="text-[10px] text-slate-400 block">
-              Cam kết đóng góp kinh phí:
-            </span>
-            <span className="text-xs font-extrabold text-emerald-300">
-              💰 {player.feeContribution}
+            <span className="text-[11px] font-semibold text-slate-300 flex items-center justify-center gap-1.5">
+              💬 Trao đổi chi phí sân &amp; trang phục trực tiếp qua Zalo
             </span>
           </div>
 
