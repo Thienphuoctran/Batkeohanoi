@@ -139,8 +139,8 @@ export function CreateMatchModal({
   const isSelectedTimeExpired = React.useMemo(() => {
     return isMatchExpired(
       { matchDate: matchDateIso, matchDateIso, startTime: timeSlot },
-      new Date(),
-      15
+      15,
+      Date.now()
     );
   }, [matchDateIso, timeSlot]);
 
