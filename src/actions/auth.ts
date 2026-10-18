@@ -31,19 +31,65 @@ async function getAuthenticatedUser() {
     const adminClient = getAdminClient();
 
     if (accessToken) {
-      const { data, error } = await adminClient.auth.getUser(accessToken);
-      if (!error && data?.user) {
-        return data.user;
+      try {
+        const { data, error } = await adminClient.auth.getUser(accessToken);
+        if (!error && data?.user) {
+          return data.user;
+        }
+      } catch (err) {
+        console.error("[getAuthenticatedUser auth.getUser Error]", err);
+      }
+
+      // Fallback 1: Giải mã trực tiếp từ payload JWT nếu Supabase Auth verify timeout/lỗi network
+      try {
+        const payloadBase64 = accessToken.split(".")[1];
+        if (payloadBase64) {
+          const base64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
+          const payload = JSON.parse(
+            Buffer.from(base64, "base64").toString("utf-8")
+          );
+          if (payload?.sub) {
+            return {
+              id: payload.sub,
+              email: payload.email || "",
+              user_metadata: payload.user_metadata || {},
+            } as any;
+          }
+        }
+      } catch (jwtErr) {
+        console.error("[getAuthenticatedUser JWT Parse Error]", jwtErr);
       }
     }
 
     if (fallbackUserId) {
-      const { data, error } = await adminClient.auth.admin.getUserById(
-        fallbackUserId
-      );
-      if (!error && data?.user) {
-        return data.user;
-      }
+      try {
+        const { data, error } = await adminClient.auth.admin.getUserById(
+          fallbackUserId
+        );
+        if (!error && data?.user) {
+          return data.user;
+        }
+      } catch (adminErr) {}
+
+      // Fallback 2: Truy vấn trực tiếp từ bảng public.users (trường hợp chưa cấu hình Service Role Key)
+      try {
+        const { data: dbUser } = await adminClient
+          .from("users")
+          .select("id, full_name, avatar_url, phone")
+          .eq("id", fallbackUserId)
+          .maybeSingle();
+
+        if (dbUser) {
+          return {
+            id: dbUser.id,
+            email: "",
+            user_metadata: {
+              full_name: dbUser.full_name,
+              avatar_url: dbUser.avatar_url,
+            },
+          } as any;
+        }
+      } catch (dbErr) {}
     }
 
     return null;

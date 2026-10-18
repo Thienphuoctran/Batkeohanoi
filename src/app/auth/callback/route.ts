@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -15,20 +16,20 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error && data.session) {
-      const cookieStore = await cookies();
-      cookieStore.set("bk7_access_token", data.session.access_token, {
+      const response = NextResponse.redirect(`${origin}/`);
+      response.cookies.set("bk7_access_token", data.session.access_token, {
         path: "/",
         httpOnly: true,
         sameSite: "lax",
         maxAge: 60 * 60 * 24 * 30,
       });
-      cookieStore.set("bk7_user_id", data.session.user.id, {
+      response.cookies.set("bk7_user_id", data.session.user.id, {
         path: "/",
         httpOnly: true,
         sameSite: "lax",
         maxAge: 60 * 60 * 24 * 30,
       });
-      return NextResponse.redirect(`${origin}/`);
+      return response;
     }
   }
 
@@ -96,8 +97,18 @@ export async function GET(request: NextRequest) {
           if (accessToken) {
             let userId = '';
             try {
-              const payload = JSON.parse(atob(accessToken.split('.')[1]));
-              userId = payload.sub || payload.id || '';
+              const base64Url = accessToken.split('.')[1];
+              if (base64Url) {
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(
+                  atob(base64)
+                    .split('')
+                    .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                    .join('')
+                );
+                const payload = JSON.parse(jsonPayload);
+                userId = payload.sub || payload.id || '';
+              }
             } catch(e) {}
 
             await fetch('/api/auth/sync-cookie', {

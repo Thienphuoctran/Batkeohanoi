@@ -56,18 +56,37 @@ export function useAuthTeam() {
       try {
         const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
         const hashToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token") || "";
+
         if (hashToken) {
           let userId = "";
           try {
-            const payload = JSON.parse(atob(hashToken.split(".")[1]));
-            userId = payload.sub || payload.id || "";
-          } catch (e) {}
+            const base64Url = hashToken.split(".")[1];
+            if (base64Url) {
+              const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+              const jsonPayload = decodeURIComponent(
+                atob(base64)
+                  .split("")
+                  .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+                  .join("")
+              );
+              const payload = JSON.parse(jsonPayload);
+              userId = payload.sub || payload.id || "";
+            }
+          } catch (e) {
+            console.error("[useAuthTeam JWT Parse Error]", e);
+          }
+
+          // Kích hoạt đồng thời cả Supabase Client session lẫn Server Cookie
+          supabase.auth
+            .setSession({ access_token: hashToken, refresh_token: refreshToken })
+            .catch(() => null);
 
           import("@/actions/auth").then(({ syncClientSessionAction }) => {
             syncClientSessionAction(hashToken, userId).then(() => {
               fetchSession();
-              // Dọn sạch hash trên thanh địa chỉ URL sau khi lưu session thành công
-              window.history.replaceState(null, "", window.location.pathname);
+              // Dọn sạch "?error=auth_failed" và "#access_token=..." trên URL
+              window.history.replaceState(null, "", "/");
             });
           });
         }

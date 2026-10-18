@@ -1,6 +1,7 @@
-import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { getAdminClient } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,13 +16,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Tự động giải mã userId từ JWT nếu client chưa truyền
+    // Tự động giải mã userId từ JWT nếu client chưa truyền (chuẩn Base64URL)
     if (!userId && accessToken) {
       try {
         const payloadBase64 = accessToken.split(".")[1];
         if (payloadBase64) {
+          const base64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
           const payload = JSON.parse(
-            Buffer.from(payloadBase64, "base64").toString("utf-8")
+            Buffer.from(base64, "base64").toString("utf-8")
           );
           userId = payload.sub || payload.id;
         }
@@ -30,8 +32,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const cookieStore = await cookies();
-    cookieStore.set("bk7_access_token", accessToken, {
+    const response = NextResponse.json({ success: true });
+    response.cookies.set("bk7_access_token", accessToken, {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
@@ -39,7 +41,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (userId) {
-      cookieStore.set("bk7_user_id", userId, {
+      response.cookies.set("bk7_user_id", userId, {
         path: "/",
         httpOnly: true,
         sameSite: "lax",
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true });
+    return response;
   } catch (err: any) {
     console.error("[POST /api/auth/sync-cookie Error]", err);
     return NextResponse.json(
