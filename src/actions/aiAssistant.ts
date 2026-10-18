@@ -516,37 +516,45 @@ export async function askBatKeoAiAssistantAction(payload: {
         parts: [{ text: userQuestion }],
       });
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents,
-            systemInstruction: {
-              parts: [{ text: SYSTEM_INSTRUCTION }],
-            },
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 600,
-            },
-          }),
-        }
-      );
+      const modelsToTry = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash"];
+      
+      for (const modelCode of modelsToTry) {
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${modelCode}:generateContent?key=${geminiApiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents,
+                systemInstruction: {
+                  parts: [{ text: SYSTEM_INSTRUCTION }],
+                },
+                generationConfig: {
+                  temperature: 0.7,
+                  maxOutputTokens: 600,
+                },
+              }),
+            }
+          );
 
-      if (response.ok) {
-        const data = await response.json();
-        const candidateText =
-          data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (candidateText && typeof candidateText === "string") {
-          return {
-            success: true,
-            reply: candidateText.trim(),
-            suggestedActions: [
-              { label: "💬 Chat Zalo Với BQT", actionType: "OPEN_ZALO" },
-              { label: "💼 Mở Ví Ký Quỹ", actionType: "OPEN_WALLET" },
-            ],
-          };
+          if (response.ok) {
+            const data = await response.json();
+            const candidateText =
+              data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (candidateText && typeof candidateText === "string") {
+              return {
+                success: true,
+                reply: candidateText.trim(),
+                suggestedActions: [
+                  { label: "💬 Chat Zalo Với BQT", actionType: "OPEN_ZALO" },
+                  { label: "💼 Mở Ví Ký Quỹ", actionType: "OPEN_WALLET" },
+                ],
+              };
+            }
+          }
+        } catch (callErr) {
+          console.warn(`[Gemini API ${modelCode} Error]`, callErr);
         }
       }
     } catch (err) {
