@@ -230,7 +230,7 @@ export function AppGuideModal({
                   <span>Cơ Chế Phạt Bùng &amp; Đền Bù Tiền Sân</span>
                 </div>
                 <ul className="space-y-1.5 text-slate-300 text-[11px]">
-                  <li>• <strong>Đội bùng kèo (không đến sân hoặc hủy sát giờ &lt;2h):</strong> Bị tịch thu 100% tiền cọc 200.000đ + trừ -40đ Uy Tín (bị khóa tạo kèo).</li>
+                  <li>• <strong>Đội bùng kèo (không đến sân hoặc hủy sát giờ &lt;1h):</strong> Bị tịch thu 100% tiền cọc 200.000đ + trừ -40đ Uy Tín (bị khóa tạo kèo). Đội muốn hủy kèo hợp lệ bắt buộc phải thông báo trước ít nhất <strong>1 tiếng</strong> trước giờ bóng lăn.</li>
                   <li>• <strong>Đội bị bùng (có mặt tại sân đúng hẹn):</strong> Nhận trọn vẹn 200.000đ tiền cọc của đội bùng để bù đắp chi phí thuê sân với chủ sân.</li>
                   <li>• <strong>Cách chứng minh:</strong> Định vị GPS tại sân (&lt;300m) + BQT gọi hotline chủ sân đối chứng.</li>
                 </ul>

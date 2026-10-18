@@ -14,7 +14,7 @@ Các quy chế nghiệp vụ cốt lõi của BắtKèo7 Hà Nội:
    - Sau khi hoàn thành trận đấu và nhập Mã Bắt Tay 4 số trên sân, 200.000đ tự động nhả về ví khả dụng.
    - Rút tiền về ngân hàng: Bất cứ lúc nào trước 22h00 hàng ngày (BQT đối soát xử lý trong 5-15 phút qua VietQR Napas247).
 2. Chống bùng kèo & đền bù tiền sân:
-   - Đội bùng kèo (không đến sân hoặc hủy sát giờ <2h): Bị tịch thu 100% tiền cọc 200k + trừ -30đ đến -40đ Uy Tín (dưới 70đ bị khóa tạo kèo).
+   - Đội bùng kèo (không đến sân hoặc hủy sát giờ <1h): Bị tịch thu 100% tiền cọc 200k + trừ -30đ đến -40đ Uy Tín (dưới 70đ bị khóa tạo kèo). Hủy hợp lệ phải báo trước ít nhất 1 tiếng.
    - Đội bị bùng (đội nạn nhân có mặt tại sân): Nhận trọn vẹn 200.000đ tiền cọc của đội bùng để bù đắp chi phí thuê sân với chủ sân.
    - Xác thực qua: Mã Bắt Tay 4 số, Định vị GPS trong bán kính 300m quanh sân bóng, và SĐT đối chứng của Chủ sân.
 3. Hộp Kháng Cáo Bất Khả Kháng (Giải Oan 100đ):

@@ -237,7 +237,7 @@ export function CancelMatchAppealModal({
             <div className="text-xs">
               <p className="font-bold text-slate-200">Tình trạng thời gian hủy kèo:</p>
               <p className="text-[11px] text-slate-400">
-                Nếu bạn hủy sát giờ lăn bóng (&lt; 2 tiếng) hoặc do sự cố sân bãi, hãy bật chế độ Kháng Cáo.
+                Nếu bạn hủy sát giờ lăn bóng (&lt; 1 tiếng) hoặc do sự cố sân bãi, hãy bật chế độ Kháng Cáo.
               </p>
             </div>
             <Button
@@ -266,7 +266,7 @@ export function CancelMatchAppealModal({
               </div>
               <p className="text-[11px] text-rose-200/90 leading-relaxed">
                 Theo quy định BắtKèo7, hủy kèo khi{' '}
-                <strong>{match.status === 'MATCHED' ? 'đã bắt cặp thành công' : 'sát giờ thi đấu (< 2h)'}</strong>{' '}
+                <strong>{match.status === 'MATCHED' ? 'đã bắt cặp thành công' : 'sát giờ thi đấu (< 1h)'}</strong>{' '}
                 sẽ tự động bị hệ thống trừ <strong>-{penaltyPoints} điểm Uy Tín</strong> (từ{' '}
                 {hostTrustScore}đ xuống còn{' '}
                 <strong>{Math.max(0, hostTrustScore - penaltyPoints)}đ</strong>) và gắn nhãn cảnh báo.
