@@ -17,6 +17,7 @@ import {
   MapPin,
   Scale,
   Bot,
+  BookOpen,
 } from "lucide-react";
 import { EscrowWallet } from "@/types/matchmaking";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ interface HeaderBarProps {
   escrowWallet?: EscrowWallet;
   onOpenEscrowModal?: () => void;
   onOpenSupport?: () => void;
+  onOpenGuide?: () => void;
 }
 
 const PITCH_WEATHER_DATA: Record<
@@ -104,6 +106,7 @@ export function HeaderBar({
   escrowWallet,
   onOpenEscrowModal,
   onOpenSupport,
+  onOpenGuide,
 }: HeaderBarProps) {
   const [selectedPitch, setSelectedPitch] = useState(
     "Trung Kính Hạ (Cầu Giấy)"
@@ -196,6 +199,17 @@ export function HeaderBar({
                 </span>
               )}
             </button>
+
+            {onOpenGuide && (
+              <button
+                onClick={onOpenGuide}
+                title="Cẩm Nang Hướng Dẫn Sử Dụng BắtKèo7"
+                className="inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-sky-400" />
+                <span className="hidden sm:inline">Hướng Dẫn</span>
+              </button>
+            )}
 
             {onOpenSupport && (
               <button

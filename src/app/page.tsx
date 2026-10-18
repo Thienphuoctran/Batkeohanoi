@@ -17,6 +17,7 @@ import {
   Plus,
   Lock,
   Bot,
+  BookOpen,
 } from "lucide-react";
 import { MOCK_MATCH_FEEDS, MOCK_TEAMS } from "@/constants/mockMatchmaking";
 import { District, MatchFeedItem, SkillTier, EscrowWallet, BankWithdrawInfo } from "@/types/matchmaking";
@@ -28,6 +29,7 @@ import { CreateMatchModal } from "@/components/matchmaking/CreateMatchModal";
 import { EditMatchModal } from "@/components/matchmaking/EditMatchModal";
 import { CancelMatchAppealModal } from "@/components/matchmaking/CancelMatchAppealModal";
 import { CustomerSupportModal } from "@/components/support/CustomerSupportModal";
+import { AppGuideModal } from "@/components/guide/AppGuideModal";
 import { LiveMatchBar } from "@/components/matchmaking/LiveMatchBar";
 import { EscrowWalletModal } from "@/components/escrow/EscrowWalletModal";
 import { HandshakeModal } from "@/components/matchmaking/HandshakeModal";
@@ -99,6 +101,7 @@ export default function HanoiMatchmakingPlatform() {
   const [isBotDrawerOpen, setIsBotDrawerOpen] = useState(false);
   const [unreadBotCount, setUnreadBotCount] = useState(1);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   // Quản lý Ví Ký Quỹ Nội Bộ (In-App Escrow Balance) & Mã Bắt Tay Sân
   const effectiveTrustScore = team?.trust_score ?? myTrustScore;
@@ -679,6 +682,7 @@ export default function HanoiMatchmakingPlatform() {
           escrowWallet={escrowWallet}
           onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
           onOpenSupport={() => setIsSupportOpen(true)}
+          onOpenGuide={() => setIsGuideOpen(true)}
         />
 
         {/* Banner Phát Sóng Khẩn Cấp Từ BQT (/admin - Đề xuất 5) */}
@@ -994,6 +998,14 @@ export default function HanoiMatchmakingPlatform() {
             © 2026 BắtKèo7 Hà Nội • Nền tảng Ghép Đối & Chống Bùng Kèo Sân Cỏ Phủi
           </p>
           <div className="flex items-center justify-center gap-3 text-[11px] text-slate-600">
+            <button
+              onClick={() => setIsGuideOpen(true)}
+              className="text-slate-500 hover:text-emerald-400 transition-colors inline-flex items-center gap-1"
+            >
+              <BookOpen className="w-2.5 h-2.5 text-sky-400" />
+              <span>Hướng dẫn sử dụng</span>
+            </button>
+            <span>•</span>
             <span>Tiêu chuẩn Sân 7 Hà Nội</span>
             <span>•</span>
             <span>Bảo chứng VietQR Napas247</span>
@@ -1235,6 +1247,15 @@ export default function HanoiMatchmakingPlatform() {
       <CustomerSupportModal
         isOpen={isSupportOpen}
         onClose={() => setIsSupportOpen(false)}
+        onOpenWallet={() => setIsEscrowModalOpen(true)}
+        onSelectTab={(tab) => setActiveTab(tab as ActiveTab)}
+      />
+
+      {/* Modal Cẩm Nang Hướng Dẫn Sử Dụng & Quy Chế BắtKèo7 */}
+      <AppGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+        onOpenSupport={() => setIsSupportOpen(true)}
         onOpenWallet={() => setIsEscrowModalOpen(true)}
         onSelectTab={(tab) => setActiveTab(tab as ActiveTab)}
       />
