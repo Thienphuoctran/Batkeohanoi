@@ -23,15 +23,15 @@ export function StadiumNightScenery() {
           {[...Array(6)].map((_, i) => (
             <span
               key={i}
-              className="w-2.5 sm:w-3.5 h-2.5 sm:h-3.5 rounded-full bg-amber-100 shadow-[0_0_12px_3px_rgba(251,191,36,0.9)] animate-pulse"
+              className="w-2.5 sm:w-3.5 h-2.5 sm:h-3.5 rounded-full bg-amber-100 shadow-[0_0_12px_3px_rgba(251,191,36,0.9)] animate-floodlight-bulb"
               style={{ animationDelay: `${i * 120}ms` }}
             />
           ))}
         </div>
 
-        {/* Floodlight Beam Cone (Chùm sáng góc trái chiếu xuống sân) */}
+        {/* Floodlight Beam Cone (Chùm sáng góc trái chiếu xuống sân kèm nhịp thở) */}
         <div
-          className="absolute top-12 left-1/2 -translate-x-1/2 w-[420px] sm:w-[600px] h-[900px] pointer-events-none opacity-40"
+          className="absolute top-12 left-1/2 -translate-x-1/2 w-[420px] sm:w-[600px] h-[900px] pointer-events-none animate-floodlight-breathe"
           style={{
             background:
               "conic-gradient(from 140deg at 50% 0%, rgba(251, 191, 36, 0.22) 0deg, rgba(52, 211, 153, 0.12) 35deg, transparent 70deg)",
@@ -52,15 +52,15 @@ export function StadiumNightScenery() {
           {[...Array(6)].map((_, i) => (
             <span
               key={i}
-              className="w-2.5 sm:w-3.5 h-2.5 sm:h-3.5 rounded-full bg-amber-100 shadow-[0_0_12px_3px_rgba(251,191,36,0.9)] animate-pulse"
+              className="w-2.5 sm:w-3.5 h-2.5 sm:h-3.5 rounded-full bg-amber-100 shadow-[0_0_12px_3px_rgba(251,191,36,0.9)] animate-floodlight-bulb"
               style={{ animationDelay: `${i * 150}ms` }}
             />
           ))}
         </div>
 
-        {/* Floodlight Beam Cone (Chùm sáng góc phải chiếu xuống sân) */}
+        {/* Floodlight Beam Cone (Chùm sáng góc phải chiếu xuống sân kèm nhịp thở) */}
         <div
-          className="absolute top-12 left-1/2 -translate-x-1/2 w-[420px] sm:w-[600px] h-[900px] pointer-events-none opacity-40"
+          className="absolute top-12 left-1/2 -translate-x-1/2 w-[420px] sm:w-[600px] h-[900px] pointer-events-none animate-floodlight-breathe"
           style={{
             background:
               "conic-gradient(from 220deg at 50% 0%, transparent 0deg, rgba(52, 211, 153, 0.12) 35deg, rgba(251, 191, 36, 0.22) 70deg)",

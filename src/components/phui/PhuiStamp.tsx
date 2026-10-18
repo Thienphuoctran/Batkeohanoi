@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import gsap from "gsap";
 
 export type StampVariant =
   | "keo-uy-tin"
@@ -17,6 +18,7 @@ interface PhuiStampProps {
   angle?: number;
   className?: string;
   size?: "sm" | "md" | "lg";
+  animated?: boolean;
 }
 
 export function PhuiStamp({
@@ -26,7 +28,34 @@ export function PhuiStamp({
   angle = -10,
   className = "",
   size = "md",
+  animated = true,
 }: PhuiStampProps) {
+  const stampRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!animated || !stampRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        stampRef.current,
+        {
+          scale: 2.2,
+          opacity: 0,
+          y: -16,
+          rotation: angle + 16,
+        },
+        {
+          scale: 1,
+          opacity: 1,
+          y: 0,
+          rotation: angle,
+          duration: 0.52,
+          ease: "back.out(2.4)",
+        }
+      );
+    }, stampRef);
+
+    return () => ctx.revert();
+  }, [animated, angle]);
   const configs: Record<
     StampVariant,
     { label: string; sub: string; color: string; borderColor: string; bg: string }
@@ -87,6 +116,7 @@ export function PhuiStamp({
 
   return (
     <div
+      ref={stampRef}
       style={{ transform: `rotate(${angle}deg)` }}
       className={`inline-flex flex-col items-center justify-center font-black uppercase rounded-lg border-2 ${current.borderColor} ${current.color} ${current.bg} shadow-md backdrop-blur-sm select-none pointer-events-none transition-transform duration-300 ${sizeClasses} ${className}`}
     >

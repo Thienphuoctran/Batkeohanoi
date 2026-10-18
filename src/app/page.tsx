@@ -53,6 +53,7 @@ import {
   StadiumNightScenery,
   PhuiStamp,
   StarRibbon,
+  RollingFootballPitch,
 } from "@/components/phui";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { TeamOnboardingModal } from "@/components/team/TeamOnboardingModal";
@@ -914,12 +915,6 @@ export default function HanoiMatchmakingPlatform() {
                     <PhuiStamp variant="san-7-ha-noi" size="sm" angle={-6} />
                   </div>
 
-                  {/* Tactical Board Icon Badge (Concept 2 Rose/Neon Glow) */}
-                  <div className="relative w-16 h-16 rounded-full bg-rose-500/15 border border-rose-500/35 text-rose-400 flex items-center justify-center mx-auto shadow-lg shadow-rose-500/20">
-                    <span className="text-2xl select-none">⚽</span>
-                    <span className="absolute -inset-1.5 rounded-full border border-rose-500/25 animate-ping opacity-40" />
-                  </div>
-
                   <div className="space-y-1.5 relative z-10">
                     <h3 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center justify-center gap-2 flex-wrap">
                       <span>HỆ THỐNG GHÉP TRẬN HÔM NAY -</span>
@@ -928,6 +923,11 @@ export default function HanoiMatchmakingPlatform() {
                     <p className="text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
                       Chưa có đội nào mở kèo tại khu vực hoặc khung giờ này. Hãy là đội tiên phong mở bát để nhận đối thủ ngay trong 5 phút!
                     </p>
+                  </div>
+
+                  {/* ⚽ 2D MINI PITCH ROLLING FOOTBALL RADAR ANIMATION (Đề xuất 3) */}
+                  <div className="py-1 relative z-10">
+                    <RollingFootballPitch statusText="Quét các cụm sân Cầu Giấy, Nam Từ Liêm, Thanh Xuân, Đống Đa..." />
                   </div>
 
                   <div className="relative z-10 pt-1">
