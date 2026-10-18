@@ -1,4 +1,4 @@
-import { MatchAppealItem, EscrowRecordItem } from '@/types/matchmaking';
+import { MatchAppealItem, EscrowRecordItem, AppealReasonCategory } from '@/types/matchmaking';
 
 const APPEALS_STORAGE_KEY = 'batkeo7_admin_appeals_v1';
 const ESCROW_STORAGE_KEY = 'batkeo7_admin_escrow_v1';
@@ -113,7 +113,7 @@ export const INITIAL_ESCROW_RECORDS: EscrowRecordItem[] = [
 ];
 
 export const APPEAL_REASON_LABELS: Record<
-  MatchAppealItem['reasonCategory'],
+  string,
   { label: string; badgeColor: string; desc: string }
 > = {
   WEATHER_FLOOD: {
@@ -146,7 +146,31 @@ export const APPEAL_REASON_LABELS: Record<
     badgeColor: 'text-slate-300 bg-slate-500/15 border-slate-500/30',
     desc: 'Cung cấp chi tiết lý do và số điện thoại đối chứng',
   },
+  WEATHER: {
+    label: '🌧️ Mưa bão / Thời tiết cực đoan',
+    badgeColor: 'text-sky-400 bg-sky-500/15 border-sky-500/30',
+    desc: 'Mặt cỏ ngập úng không đảm bảo an toàn thi đấu',
+  },
+  PITCH_ISSUE: {
+    label: '🏟️ Sự cố sân bóng / Dàn đèn',
+    badgeColor: 'text-amber-400 bg-amber-500/15 border-amber-500/30',
+    desc: 'Sân mất điện hoặc ban quản lý xếp trùng lịch',
+  },
+  OTHER: {
+    label: '📋 Lý do bất khả kháng khác',
+    badgeColor: 'text-slate-300 bg-slate-500/15 border-slate-500/30',
+    desc: 'Có xác minh từ quản lý sân hoặc đối thủ',
+  },
 };
+
+export const SELECTABLE_APPEAL_REASONS: AppealReasonCategory[] = [
+  'WEATHER_FLOOD',
+  'FLOODLIGHT_OUTAGE',
+  'PITCH_DOUBLE_BOOKED',
+  'MEDICAL_EMERGENCY',
+  'MUTUAL_AGREEMENT',
+  'OTHER_FORCE_MAJEURE',
+];
 
 export function getStoredAppeals(): MatchAppealItem[] {
   if (typeof window === 'undefined') return INITIAL_APPEALS;

@@ -25,7 +25,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { MatchFeedItem, AppealReasonCategory, MatchAppealItem } from '@/types/matchmaking';
-import { APPEAL_REASON_LABELS, addStoredAppeal } from '@/lib/adminStore';
+import { APPEAL_REASON_LABELS, addStoredAppeal, SELECTABLE_APPEAL_REASONS } from '@/lib/adminStore';
 import { HANOI_PITCHES } from '@/constants/hanoiPitches';
 import { submitMatchAppealAction } from '@/actions/auth';
 
@@ -139,7 +139,7 @@ export function CancelMatchAppealModal({
       district: match.district,
       timeSlot: `${timeSlotLabel} (${dateLabel})`,
       penaltyPoints,
-      reasonLabel: APPEAL_REASON_LABELS[reasonCategory].label,
+      reasonLabel: APPEAL_REASON_LABELS[reasonCategory]?.label || reasonCategory,
       reasonDetail: reasonDetail.trim(),
       managerVerifyPhone: effectiveManagerPhone.trim() || undefined,
     });
@@ -297,8 +297,9 @@ export function CancelMatchAppealModal({
                   1. Chọn nguyên nhân hủy kèo bất khả kháng:
                 </Label>
                 <div className="grid grid-cols-1 gap-1.5">
-                  {(Object.keys(APPEAL_REASON_LABELS) as AppealReasonCategory[]).map((key) => {
+                  {SELECTABLE_APPEAL_REASONS.map((key) => {
                     const item = APPEAL_REASON_LABELS[key];
+                    if (!item) return null;
                     const selected = reasonCategory === key;
                     return (
                       <button
