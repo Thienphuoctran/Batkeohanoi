@@ -5,6 +5,12 @@ import { supabase } from "@/lib/supabase";
 import { MatchFeedItem, District, SkillTier } from "@/types/matchmaking";
 import { MOCK_TEAMS } from "@/constants/mockMatchmaking";
 import { playNotificationChime } from "@/lib/zalo";
+import {
+  toLocalIsoDate,
+  getTodayIsoDate,
+  formatMatchDateDisplay,
+  getMatchExpiresDate,
+} from "@/lib/matchTime";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 export interface MatchItem {
@@ -89,13 +95,34 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
   const district: District =
     row.district === "NamTuLiem" || row.district === "Nam Từ Liêm"
       ? "Nam Từ Liêm"
-      : "Cầu Giấy";
+      : row.district || "Cầu Giấy";
   const tier = ([1, 2, 3].includes(Number(row.teams?.skill_tier))
     ? Number(row.teams?.skill_tier)
     : 2) as SkillTier;
   const [startTime, endTime] = (row.time_slot_label || "19:00 - 20:30").split(
     " - "
   );
+
+  let matchDateIso = getTodayIsoDate();
+  if (row.kickoff_time) {
+    const parsedKickoff = new Date(row.kickoff_time);
+    if (!isNaN(parsedKickoff.getTime())) {
+      matchDateIso = toLocalIsoDate(parsedKickoff);
+    }
+  }
+  const matchDateLabel = formatMatchDateDisplay(matchDateIso);
+
+  const resolvedExpiresAt =
+    row.expires_at ||
+    getMatchExpiresDate(
+      {
+        matchDate: matchDateIso,
+        matchDateIso,
+        startTime: startTime || "19:00",
+        kickoffTime: row.kickoff_time,
+      },
+      15
+    ).toISOString();
 
   return {
     id: row.id,
@@ -118,7 +145,8 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
     district,
     pitchName: row.pitch_custom_name || "Sân Thành Phát",
     pitchAddress: `Khu vực ${district}, Hà Nội`,
-    matchDate: "Hôm nay",
+    matchDate: matchDateLabel,
+    matchDateIso,
     startTime: startTime || "19:00",
     endTime: endTime || "20:30",
     totalCostVnd: Number(row.total_fee) || 800000,
@@ -141,7 +169,8 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
     isSOS: Boolean(row.is_sos),
     sosCountdownSeconds: row.is_sos ? 3600 : undefined,
     notes: row.notes || undefined,
-    expiresAt: row.expires_at || undefined,
+    kickoffTime: row.kickoff_time || undefined,
+    expiresAt: resolvedExpiresAt,
     createdAt: "Real-time",
   };
 }

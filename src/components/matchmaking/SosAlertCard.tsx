@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ClickSpark } from "@/components/reactbits/ClickSpark";
 import { LaserGlowCard } from "@/components/reactbits/LaserGlowCard";
 import { PhuiStamp } from "@/components/phui";
+import { formatMatchDateDisplay, formatFullExpiryLabel } from "@/lib/matchTime";
 
 interface SosAlertCardProps {
   match: MatchFeedItem;
@@ -91,7 +92,21 @@ export function SosAlertCard({
             </span>
             <span className="text-amber-300 font-extrabold tabular-nums flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {match.startTime} - {match.endTime} ({match.matchDate})
+              {match.startTime} - {match.endTime} •{" "}
+              <span className="text-emerald-300">
+                {formatMatchDateDisplay(match.matchDateIso || match.matchDate)}
+              </span>
+            </span>
+            <span className="text-[11px] text-slate-400 font-mono">
+              (🧹 Tự đóng:{" "}
+              <strong className="text-amber-300">
+                {formatFullExpiryLabel(
+                  match.startTime,
+                  match.matchDateIso || match.matchDate,
+                  15
+                )}
+              </strong>
+              )
             </span>
           </div>
 

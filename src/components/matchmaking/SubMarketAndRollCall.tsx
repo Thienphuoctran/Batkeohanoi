@@ -18,6 +18,7 @@ import {
   X,
   Flame,
   Gift,
+  Calendar,
 } from "lucide-react";
 import { MOCK_SUB_PLAYERS, MOCK_FREE_AGENTS } from "@/constants/mockMatchmaking";
 import {
@@ -30,6 +31,15 @@ import {
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { Button } from "@/components/ui/button";
 import { getZaloDeepLink, normalizeVietnamPhone } from "@/lib/zalo";
+import {
+  getTodayIsoDate,
+  getOffsetIsoDate,
+  getQuickDateOptions,
+  formatMatchDateDisplay,
+  formatMatchDateShort,
+  getMatchExpiresDate,
+  isMatchExpired,
+} from "@/lib/matchTime";
 import { FutCardModal } from "./FutCardModal";
 import { SpotlightCard } from "@/components/reactbits/SpotlightCard";
 import { ClickSpark } from "@/components/reactbits/ClickSpark";
@@ -102,9 +112,12 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
   const [positionCode, setPositionCode] = useState<SoloPosition>("MF");
   const [skillTier, setSkillTier] = useState<SkillTier>(2);
   const [district, setDistrict] = useState<District>("Cầu Giấy");
+  const [matchDateIso, setMatchDateIso] = useState<string>(() => getTodayIsoDate());
   const [timeSlot, setTimeSlot] = useState("19:00 - 20:30");
   const [phone, setPhone] = useState("");
   const [bioOrNotes, setBioOrNotes] = useState("");
+
+  const quickDates = useMemo(() => getQuickDateOptions(4), []);
 
   // Riêng cho Đội tuyển người
   const [teamName, setTeamName] = useState("");
@@ -168,9 +181,23 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     });
   }, [freeAgents, posFilter, districtFilter, tierFilter, onlyGkHotline]);
 
-  // Lọc danh sách Đội tuyển người
+  // Lọc danh sách Đội tuyển người (Tự động dọn dẹp các tin quá 15 phút sau bóng lăn)
   const filteredSubPosts = useMemo(() => {
     return subPosts.filter((p) => {
+      if (p.status !== "ACTIVE") return false;
+      if (
+        isMatchExpired(
+          {
+            matchDate: p.matchDate || p.matchDateIso,
+            matchDateIso: p.matchDateIso,
+            startTime: p.matchTime,
+            expiresAt: p.expiresAt,
+          },
+          15
+        )
+      ) {
+        return false;
+      }
       const code: SoloPosition =
         p.positionCode ||
         (p.positionNeeded.includes("GK")
@@ -206,6 +233,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     setPositionCode("MF");
     setSkillTier(2);
     setDistrict("Cầu Giấy");
+    setMatchDateIso(getTodayIsoDate());
     setTimeSlot("19:00 - 20:30");
     setPhone("");
     setBioOrNotes("");
@@ -226,6 +254,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     setPositionCode(agent.position);
     setSkillTier(agent.skillTier);
     setDistrict(agent.districts[0] || "Cầu Giấy");
+    if (agent.availableDateIso) setMatchDateIso(agent.availableDateIso);
     setTimeSlot(agent.availableTimeSlots.join(", ") || "19:00");
     setPhone(agent.phone);
     setBioOrNotes(agent.bio || "");
@@ -240,6 +269,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     setTeamName(post.teamName);
     setPitchName(post.pitchName);
     setDistrict(post.district);
+    if (post.matchDateIso) setMatchDateIso(post.matchDateIso);
     setTimeSlot(post.matchTime);
     setQuantity(post.quantity);
     setSkillTier(post.skillTier || 2);
@@ -299,6 +329,8 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
         },
         phone: phone.trim() || "0988.666.888",
         zaloPhone: normalizeVietnamPhone(phone.trim() || "0988666888"),
+        availableDate: formatMatchDateDisplay(matchDateIso),
+        availableDateIso: matchDateIso,
         bio:
           bioOrNotes.trim() ||
           "Đá nhiệt tình, văn minh, đúng giờ, tìm đội giao lưu lâu dài.",
@@ -327,6 +359,16 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
           ? "Tiền Vệ (MF)"
           : "Tiền Đạo (FW)";
 
+      const formattedDate = formatMatchDateDisplay(matchDateIso);
+      const expiresDateObj = getMatchExpiresDate(
+        {
+          matchDate: matchDateIso,
+          matchDateIso,
+          startTime: timeSlot,
+        },
+        15
+      );
+
       const newPost: SubPlayerPost = {
         id: editingSubId || `sub-${Date.now()}`,
         teamId: `team-${Date.now()}`,
@@ -334,7 +376,10 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
         positionNeeded: mappedPosNeeded,
         positionCode,
         quantity: Number(quantity) || 1,
-        matchTime: timeSlot.trim() || "19:00 - 20:30 Hôm nay",
+        matchDate: formattedDate,
+        matchDateIso,
+        matchTime: timeSlot.trim() || "19:00 - 20:30",
+        expiresAt: expiresDateObj.toISOString(),
         pitchName: pitchName.trim() || "Sân Cỏ Nhân Tạo",
         district,
         skillTier,
@@ -838,7 +883,12 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       )}
                       <span className="text-xs text-amber-300 font-bold flex items-center gap-1 tabular-nums">
                         <Clock className="w-3.5 h-3.5" />
-                        {post.matchTime}
+                        <span>{post.matchTime}</span>
+                        {post.matchDate && (
+                          <span className="text-emerald-300 font-bold">
+                            • {post.matchDate}
+                          </span>
+                        )}
                       </span>
                       {post.isCreatedByCurrentUser && (
                         <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black">
@@ -1078,6 +1128,40 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                 </div>
               </div>
 
+              {/* Ngày thi đấu & Chọn nhanh ngày */}
+              <div className="space-y-1.5 p-2.5 rounded-xl bg-slate-950/80 border border-white/10">
+                <div className="flex items-center justify-between">
+                  <label className="font-semibold text-slate-300 flex items-center gap-1.5 text-[11px]">
+                    <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Ngày đá ({formatMatchDateDisplay(matchDateIso)})</span>
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    min={getTodayIsoDate()}
+                    value={matchDateIso}
+                    onChange={(e) => setMatchDateIso(e.target.value)}
+                    className="h-7 px-2 rounded-lg bg-slate-900 border border-emerald-500/40 text-emerald-300 font-mono text-[11px] font-bold"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {quickDates.map((d) => (
+                    <button
+                      type="button"
+                      key={d.isoDate}
+                      onClick={() => setMatchDateIso(d.isoDate)}
+                      className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition border ${
+                        matchDateIso === d.isoDate
+                          ? "bg-emerald-500/20 border-emerald-400 text-emerald-300"
+                          : "bg-slate-900 border-white/[0.08] text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      {d.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Khu vực, Khung giờ & Chân thuận / Số lượng */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <div>
@@ -1100,7 +1184,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     type="text"
                     value={timeSlot}
                     onChange={(e) => setTimeSlot(e.target.value)}
-                    placeholder="VD: 19:00, 20:30"
+                    placeholder="VD: 19:00 - 20:30, 20:30..."
                     className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-amber-300 font-bold"
                   />
                 </div>

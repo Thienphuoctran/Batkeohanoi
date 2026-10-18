@@ -78,7 +78,8 @@ export interface MatchFeedItem {
   district: District;
   pitchName: string;
   pitchAddress: string;
-  matchDate: string; // YYYY-MM-DD hoặc định dạng ngày hiển thị
+  matchDate: string; // Chuỗi hiển thị ngày (VD: "Ngày mai (19/10/2026)")
+  matchDateIso?: string; // YYYY-MM-DD (VD: "2026-10-19")
   startTime: string; // HH:mm (VD: 19:00)
   endTime: string;   // HH:mm (VD: 20:30)
   totalCostVnd: number; // Tổng tiền sân (VD: 800.000đ)
@@ -94,7 +95,8 @@ export interface MatchFeedItem {
   notes?: string;
   matchedAt?: string;
   createdAt: string;
-  expiresAt?: string; // Thời điểm tự động đóng bài (kickoff + 15 phút)
+  kickoffTime?: string; // Thời điểm bóng lăn chuẩn ISO (Ngày + Giờ)
+  expiresAt?: string; // Thời điểm tự động đóng bài (kickoffTime + 15 phút)
   handshakePin?: string; // Mã Bắt Tay 4 Số ngẫu nhiên (chống vu khống bùng kèo 100%)
   isHandshakeVerified?: boolean; // Hai đội đã nhập mã bắt tay thật sự trên sân
   escrowDepositTeamId?: string; // Đội đã ký quỹ 200k nếu điểm uy tín < 70
@@ -129,6 +131,8 @@ export interface FreeAgentScoutCard {
   positionLabel: string; // VD: "Thủ Môn (GK)", "Hậu Vệ (DF)", "Tiền Vệ (MF)", "Tiền Đạo (FW)"
   skillTier: SkillTier; // 1 | 2 | 3
   districts: string[]; // VD: ["Cầu Giấy", "Nam Từ Liêm"]
+  availableDate?: string; // Ngày rảnh đi đá (VD: "Hôm nay (18/10/2026)" hoặc "Mọi ngày")
+  availableDateIso?: string; // YYYY-MM-DD
   availableTimeSlots: string[]; // VD: ["19:00", "20:30"]
   feeContribution?: string; // Tùy chọn (trao đổi trực tiếp qua Zalo)
   trustRating: number; // VD: 4.9 (thang 5.0 ★)
@@ -156,7 +160,10 @@ export interface SubPlayerPost {
   positionNeeded: "Thủ Môn (GK)" | "Trung Vệ (CB)" | "Tiền Vệ (MF)" | "Tiền Đạo (FW)";
   positionCode?: SoloPosition;
   quantity: number;
-  matchTime: string; // VD: "19:00 - 20:30 Hôm nay"
+  matchDate?: string; // VD: "Ngày mai (19/10/2026)"
+  matchDateIso?: string; // YYYY-MM-DD
+  matchTime: string; // VD: "19:00 - 20:30"
+  expiresAt?: string; // Thời điểm tự đóng tin tuyển người (kickoff + 15p)
   pitchName: string;
   district: District;
   skillTier?: SkillTier;

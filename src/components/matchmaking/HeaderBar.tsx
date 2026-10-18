@@ -18,6 +18,7 @@ import {
   Scale,
   Bot,
   BookOpen,
+  LogOut,
 } from "lucide-react";
 import { EscrowWallet } from "@/types/matchmaking";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ interface HeaderBarProps {
   currentTeamName?: string;
   onOpenAuthModal?: () => void;
   onOpenTeamOnboarding?: () => void;
+  onSignOut?: () => void;
   escrowWallet?: EscrowWallet;
   onOpenEscrowModal?: () => void;
   onOpenSupport?: () => void;
@@ -104,6 +106,7 @@ export function HeaderBar({
   currentTeamName,
   onOpenAuthModal,
   onOpenTeamOnboarding,
+  onSignOut,
   escrowWallet,
   onOpenEscrowModal,
   onOpenSupport,
@@ -243,21 +246,55 @@ export function HeaderBar({
                 <span>Đăng nhập / Tạo Đội</span>
               </button>
             ) : !hasTeam ? (
-              <button
-                onClick={onOpenTeamOnboarding}
-                className="h-9 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition animate-pulse"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span>Hoàn tất Tạo Đội</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={onOpenTeamOnboarding}
+                  className="h-9 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition animate-pulse"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Hoàn tất Tạo Đội</span>
+                </button>
+                {onSignOut && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm("Bạn có chắc chắn muốn đăng xuất tài khoản?")) {
+                        onSignOut();
+                      }
+                    }}
+                    title="Đăng xuất tài khoản"
+                    className="h-9 px-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 border border-rose-500/30 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Đăng xuất</span>
+                  </button>
+                )}
+              </div>
             ) : (
-              <button
-                onClick={() => setActiveTab("trust-profile")}
-                className="h-9 px-3 rounded-xl bg-[#0a2318] hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition max-w-[140px]"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="truncate">{currentTeamName}</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setActiveTab("trust-profile")}
+                  className="h-9 px-3 rounded-xl bg-[#0a2318] hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition max-w-[140px]"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="truncate">{currentTeamName}</span>
+                </button>
+                {onSignOut && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm("Bạn có chắc chắn muốn đăng xuất tài khoản?")) {
+                        onSignOut();
+                      }
+                    }}
+                    title="Đăng xuất tài khoản"
+                    className="h-9 px-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 border border-rose-500/30 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Đăng xuất</span>
+                  </button>
+                )}
+              </div>
             )}
 
             {/* Quick Pill Ví Ký Quỹ */}

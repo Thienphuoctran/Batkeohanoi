@@ -62,12 +62,27 @@ export function useAuthTeam() {
     };
   }, [fetchSession]);
 
+  const signOut = useCallback(async () => {
+    try {
+      const { signOutAction } = await import("@/actions/auth");
+      await signOutAction();
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error("[Sign Out Error]", err);
+    } finally {
+      setUser(null);
+      setProfile(null);
+      setTeam(null);
+    }
+  }, []);
+
   return {
     user,
     profile,
     team,
     loading,
     refreshAuth: fetchSession,
+    signOut,
     isAuthenticated: !!user,
     hasTeam: !!team,
   };

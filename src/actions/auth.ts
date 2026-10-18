@@ -384,6 +384,8 @@ export async function createMatchInDatabaseAction(payload: {
   pitchCustomName: string;
   district: string;
   timeSlotLabel: string;
+  kickoffTimeIso?: string;
+  expiresAtIso?: string;
   totalFee: number;
   splitFee: number;
   isSos: boolean;
@@ -413,8 +415,21 @@ export async function createMatchInDatabaseAction(payload: {
     matchCreationRateLimitMap.set(payload.hostTeamId, recent);
 
     const adminClient = getAdminClient();
-    const kickoffDate = new Date(Date.now() + 2 * 3600 * 1000);
-    const expiresDate = new Date(kickoffDate.getTime() + 15 * 60 * 1000);
+    const parsedKickoff = payload.kickoffTimeIso
+      ? new Date(payload.kickoffTimeIso)
+      : null;
+    const kickoffDate =
+      parsedKickoff && !isNaN(parsedKickoff.getTime())
+        ? parsedKickoff
+        : new Date(Date.now() + 2 * 3600 * 1000);
+
+    const parsedExpires = payload.expiresAtIso
+      ? new Date(payload.expiresAtIso)
+      : null;
+    const expiresDate =
+      parsedExpires && !isNaN(parsedExpires.getTime())
+        ? parsedExpires
+        : new Date(kickoffDate.getTime() + 15 * 60 * 1000);
 
     const insertObj: Record<string, any> = {
       host_team_id: payload.hostTeamId,

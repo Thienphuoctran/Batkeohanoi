@@ -13,6 +13,7 @@ import {
   Navigation,
   Compass,
   ExternalLink,
+  Calendar,
 } from "lucide-react";
 import {
   MatchFeedItem,
@@ -22,7 +23,15 @@ import {
 import { POPULAR_HANOI_DISTRICTS, GOLDEN_TIME_SLOTS } from "./CreateMatchModal";
 import { HANOI_PITCHES, SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { Button } from "@/components/ui/button";
-import { getMatchExpiresDate } from "@/lib/matchTime";
+import {
+  getTodayIsoDate,
+  getQuickDateOptions,
+  normalizeToIsoDate,
+  formatMatchDateDisplay,
+  formatFullExpiryLabel,
+  getMatchKickoffDate,
+  getMatchExpiresDate,
+} from "@/lib/matchTime";
 
 interface EditMatchModalProps {
   isOpen: boolean;
@@ -42,6 +51,7 @@ export function EditMatchModal({
   const [pitchName, setPitchName] = useState("");
   const [pitchAddress, setPitchAddress] = useState("");
   const [district, setDistrict] = useState("Cầu Giấy");
+  const [matchDateIso, setMatchDateIso] = useState<string>(() => getTodayIsoDate());
   const [timeSlot, setTimeSlot] = useState("19:00 - 20:30");
   const [tier, setTier] = useState<SkillTier>(2);
   const [totalCost, setTotalCost] = useState(800000);
@@ -53,11 +63,16 @@ export function EditMatchModal({
   const [customGmapsUrl, setCustomGmapsUrl] = useState("");
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
+  const quickDates = React.useMemo(() => getQuickDateOptions(4), [isOpen]);
+
   useEffect(() => {
     if (match) {
       setPitchName(match.pitchName);
       setPitchAddress(match.pitchAddress);
       setDistrict(match.district);
+      setMatchDateIso(
+        match.matchDateIso || normalizeToIsoDate(match.matchDate)
+      );
       setTimeSlot(`${match.startTime} - ${match.endTime}`);
       setTier(match.requiredTier);
       setTotalCost(match.totalCostVnd);
@@ -120,11 +135,28 @@ export function EditMatchModal({
     const startTime = timeParts[0] || match.startTime;
     const endTime = timeParts[1] || match.endTime;
 
+    const formattedMatchDate = formatMatchDateDisplay(matchDateIso);
+    const kickoffDateObj = getMatchKickoffDate({
+      matchDate: matchDateIso,
+      matchDateIso,
+      startTime,
+    });
+    const expiresDateObj = getMatchExpiresDate(
+      {
+        matchDate: matchDateIso,
+        matchDateIso,
+        startTime,
+      },
+      15
+    );
+
     const updatedMatch: MatchFeedItem = {
       ...match,
       pitchName: pitchName.trim() || match.pitchName,
       pitchAddress: pitchAddress.trim() || match.pitchAddress,
       district,
+      matchDate: formattedMatchDate,
+      matchDateIso,
       startTime,
       endTime,
       requiredTier: tier,
@@ -135,7 +167,8 @@ export function EditMatchModal({
       splitRatioLabel,
       isSOS,
       notes,
-      expiresAt: getMatchExpiresDate({ matchDate: match.matchDate, startTime }, 15).toISOString(),
+      kickoffTime: kickoffDateObj.toISOString(),
+      expiresAt: expiresDateObj.toISOString(),
       gmapsUrl: effectiveGmapsUrl,
       isGmapsIntegrated: isGmapsIntegrated,
     };
@@ -208,20 +241,72 @@ export function EditMatchModal({
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-300 mb-1">
-                  Khung giờ thi đấu
+                <label className="block font-semibold text-slate-300 mb-1 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Ngày thi đấu</span>
                 </label>
-                <select
-                  value={timeSlot}
-                  onChange={(e) => setTimeSlot(e.target.value)}
-                  className="w-full h-9 px-2.5 rounded-xl bg-slate-900 border border-white/[0.1] text-amber-300 font-mono font-bold"
+                <input
+                  type="date"
+                  required
+                  value={matchDateIso}
+                  onChange={(e) => setMatchDateIso(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 font-mono font-bold"
+                />
+              </div>
+            </div>
+
+            {/* Quick Date Chips */}
+            <div className="flex flex-wrap gap-1.5">
+              {quickDates.map((d) => (
+                <button
+                  type="button"
+                  key={d.isoDate}
+                  onClick={() => setMatchDateIso(d.isoDate)}
+                  className={`px-2 py-1 rounded-lg text-[10px] font-bold transition border ${
+                    matchDateIso === d.isoDate
+                      ? "bg-emerald-500/20 border-emerald-400 text-emerald-300"
+                      : "bg-slate-900 border-white/[0.08] text-slate-400 hover:text-white"
+                  }`}
                 >
-                  {GOLDEN_TIME_SLOTS.map((slot) => (
-                    <option key={slot} value={slot}>
-                      {slot}
-                    </option>
-                  ))}
-                </select>
+                  {d.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Khung giờ thi đấu */}
+            <div>
+              <label className="block font-semibold text-slate-300 mb-1">
+                Khung giờ thi đấu (Tự điền hoặc chọn nhanh)
+              </label>
+              <input
+                type="text"
+                required
+                value={timeSlot}
+                onChange={(e) => setTimeSlot(e.target.value)}
+                placeholder="VD: 07:00 - 08:30, 19:00 - 20:30..."
+                className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-amber-300 font-mono font-bold mb-1.5"
+              />
+              <div className="flex flex-wrap gap-1.5">
+                {GOLDEN_TIME_SLOTS.map((slot) => (
+                  <button
+                    type="button"
+                    key={slot}
+                    onClick={() => setTimeSlot(slot)}
+                    className={`px-2 py-1 rounded-lg text-[10px] font-mono font-bold transition border ${
+                      timeSlot === slot
+                        ? "bg-amber-500/20 border-amber-400 text-amber-300"
+                        : "bg-slate-900 border-white/[0.08] text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-[10.5px] text-slate-300 flex items-center justify-between">
+                <span>🧹 Tự đóng nếu chưa có đối:</span>
+                <strong className="text-amber-300 font-bold">
+                  {formatFullExpiryLabel(timeSlot, matchDateIso, 15)}
+                </strong>
               </div>
             </div>
 

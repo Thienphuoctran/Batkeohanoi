@@ -13,6 +13,7 @@ import {
   Navigation,
   Compass,
   MapPin,
+  Calendar,
 } from "lucide-react";
 import { District, MatchFeedItem, SkillTier, EscrowWallet, SplitCostRatio } from "@/types/matchmaking";
 import { HANOI_PITCHES, SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
@@ -25,7 +26,16 @@ import {
   maskPhoneNumber,
   getZaloDeepLink,
 } from "@/lib/zalo";
-import { formatExpiryTime, getMatchExpiresDate } from "@/lib/matchTime";
+import {
+  getTodayIsoDate,
+  getOffsetIsoDate,
+  getQuickDateOptions,
+  formatMatchDateDisplay,
+  formatFullExpiryLabel,
+  getMatchKickoffDate,
+  getMatchExpiresDate,
+  isMatchExpired,
+} from "@/lib/matchTime";
 
 import {
   AuthenticatedTeamProfile,
@@ -47,6 +57,9 @@ export const POPULAR_HANOI_DISTRICTS = [
 ];
 
 export const GOLDEN_TIME_SLOTS = [
+  "07:00 - 08:30",
+  "08:30 - 10:00",
+  "16:00 - 17:30",
   "17:30 - 19:00",
   "19:00 - 20:30",
   "19:30 - 21:00",
@@ -102,6 +115,11 @@ export function CreateMatchModal({
       ? Number(verifiedTeam?.skill_tier)
       : 2) as SkillTier
   );
+  // Mặc định thông minh: Nếu đã qua 20h00 tối thì mặc định chọn Ngày mai để tránh tạo nhầm kèo quá khứ
+  const [matchDateIso, setMatchDateIso] = useState<string>(() => {
+    const now = new Date();
+    return now.getHours() >= 20 ? getOffsetIsoDate(1) : getTodayIsoDate();
+  });
   const [timeSlot, setTimeSlot] = useState("19:00 - 20:30");
   const [totalCost, setTotalCost] = useState(850000);
   const [splitRatio, setSplitRatio] = useState<SplitCostRatio>("50_50");
@@ -115,6 +133,16 @@ export function CreateMatchModal({
   const [customGmapsUrl, setCustomGmapsUrl] = useState("");
   // Honeypot Chống Bot (Mục 13)
   const [botHoneypot, setBotHoneypot] = useState("");
+
+  const quickDates = React.useMemo(() => getQuickDateOptions(4), [isOpen]);
+
+  const isSelectedTimeExpired = React.useMemo(() => {
+    return isMatchExpired(
+      { matchDate: matchDateIso, matchDateIso, startTime: timeSlot },
+      new Date(),
+      15
+    );
+  }, [matchDateIso, timeSlot]);
 
   const effectiveGmapsUrl = React.useMemo(() => {
     if (!isGmapsIntegrated) return undefined;
@@ -210,7 +238,7 @@ export function CreateMatchModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (botHoneypot && botHoneypot.trim().length > 0) return; // Chặn bot âm thầm
-    if (!isPhoneValid || !isZaloValid || isEscrowLocked) return;
+    if (!isPhoneValid || !isZaloValid || isEscrowLocked || isSelectedTimeExpired) return;
 
     const timeParts = timeSlot.includes("-")
       ? timeSlot.split("-").map((t) => t.trim())
@@ -223,6 +251,21 @@ export function CreateMatchModal({
     const finalPitchName = pitchName.trim() || "Sân Cỏ Nhân Tạo";
     const finalPitchAddress =
       pitchAddress.trim() || `Khu vực ${district.trim() || "Hà Nội"}`;
+
+    const formattedMatchDate = formatMatchDateDisplay(matchDateIso);
+    const kickoffDateObj = getMatchKickoffDate({
+      matchDate: matchDateIso,
+      matchDateIso,
+      startTime: startTime || "19:00",
+    });
+    const expiresDateObj = getMatchExpiresDate(
+      {
+        matchDate: matchDateIso,
+        matchDateIso,
+        startTime: startTime || "19:00",
+      },
+      15
+    );
 
     const newMatch: MatchFeedItem = {
       id: `match-new-${Date.now()}`,
@@ -242,7 +285,8 @@ export function CreateMatchModal({
       district,
       pitchName: finalPitchName,
       pitchAddress: finalPitchAddress,
-      matchDate: "Hôm nay",
+      matchDate: formattedMatchDate,
+      matchDateIso,
       startTime: startTime || "19:00",
       endTime: endTime || "20:30",
       totalCostVnd: totalCost,
@@ -260,7 +304,8 @@ export function CreateMatchModal({
         : undefined,
       notes,
       createdAt: "Vừa xong",
-      expiresAt: getMatchExpiresDate({ matchDate: "Hôm nay", startTime: startTime || "19:00" }, 15).toISOString(),
+      kickoffTime: kickoffDateObj.toISOString(),
+      expiresAt: expiresDateObj.toISOString(),
       handshakePin: Math.floor(1000 + Math.random() * 9000).toString(),
       isHandshakeVerified: false,
       escrowDepositTeamId: currentTrustScore < 70 ? (verifiedTeam?.id || "team-escrow") : undefined,
@@ -638,54 +683,135 @@ export function CreateMatchModal({
               </div>
             </div>
 
-            {/* Khung giờ tự điền */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="font-semibold text-slate-300">
-                  3. Thời gian thi đấu (Tự điền linh hoạt)
+            {/* 3. Ngày & Thời gian thi đấu (Chuẩn thời gian thực) */}
+            <div className="rounded-2xl bg-slate-950/75 border border-white/[0.08] p-3.5 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="font-semibold text-slate-200 flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-emerald-400" />
+                  <span>3. Ngày &amp; Giờ thi đấu (Chuẩn thời gian thực)</span>
                 </label>
-                <span className="text-[10px] text-slate-400">
-                  Trận 90 phút hoặc tùy chỉnh
+                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 font-bold border border-emerald-500/30">
+                  Đang chọn: {formatMatchDateDisplay(matchDateIso)}
                 </span>
-              </div>
-              <input
-                type="text"
-                required
-                value={timeSlot}
-                onChange={(e) => setTimeSlot(e.target.value)}
-                placeholder="VD: 19:00 - 20:30, 19:30 - 21:00, 20:00 - 21:30..."
-                className="w-full h-10 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white font-mono text-xs font-bold placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 mb-2"
-              />
-              {/* Quick chips gợi ý ca giờ vàng */}
-              <div className="flex flex-wrap gap-1.5">
-                {GOLDEN_TIME_SLOTS.map((slot) => (
-                  <button
-                    type="button"
-                    key={slot}
-                    onClick={() => setTimeSlot(slot)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition border ${
-                      timeSlot === slot
-                        ? "bg-amber-500/20 border-amber-400 text-amber-300 ring-1 ring-amber-400"
-                        : "bg-slate-950/80 border-white/[0.07] text-slate-400 hover:text-white"
-                    }`}
-                  >
-                    {slot}
-                  </button>
-                ))}
               </div>
 
-              {/* Cam kết tự động đóng bài sau 15p bóng lăn & bảo toàn Uy Tín */}
-              <div className="mt-2.5 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px]">
-                <span className="text-slate-300 flex items-center gap-1.5">
-                  <span>🧹</span>
-                  <span>
-                    Tự động đóng nếu chưa có đối: <strong className="text-amber-300 font-bold">{formatExpiryTime(timeSlot, 15)}</strong> (15p sau giờ đá)
-                  </span>
-                </span>
-                <span className="text-emerald-400 font-bold text-[10px] sm:text-right">
-                  Bảo toàn 100% điểm Uy Tín &amp; Cọc
-                </span>
+              {/* Chọn ngày thi đấu (Quick Chips + Lịch) */}
+              <div className="space-y-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <div className="flex-1">
+                    <span className="block text-[10px] text-slate-400 mb-1">
+                      Chọn nhanh ngày đá:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {quickDates.map((d) => (
+                        <button
+                          type="button"
+                          key={d.isoDate}
+                          onClick={() => setMatchDateIso(d.isoDate)}
+                          className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition border ${
+                            matchDateIso === d.isoDate
+                              ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 ring-1 ring-emerald-400 shadow-sm"
+                              : "bg-slate-900 border-white/[0.08] text-slate-400 hover:text-white"
+                          }`}
+                        >
+                          {d.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="sm:w-44">
+                    <span className="block text-[10px] text-slate-400 mb-1">
+                      Hoặc chọn ngày trên lịch:
+                    </span>
+                    <input
+                      type="date"
+                      required
+                      min={getTodayIsoDate()}
+                      value={matchDateIso}
+                      onChange={(e) => setMatchDateIso(e.target.value)}
+                      className="w-full h-9 px-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold focus:outline-none focus:border-emerald-400"
+                    />
+                  </div>
+                </div>
               </div>
+
+              {/* Chọn khung giờ thi đấu */}
+              <div className="pt-2 border-t border-white/[0.06]">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-semibold text-slate-300">
+                    Khung giờ bóng lăn (Tự điền hoặc chọn nhanh):
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    Ca 90 phút tiêu chuẩn
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={timeSlot}
+                  onChange={(e) => setTimeSlot(e.target.value)}
+                  placeholder="VD: 07:00 - 08:30, 19:00 - 20:30, 20:30 - 22:00..."
+                  className="w-full h-10 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white font-mono text-xs font-bold placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 mb-2"
+                />
+                {/* Quick chips gợi ý ca giờ vàng */}
+                <div className="flex flex-wrap gap-1.5">
+                  {GOLDEN_TIME_SLOTS.map((slot) => (
+                    <button
+                      type="button"
+                      key={slot}
+                      onClick={() => setTimeSlot(slot)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition border ${
+                        timeSlot === slot
+                          ? "bg-amber-500/20 border-amber-400 text-amber-300 ring-1 ring-amber-400"
+                          : "bg-slate-900 border-white/[0.07] text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      {slot}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Cảnh báo nếu chọn Ngày Hôm Nay nhưng giờ đá đã qua > 15 phút */}
+              {isSelectedTimeExpired ? (
+                <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 space-y-2">
+                  <div className="flex items-start gap-2 text-rose-300 text-[11px] font-bold leading-snug">
+                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                    <span>
+                      Khung giờ <strong className="text-white">{timeSlot}</strong> của ngày{" "}
+                      <strong className="text-amber-300">{formatMatchDateDisplay(matchDateIso)}</strong>{" "}
+                      đã trôi qua quá 15 phút so với giờ hiện tại! Vui lòng chuyển sang{" "}
+                      <strong className="text-emerald-300">Ngày mai</strong> hoặc chọn khung giờ muộn hơn.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMatchDateIso(getOffsetIsoDate(1))}
+                    className="w-full py-1.5 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[11px] transition flex items-center justify-center gap-1.5"
+                  >
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>
+                      Chuyển sang {formatMatchDateDisplay(getOffsetIsoDate(1))} ngay (1-Click)
+                    </span>
+                  </button>
+                </div>
+              ) : (
+                /* Cam kết tự động đóng bài sau 15p bóng lăn đúng ngày & giờ */
+                <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px]">
+                  <span className="text-slate-300 flex items-center gap-1.5">
+                    <span>🧹</span>
+                    <span>
+                      Tự động đóng nếu chưa có đối lúc:{" "}
+                      <strong className="text-amber-300 font-bold">
+                        {formatFullExpiryLabel(timeSlot, matchDateIso, 15)}
+                      </strong>
+                    </span>
+                  </span>
+                  <span className="text-emerald-400 font-bold text-[10px] sm:text-right">
+                    15p sau bóng lăn • Bảo toàn 100% Uy Tín
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -824,11 +950,15 @@ export function CreateMatchModal({
           ) : (
             <Button
               type="submit"
-              disabled={!isPhoneValid || !isZaloValid}
-              className="w-full min-h-[46px] rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs gap-2"
+              disabled={!isPhoneValid || !isZaloValid || isSelectedTimeExpired}
+              className="w-full min-h-[46px] rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs gap-2 disabled:opacity-50"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>Đăng Kèo Lên Bảng Tin Ngay (Miễn Cọc)</span>
+              <span>
+                {isSelectedTimeExpired
+                  ? "Khung Giờ Đã Qua — Vui Lòng Chọn Ngày Mai Hoặc Đổi Giờ"
+                  : `Đăng Kèo ${formatMatchDateDisplay(matchDateIso)} Lên Bảng Tin Ngay`}
+              </span>
             </Button>
           )}
         </form>

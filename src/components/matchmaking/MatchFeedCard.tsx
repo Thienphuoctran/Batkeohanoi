@@ -22,7 +22,7 @@ import { maskPhoneNumber, getZaloDeepLink } from "@/lib/zalo";
 import { SpotlightCard } from "@/components/reactbits/SpotlightCard";
 import { ClickSpark } from "@/components/reactbits/ClickSpark";
 import { PhuiStamp } from "@/components/phui";
-import { formatExpiryTime } from "@/lib/matchTime";
+import { formatFullExpiryLabel, formatMatchDateDisplay } from "@/lib/matchTime";
 
 interface MatchFeedCardProps {
   match: MatchFeedItem;
@@ -195,7 +195,10 @@ export function MatchFeedCard({
           <div className="flex items-center justify-between text-xs pt-1.5 border-t border-emerald-500/15">
             <span className="text-amber-300 font-bold flex items-center gap-1.5 tabular-nums">
               <Clock className="w-3.5 h-3.5" />
-              {match.startTime} - {match.endTime} ({match.matchDate})
+              {match.startTime} - {match.endTime} •{" "}
+              <span className="text-emerald-300">
+                {formatMatchDateDisplay(match.matchDateIso || match.matchDate)}
+              </span>
             </span>
             <span className="text-slate-300 font-medium">
               Áo:{" "}
@@ -211,14 +214,22 @@ export function MatchFeedCard({
             </span>
           </div>
 
-          {/* Hạn tự động dọn dẹp bài đăng nếu chưa có đối (kickoff + 15p) */}
+          {/* Hạn tự động dọn dẹp bài đăng nếu chưa có đối (Đúng ngày + giờ bóng lăn + 15p) */}
           {!isMatched && (
             <div className="flex items-center justify-between text-[10.5px] text-slate-400 pt-1.5 border-t border-emerald-500/10">
               <span className="flex items-center gap-1 text-emerald-400/90 font-medium">
                 <span>🧹 Tự đóng sau 15p bóng lăn</span>
               </span>
               <span className="font-mono text-slate-400 text-[10px]">
-                (Đóng lúc: <strong className="text-amber-300 font-bold">{formatExpiryTime(match.startTime, 15)}</strong>)
+                (Đóng lúc:{" "}
+                <strong className="text-amber-300 font-bold">
+                  {formatFullExpiryLabel(
+                    match.startTime,
+                    match.matchDateIso || match.matchDate,
+                    15
+                  )}
+                </strong>
+                )
               </span>
             </div>
           )}

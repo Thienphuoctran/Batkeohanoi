@@ -92,6 +92,7 @@ export default function HanoiMatchmakingPlatform() {
     profile,
     team,
     refreshAuth,
+    signOut,
     isAuthenticated,
     hasTeam,
   } = useAuthTeam();
@@ -572,6 +573,8 @@ export default function HanoiMatchmakingPlatform() {
         pitchCustomName: newMatch.pitchName,
         district: newMatch.district,
         timeSlotLabel: `${newMatch.startTime} - ${newMatch.endTime}`,
+        kickoffTimeIso: newMatch.kickoffTime,
+        expiresAtIso: newMatch.expiresAt,
         totalFee: newMatch.totalCostVnd,
         splitFee: newMatch.shareCostVnd,
         isSos: newMatch.isSOS,
@@ -585,7 +588,7 @@ export default function HanoiMatchmakingPlatform() {
       newMatch.isSOS
         ? "🚨 Đã Phát Tín Hiệu Cứu Hộ SOS"
         : "⚽ Đã Đăng Kèo Mới Lên Bảng Tin",
-      `${newMatch.hostTeam.name} tìm đối tại ${newMatch.pitchName} (${newMatch.startTime}). Đã gắn định tuyến Zalo (${newMatch.hostTeam.captainPhone}).`,
+      `${newMatch.hostTeam.name} tìm đối tại ${newMatch.pitchName} (${newMatch.startTime} - ${newMatch.matchDate}). Đã gắn định tuyến Zalo (${newMatch.hostTeam.captainPhone}).`,
       newMatch.isSOS ? "SOS < 1h" : "Kèo Mới",
       newMatch.hostTeam.captainZalo || newMatch.hostTeam.captainPhone,
       `${newMatch.hostTeam.captainName} (${newMatch.hostTeam.shortName})`
@@ -609,7 +612,7 @@ export default function HanoiMatchmakingPlatform() {
     setEditingMatch(null);
     pushBotLog(
       "✏️ Đã Cập Nhật Kèo Đấu",
-      `Thông tin kèo đấu tại ${updatedMatch.pitchName} (${updatedMatch.startTime} - ${updatedMatch.district}) đã được cập nhật thành công!`,
+      `Thông tin kèo đấu tại ${updatedMatch.pitchName} (${updatedMatch.startTime} • ${updatedMatch.matchDate} - ${updatedMatch.district}) đã được cập nhật thành công!`,
       "Đã Cập Nhật"
     );
   };
@@ -721,6 +724,14 @@ export default function HanoiMatchmakingPlatform() {
           currentTeamName={team?.team_name}
           onOpenAuthModal={() => setIsAuthModalOpen(true)}
           onOpenTeamOnboarding={() => setIsTeamOnboardingOpen(true)}
+          onSignOut={async () => {
+            await signOut();
+            pushBotLog(
+              "👋 Đã Đăng Xuất Tài Khoản",
+              "Bạn đã đăng xuất an toàn khỏi hệ thống. Bấm Đăng nhập khi cần quản lý đội bóng hoặc mở kèo!",
+              "Đã Đăng Xuất"
+            );
+          }}
           escrowWallet={escrowWallet}
           onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
           onOpenSupport={() => setIsSupportOpen(true)}
@@ -1085,8 +1096,12 @@ export default function HanoiMatchmakingPlatform() {
                   onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
                   onQuickCreateMatch={() => setIsCreateOpen(true)}
                   onSignOut={async () => {
-                    await signOutAction();
-                    await refreshAuth();
+                    await signOut();
+                    pushBotLog(
+                      "👋 Đã Đăng Xuất Tài Khoản",
+                      "Bạn đã đăng xuất an toàn khỏi hệ thống. Bấm Đăng nhập khi cần quản lý đội bóng hoặc mở kèo!",
+                      "Đã Đăng Xuất"
+                    );
                   }}
                   onRefreshTeam={refreshAuth}
                 />
