@@ -56,6 +56,7 @@ export type MatchStatus =
   | "MATCHED"
   | "SOS"
   | "PLAYING_VERIFIED"
+  | "CANCEL_REQUESTED"
   | "FINISHED"
   | "CANCELLED"
   | "DISPUTED"
@@ -105,6 +106,16 @@ export interface MatchFeedItem {
   creatorId?: string;
   gmapsUrl?: string; // Link vị trí sân trên Google Maps (chủ kèo ghim hoặc tự sinh)
   isGmapsIntegrated?: boolean; // Cờ tích hợp Google Maps
+  cancelRequest?: {
+    requestedBy: "HOST" | "GUEST";
+    requestedByName: string;
+    requestedByPhone: string;
+    requestedAt: string;
+    reasonCategory: string;
+    reasonDetail: string;
+    penaltyPoints: number;
+    compensationAmountVnd?: number;
+  };
 }
 
 export interface BlindReview {

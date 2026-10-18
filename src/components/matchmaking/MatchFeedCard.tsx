@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   MapPin,
   Clock,
@@ -15,6 +15,7 @@ import {
   Navigation,
   ExternalLink,
   UserX,
+  Activity,
 } from "lucide-react";
 import { MatchFeedItem } from "@/types/matchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
@@ -23,7 +24,11 @@ import { maskPhoneNumber, getZaloDeepLink } from "@/lib/zalo";
 import { SpotlightCard } from "@/components/reactbits/SpotlightCard";
 import { ClickSpark } from "@/components/reactbits/ClickSpark";
 import { PhuiStamp } from "@/components/phui";
-import { formatFullExpiryLabel, formatMatchDateDisplay } from "@/lib/matchTime";
+import {
+  formatFullExpiryLabel,
+  formatMatchDateDisplay,
+  getMatchKickoffDate,
+} from "@/lib/matchTime";
 
 interface MatchFeedCardProps {
   match: MatchFeedItem;
@@ -34,6 +39,7 @@ interface MatchFeedCardProps {
   onEditMatch?: (match: MatchFeedItem) => void;
   onDeleteMatch?: (matchId: string) => void;
   onCancelGuestChallenge?: (match: MatchFeedItem) => void;
+  onOpenRespondCancel?: (match: MatchFeedItem) => void;
 }
 
 export function MatchFeedCard({
@@ -45,16 +51,112 @@ export function MatchFeedCard({
   onEditMatch,
   onDeleteMatch,
   onCancelGuestChallenge,
+  onOpenRespondCancel,
 }: MatchFeedCardProps) {
   const tierInfo = SKILL_TIERS_CONFIG[match.requiredTier];
   const isMatched = match.status === "MATCHED" || match.status === "PLAYING_VERIFIED";
   const isPlayingVerified = match.status === "PLAYING_VERIFIED";
+  const isCancelRequested = match.status === "CANCEL_REQUESTED";
+  const isDisputed = match.status === "DISPUTED";
   const host = match.hostTeam;
   const avgStar = (
     (host.ratingPunctual + host.ratingFairplay + host.ratingFinancial) /
     3
   ).toFixed(1);
   const hostZaloUrl = getZaloDeepLink(host.captainPhone, host.captainZalo);
+
+  // ⏱️ Realtime Live Countdown Tracker: Cập nhật mỗi 5 giây
+  const [liveNow, setLiveNow] = useState(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setLiveNow(Date.now()), 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const kickoffDate = useMemo(() => {
+    try {
+      return getMatchKickoffDate({
+        matchDate: match.matchDateIso || match.matchDate,
+        matchDateIso: match.matchDateIso,
+        startTime: match.startTime,
+        kickoffTime: match.kickoffTime,
+      });
+    } catch {
+      return new Date(Date.now() + 2 * 3600 * 1000);
+    }
+  }, [match]);
+
+  const diffMs = kickoffDate.getTime() - liveNow;
+  const diffMinutes = Math.round(diffMs / (60 * 1000));
+
+  const liveStatusPill = useMemo(() => {
+    if (match.status === "CANCELLED") {
+      return {
+        label: "Đã hủy trận đấu",
+        className: "bg-rose-500/15 text-rose-400 border-rose-500/30",
+        icon: "🛑",
+      };
+    }
+    if (isCancelRequested) {
+      return {
+        label: "Chờ duyệt hủy kèo (Cần 2 bên đồng thuận)",
+        className: "bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse font-bold",
+        icon: "⚠️",
+      };
+    }
+    if (isDisputed) {
+      return {
+        label: "Đang tranh chấp • BQT can thiệp",
+        className: "bg-rose-500/25 text-rose-300 border-rose-500/50 font-bold animate-pulse",
+        icon: "⚖️",
+      };
+    }
+    if (diffMinutes < -90) {
+      return {
+        label: "Đã kết thúc trận đấu",
+        className: "bg-slate-800/80 text-slate-400 border-slate-700",
+        icon: "🏁",
+      };
+    }
+    if (diffMinutes <= 0 && diffMinutes >= -90) {
+      return {
+        label: `LIVE: Đang thi đấu (${Math.min(90, Math.abs(diffMinutes))}')`,
+        className: "bg-emerald-500/25 text-emerald-300 border-emerald-500/50 font-black animate-pulse",
+        icon: "⚽",
+      };
+    }
+    if (diffMinutes <= 60) {
+      return {
+        label: `🚨 Còn ${diffMinutes} phút • Sắp lăn bóng!`,
+        className: "bg-rose-500/20 text-rose-300 border-rose-500/40 font-black animate-pulse",
+        icon: "🔥",
+      };
+    }
+    if (diffMinutes <= 120) {
+      const h = Math.floor(diffMinutes / 60);
+      const m = diffMinutes % 60;
+      return {
+        label: `⚠️ Còn ${h}h ${m}m • Sát giờ thi đấu`,
+        className: "bg-orange-500/20 text-orange-300 border-orange-500/40 font-bold",
+        icon: "⏳",
+      };
+    }
+    if (diffMinutes <= 240) {
+      const h = Math.floor(diffMinutes / 60);
+      const m = diffMinutes % 60;
+      return {
+        label: `⚡ Còn ${h}h ${m}m • Khung giờ vàng`,
+        className: "bg-amber-500/15 text-amber-300 border-amber-500/30 font-medium",
+        icon: "⚡",
+      };
+    }
+    const h = Math.floor(diffMinutes / 60);
+    const m = diffMinutes % 60;
+    return {
+      label: `⏳ Còn ${h}h ${m}m nữa bóng lăn`,
+      className: "bg-slate-800/80 text-slate-300 border-slate-700",
+      icon: "⏱️",
+    };
+  }, [diffMinutes, match.status, isCancelRequested, isDisputed]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -158,6 +260,39 @@ export function MatchFeedCard({
           </span>
         </div>
 
+        {/* Banner Yêu Cầu Xin Hủy Kèo 2 Bên */}
+        {isCancelRequested && (
+          <div className="mt-2.5 p-2.5 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs bg-amber-950/40 border-amber-500/50">
+            <div className="flex items-start sm:items-center gap-2">
+              <AlertOctagon className="w-4 h-4 text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
+              <div>
+                <span className="font-bold text-amber-300">
+                  {isOwner
+                    ? `⏳ Đang chờ Đội khách (${match.guestTeam?.name || "đối tác"}) phản hồi xin hủy kèo`
+                    : `⚠️ Chủ nhà (${host.name}) xin hủy trận: `}
+                </span>
+                {!isOwner && (
+                  <span className="text-slate-300 italic text-[11px]">
+                    "{match.cancelRequest?.reasonDetail || 'Sự cố đột xuất'}"
+                  </span>
+                )}
+              </div>
+            </div>
+            {!isOwner && onOpenRespondCancel && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenRespondCancel(match);
+                }}
+                className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:brightness-110 text-slate-950 text-xs font-black shrink-0 shadow-md active:scale-95"
+              >
+                Phản Hồi Hủy Kèo
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Pitch & Time Box */}
         <div className="mt-3 rounded-xl bg-[#020d07]/90 border border-emerald-500/20 p-3 space-y-2">
           <div className="flex items-center justify-between text-xs">
@@ -216,6 +351,35 @@ export function MatchFeedCard({
               </strong>
             </span>
           </div>
+
+          {/* Realtime Live Countdown Tracker */}
+          <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-emerald-500/15">
+            <span className="text-slate-400 font-medium flex items-center gap-1.5">
+              <span>{liveStatusPill.icon}</span>
+              <span className="text-slate-300 font-semibold">Tiến độ trận:</span>
+            </span>
+            <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] border flex items-center gap-1 tabular-nums ${liveStatusPill.className}`}>
+              {liveStatusPill.label}
+            </span>
+          </div>
+
+          {/* Thanh Tiến Trình Thời Gian Thực (Live Time Progress Bar) */}
+          {diffMinutes > 0 && diffMinutes <= 360 && (
+            <div className="w-full bg-slate-800/80 rounded-full h-1 overflow-hidden mt-0.5">
+              <div
+                className={`h-full transition-all duration-1000 ${
+                  diffMinutes <= 60
+                    ? 'bg-rose-500'
+                    : diffMinutes <= 120
+                    ? 'bg-amber-500'
+                    : 'bg-emerald-500'
+                }`}
+                style={{
+                  width: `${Math.max(5, Math.min(100, Math.round(((360 - diffMinutes) / 360) * 100)))}%`,
+                }}
+              />
+            </div>
+          )}
 
           {/* Hạn tự động dọn dẹp bài đăng nếu chưa có đối (Đúng ngày + giờ bóng lăn + 15p) */}
           {!isMatched && (

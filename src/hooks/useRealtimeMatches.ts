@@ -166,6 +166,10 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
     status:
       row.status === "matched"
         ? "MATCHED"
+        : row.status === "cancel_requested"
+        ? "CANCEL_REQUESTED"
+        : row.status === "disputed"
+        ? "DISPUTED"
         : row.status === "expired"
         ? "EXPIRED"
         : row.is_sos
@@ -464,6 +468,79 @@ export function useRealtimeMatchFeed(
           undefined
         );
       })
+      .on("broadcast", { event: "cancellation_requested" }, ({ payload }) => {
+        const { matchId, requestedByName, reasonDetail, penaltyPoints, compensationAmountVnd } =
+          payload as {
+            matchId: string;
+            requestedByName: string;
+            reasonDetail: string;
+            penaltyPoints: number;
+            compensationAmountVnd: number;
+          };
+        if (!matchId) return;
+        setMatches((prev) =>
+          prev.map((m) =>
+            m.id === matchId
+              ? {
+                  ...m,
+                  status: "CANCEL_REQUESTED",
+                  cancelRequest: {
+                    requestedBy: "HOST",
+                    requestedByName,
+                    requestedByPhone: m.hostTeam.captainPhone || "",
+                    requestedAt: new Date().toLocaleTimeString("vi-VN"),
+                    reasonCategory: "HOST_CANCEL",
+                    reasonDetail,
+                    penaltyPoints,
+                    compensationAmountVnd,
+                  },
+                }
+              : m
+          )
+        );
+        playNotificationChime();
+        onNewRealtimeEvent?.(
+          "⚠️ [Realtime] Chủ Kèo Xin Hủy Trận Đấu!",
+          `Đội ${requestedByName} xin hủy trận do: "${reasonDetail}". Vui lòng phản hồi xác nhận!`,
+          "Yêu Cầu Hủy",
+          undefined,
+          requestedByName
+        );
+      })
+      .on("broadcast", { event: "cancellation_responded" }, ({ payload }) => {
+        const { matchId, decision, guestTeamName } = payload as {
+          matchId: string;
+          decision: "ACCEPTED" | "REJECTED";
+          guestTeamName: string;
+        };
+        if (!matchId) return;
+        if (decision === "ACCEPTED") {
+          setMatches((prev) => prev.filter((m) => m.id !== matchId));
+          playNotificationChime();
+          onNewRealtimeEvent?.(
+            "✅ [Realtime] Đã Đồng Thuận Hủy Trận Đấu",
+            `Đội ${guestTeamName} đã đồng ý hủy kèo. Trận đấu chính thức đóng.`,
+            "Đã Hủy"
+          );
+        } else {
+          setMatches((prev) =>
+            prev.map((m) =>
+              m.id === matchId
+                ? {
+                    ...m,
+                    status: "DISPUTED",
+                  }
+                : m
+            )
+          );
+          playNotificationChime();
+          onNewRealtimeEvent?.(
+            "🚨 [Realtime] Đội Khách Từ Chối Cho Hủy Kèo!",
+            `Đội ${guestTeamName} không chấp thuận hủy trận. Vụ việc đã chuyển lên Ban Quản Trị xử phạt!`,
+            "Tranh Chấp"
+          );
+        }
+      })
       .subscribe((status) => {
         setIsRealtimeConnected(status === "SUBSCRIBED");
       });
@@ -535,6 +612,48 @@ export function useRealtimeMatchFeed(
     []
   );
 
+  const broadcastCancelRequest = useCallback(
+    async (
+      matchId: string,
+      requestedByName: string,
+      reasonDetail: string,
+      penaltyPoints: number,
+      compensationAmountVnd: number
+    ) => {
+      if (channelRef.current) {
+        await channelRef.current.send({
+          type: "broadcast",
+          event: "cancellation_requested",
+          payload: {
+            matchId,
+            requestedByName,
+            reasonDetail,
+            penaltyPoints,
+            compensationAmountVnd,
+          },
+        });
+      }
+    },
+    []
+  );
+
+  const broadcastCancelResponse = useCallback(
+    async (
+      matchId: string,
+      decision: "ACCEPTED" | "REJECTED",
+      guestTeamName: string
+    ) => {
+      if (channelRef.current) {
+        await channelRef.current.send({
+          type: "broadcast",
+          event: "cancellation_responded",
+          payload: { matchId, decision, guestTeamName },
+        });
+      }
+    },
+    []
+  );
+
   return {
     matches,
     setMatches,
@@ -543,5 +662,7 @@ export function useRealtimeMatchFeed(
     broadcastMatchLock,
     broadcastMatchDelete,
     broadcastGuestWithdrawal,
+    broadcastCancelRequest,
+    broadcastCancelResponse,
   };
 }

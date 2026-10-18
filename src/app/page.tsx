@@ -68,7 +68,10 @@ import {
   deleteOrCancelMatchAction,
   guestWithdrawFromMatchAction,
   confirmMatchChallengeAction,
+  requestHostMatchCancelAction,
+  respondMatchCancelRequestAction,
 } from "@/actions/auth";
+import { RespondCancelRequestModal } from "@/components/matchmaking/RespondCancelRequestModal";
 import {
   addStoredEscrowRecord,
   getStoredBroadcasts,
@@ -116,6 +119,7 @@ export default function HanoiMatchmakingPlatform() {
   const [editingMatch, setEditingMatch] = useState<MatchFeedItem | null>(null);
   const [cancellingMatch, setCancellingMatch] = useState<MatchFeedItem | null>(null);
   const [cancellingGuestMatch, setCancellingGuestMatch] = useState<MatchFeedItem | null>(null);
+  const [respondingCancelMatch, setRespondingCancelMatch] = useState<MatchFeedItem | null>(null);
   const [latestBroadcast, setLatestBroadcast] = useState<EmergencyBroadcastItem | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isBotDrawerOpen, setIsBotDrawerOpen] = useState(false);
@@ -284,6 +288,8 @@ export default function HanoiMatchmakingPlatform() {
     broadcastMatchLock,
     broadcastMatchDelete,
     broadcastGuestWithdrawal,
+    broadcastCancelRequest,
+    broadcastCancelResponse,
   } = useRealtimeMatchFeed(MOCK_MATCH_FEEDS, pushBotLog);
 
   // TẦNG 2: Realtime Client Engine - Quét định kỳ mỗi 10 giây để tự động ẩn các kèo quá 15 phút sau bóng lăn
@@ -858,6 +864,162 @@ export default function HanoiMatchmakingPlatform() {
     }
   };
 
+  // Xử lý khi Đội Chủ Nhà gửi yêu cầu xin hủy kèo (Cần 2 bên đồng thuận khi đã có đối)
+  const handleRequestMutualCancel = async (
+    matchId: string,
+    options: {
+      reasonCategory: string;
+      reasonDetail: string;
+      penaltyPoints: number;
+      compensationAmountVnd: number;
+    }
+  ) => {
+    const target = matches.find((m) => m.id === matchId);
+    if (!target) return;
+
+    // 1. Cập nhật Optimistic UI: status -> CANCEL_REQUESTED
+    setMatches((prev) =>
+      prev.map((m) =>
+        m.id === matchId
+          ? {
+              ...m,
+              status: "CANCEL_REQUESTED",
+              cancelRequest: {
+                requestedBy: "HOST",
+                requestedByName: target.hostTeam.name,
+                requestedByPhone: target.hostTeam.captainPhone,
+                requestedAt: new Date().toLocaleTimeString("vi-VN"),
+                reasonCategory: options.reasonCategory,
+                reasonDetail: options.reasonDetail,
+                penaltyPoints: options.penaltyPoints,
+                compensationAmountVnd: options.compensationAmountVnd,
+              },
+            }
+          : m
+      )
+    );
+    setCancellingMatch(null);
+
+    // 2. Phát sóng WebSocket Realtime sang toàn bộ người dùng
+    await broadcastCancelRequest(
+      matchId,
+      target.hostTeam.name,
+      options.reasonDetail,
+      options.penaltyPoints,
+      options.compensationAmountVnd
+    );
+
+    // 3. Đồng bộ Supabase DB & Báo Telegram BQT
+    await requestHostMatchCancelAction({
+      matchId,
+      hostTeamName: target.hostTeam.name,
+      guestTeamName: target.guestTeam?.name || "Đội Khách",
+      hostPhone: target.hostTeam.captainPhone,
+      guestPhone: target.guestTeam?.captainPhone || "",
+      pitchName: target.pitchName,
+      timeSlot: `${target.startTime} - ${target.endTime}`,
+      reasonCategory: options.reasonCategory,
+      reasonDetail: options.reasonDetail,
+      penaltyPoints: options.penaltyPoints,
+      compensationAmountVnd: options.compensationAmountVnd,
+    });
+
+    pushBotLog(
+      "⏳ Đã Gửi Yêu Cầu Xin Hủy Kèo Tới Đối Tác",
+      `Yêu cầu xin hủy trận tại ${target.pitchName} (${target.startTime}) đã được gửi tới ${target.guestTeam?.name || "đối thủ"}. Trận đấu tạm khóa chờ đối tác phản hồi đồng thuận.`,
+      "Chờ Đối Duyệt"
+    );
+  };
+
+  // Xử lý khi Đội Khách đồng ý chấp thuận yêu cầu hủy từ Chủ Nhà
+  const handleAcceptCancelRequest = async (matchId: string) => {
+    const target = matches.find((m) => m.id === matchId);
+    if (!target) return;
+
+    const compensation = target.cancelRequest?.compensationAmountVnd || 0;
+    const penalty = target.cancelRequest?.penaltyPoints || 0;
+    const hostName = target.hostTeam.name;
+    const guestName = target.guestTeam?.name || team?.team_name || "Đội bạn";
+
+    // 1. Gỡ trận đấu khỏi danh sách
+    setMatches((prev) => prev.filter((m) => m.id !== matchId));
+
+    // 2. Nếu có tiền bồi thường, cộng thẳng vào Ví Ký Quỹ của Đội Khách
+    if (compensation > 0) {
+      setEscrowWallet((prev) => ({
+        ...prev,
+        balance: prev.balance + compensation,
+        availableBalance: prev.availableBalance + compensation,
+      }));
+    }
+
+    // 3. Phát sóng Realtime
+    await broadcastCancelResponse(matchId, "ACCEPTED", guestName);
+
+    // 4. Đồng bộ Supabase CSDL
+    await respondMatchCancelRequestAction({
+      matchId,
+      decision: "ACCEPTED",
+      guestTeamName: guestName,
+      hostTeamName: hostName,
+      penaltyPoints: penalty,
+      compensationAmountVnd: compensation,
+    });
+
+    pushBotLog(
+      compensation > 0
+        ? `✅ Đã Đồng Thuận Hủy Trận (+${compensation.toLocaleString("vi-VN")}đ)`
+        : "✅ Đã Đồng Thuận Hủy Trận Đấu",
+      `Đội bạn đã chấp thuận yêu cầu hủy từ ${hostName}. ${
+        compensation > 0
+          ? `Khoản bồi thường cọc ${compensation.toLocaleString("vi-VN")}đ đã được cộng vào Ví Ký Quỹ của bạn!`
+          : "Trận đấu đã được hủy hợp lệ trước 4 tiếng."
+      }`,
+      "Đã Hủy Trận"
+    );
+  };
+
+  // Xử lý khi Đội Khách TỪ CHỐI yêu cầu hủy kèo từ Chủ Nhà
+  const handleRejectCancelRequest = async (matchId: string, reason: string) => {
+    const target = matches.find((m) => m.id === matchId);
+    if (!target) return;
+
+    const hostName = target.hostTeam.name;
+    const guestName = target.guestTeam?.name || team?.team_name || "Đội bạn";
+
+    // 1. Chuyển trạng thái trận đấu sang DISPUTED
+    setMatches((prev) =>
+      prev.map((m) =>
+        m.id === matchId
+          ? {
+              ...m,
+              status: "DISPUTED",
+            }
+          : m
+      )
+    );
+
+    // 2. Phát sóng Realtime
+    await broadcastCancelResponse(matchId, "REJECTED", guestName);
+
+    // 3. Đồng bộ Supabase DB & Gửi cảnh báo khẩn Telegram BQT
+    await respondMatchCancelRequestAction({
+      matchId,
+      decision: "REJECTED",
+      guestTeamName: guestName,
+      hostTeamName: hostName,
+      penaltyPoints: target.cancelRequest?.penaltyPoints || 25,
+      compensationAmountVnd: target.cancelRequest?.compensationAmountVnd || 200000,
+      rejectReason: reason,
+    });
+
+    pushBotLog(
+      "🚨 Đã Từ Chối Hủy Kèo — Chuyển BQT Xử Lý Bùng Kèo",
+      `Đội bạn đã từ chối yêu cầu hủy của ${hostName}. Vụ việc đã được chuyển tới Ban Trọng Tài / BQT (/admin) để xử phạt theo quy định bùng kèo!`,
+      "Tranh Chấp"
+    );
+  };
+
   return (
     <div className="min-h-screen bg-stadium-multi text-slate-100 flex flex-col pb-16 relative overflow-x-hidden">
       {/* 🏟️ LAYER 0: CẢNH NỀN SÂN ĐÈN CAO ÁP ĐÊM (Vignette + Dark overlay 85%) */}
@@ -1190,6 +1352,7 @@ export default function HanoiMatchmakingPlatform() {
                         onEditMatch={(m) => setEditingMatch(m)}
                         onDeleteMatch={handleDeleteMatch}
                         onCancelGuestChallenge={(m) => setCancellingGuestMatch(m)}
+                        onOpenRespondCancel={(m) => setRespondingCancelMatch(m)}
                       />
                     );
                   })}
@@ -1402,6 +1565,7 @@ export default function HanoiMatchmakingPlatform() {
         open={!!cancellingMatch}
         onClose={() => setCancellingMatch(null)}
         onConfirmCancelMatch={handleConfirmCancelMatch}
+        onRequestMutualCancel={handleRequestMutualCancel}
       />
 
       {/* Modal Đội Khách Xin Rút Lui / Hủy Nhận Kèo Đột Xuất & Kháng Cáo BQT */}
@@ -1413,6 +1577,15 @@ export default function HanoiMatchmakingPlatform() {
         guestCaptainPhone={profile?.phone || team?.captain_phone || ""}
         myTrustScore={effectiveTrustScore}
         onConfirmWithdraw={handleConfirmGuestWithdraw}
+      />
+
+      {/* Modal Đội Khách Phản Hồi Yêu Cầu Xin Hủy Kèo Từ Chủ Sân (Đồng thuận 2 bên) */}
+      <RespondCancelRequestModal
+        match={respondingCancelMatch}
+        open={!!respondingCancelMatch}
+        onClose={() => setRespondingCancelMatch(null)}
+        onAcceptCancel={handleAcceptCancelRequest}
+        onRejectCancel={handleRejectCancelRequest}
       />
 
       {/* Modal Đăng Nhập / Đăng Ký Đội Trưởng */}

@@ -1251,3 +1251,108 @@ export async function confirmMatchChallengeAction(payload: {
   }
 }
 
+// 15. Đội Chủ Kèo Gửi Yêu Cầu Xin Hủy Kèo (Cần Sự Chấp Thuận Của 2 Bên Khi Đã Có Đối)
+export async function requestHostMatchCancelAction(payload: {
+  matchId: string;
+  hostTeamName: string;
+  guestTeamName: string;
+  hostPhone: string;
+  guestPhone: string;
+  pitchName: string;
+  timeSlot: string;
+  reasonCategory: string;
+  reasonDetail: string;
+  penaltyPoints: number;
+  compensationAmountVnd: number;
+}) {
+  try {
+    const adminClient = getAdminClient();
+
+    const updateObj: Record<string, any> = {
+      status: "cancel_requested",
+      notes: `[Chủ nhà ${payload.hostTeamName} xin hủy kèo - Lý do: ${payload.reasonDetail}]`,
+    };
+
+    await adminClient.from("matches").update(updateObj).eq("id", payload.matchId);
+
+    const alertText =
+      `⚠️ <b>YÊU CẦU XIN HỦY KÈO TỪ CHỦ NHÀ (CHỜ ĐỐI XÁC NHẬN)</b>\n` +
+      `• Chủ kèo xin hủy: <b>${payload.hostTeamName}</b> (${payload.hostPhone})\n` +
+      `• Đội đối tác (Khách): <b>${payload.guestTeamName}</b> (${payload.guestPhone})\n` +
+      `• Sân thi đấu: <b>${payload.pitchName}</b> (${payload.timeSlot})\n` +
+      `• Mức phạt áp dụng nếu hủy: <b>-${payload.penaltyPoints} Điểm Uy Tín</b>\n` +
+      (payload.compensationAmountVnd > 0
+        ? `• Bồi thường dự kiến cho khách: <b>${payload.compensationAmountVnd.toLocaleString("vi-VN")} VNĐ</b>\n`
+        : "") +
+      `• Lý do: <i>${payload.reasonDetail || payload.reasonCategory}</i>\n` +
+      `👉 <i>Hệ thống đã gửi thông báo xác nhận tới Đội khách để phê duyệt đồng thuận!</i>`;
+
+    await sendTelegramAlert(alertText);
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.error("[requestHostMatchCancelAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+
+// 16. Phản Hồi Yêu Cầu Hủy Kèo (Đội Khách Phê Duyệt Đồng Ý Hoặc Từ Chối)
+export async function respondMatchCancelRequestAction(payload: {
+  matchId: string;
+  decision: "ACCEPTED" | "REJECTED";
+  guestTeamName: string;
+  hostTeamName: string;
+  penaltyPoints: number;
+  compensationAmountVnd: number;
+  rejectReason?: string;
+}) {
+  try {
+    const adminClient = getAdminClient();
+
+    if (payload.decision === "ACCEPTED") {
+      // Hủy trận đấu hoàn toàn
+      await adminClient
+        .from("matches")
+        .update({
+          status: "cancelled",
+          notes: `[Đã hủy đồng thuận giữa ${payload.hostTeamName} và ${payload.guestTeamName}]`,
+        })
+        .eq("id", payload.matchId);
+
+      const alertText =
+        `✅ <b>ĐÃ ĐỒNG THUẬN HỦY TRẬN ĐẤU</b>\n` +
+        `• Đội khách <b>${payload.guestTeamName}</b> đã chấp thuận yêu cầu hủy từ <b>${payload.hostTeamName}</b>.\n` +
+        `• Chế tài áp dụng: Chủ nhà bị trừ <b>-${payload.penaltyPoints} Điểm Uy Tín</b>` +
+        (payload.compensationAmountVnd > 0
+          ? ` và bồi thường <b>${payload.compensationAmountVnd.toLocaleString("vi-VN")}đ</b> cọc cho đội khách.`
+          : ".");
+
+      await sendTelegramAlert(alertText);
+    } else {
+      // Đội khách từ chối hủy -> Chuyển sang tranh chấp DISPUTED để BQT can thiệp
+      await adminClient
+        .from("matches")
+        .update({
+          status: "disputed",
+          notes: `[Tranh chấp: Đội khách từ chối hủy kèo - ${payload.rejectReason || "Yêu cầu bồi thường theo luật"}]`,
+        })
+        .eq("id", payload.matchId);
+
+      const alertText =
+        `🚨 <b>TRANH CHẤP BÙNG KÈO: ĐỘI KHÁCH TỪ CHỐI CHO HỦY</b>\n` +
+        `• Đội khách: <b>${payload.guestTeamName}</b> KHÔNG ĐỒNG Ý hủy kèo của <b>${payload.hostTeamName}</b>.\n` +
+        `• Lý do từ chối: <i>${payload.rejectReason || "Đội khách đã chuẩn bị xong lực lượng, không chấp nhận hủy sát giờ"}</i>\n` +
+        `👉 <i>Admin vui lòng vào /admin kiểm tra và xử lý trừng phạt tài khoản chủ sân theo quy định!</i>`;
+
+      await sendTelegramAlert(alertText);
+    }
+
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.error("[respondMatchCancelRequestAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+
+
