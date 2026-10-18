@@ -674,13 +674,18 @@ export async function deleteOrCancelMatchAction(matchId: string) {
   try {
     const adminClient = getAdminClient();
 
-    // 1. Thử xóa hoàn toàn khỏi bảng matches
+    // 1. Dọn dẹp bản ghi kháng cáo liên kết (nếu có) để tránh xung đột Foreign Key
+    try {
+      await adminClient.from("match_appeals").delete().eq("match_id", matchId);
+    } catch {}
+
+    // 2. Thử xóa hoàn toàn khỏi bảng matches
     const { error: delError } = await adminClient
       .from("matches")
       .delete()
       .eq("id", matchId);
 
-    // 2. Nếu có lỗi ràng buộc khóa ngoại, cập nhật status = 'cancelled'
+    // 3. Nếu có lỗi ràng buộc khóa ngoại khác, cập nhật status = 'cancelled'
     if (delError) {
       console.warn("[deleteMatch] delete error, fallback update to cancelled:", delError.message);
       await adminClient
