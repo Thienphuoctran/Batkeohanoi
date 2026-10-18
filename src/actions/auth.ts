@@ -21,6 +21,8 @@ function getAnonAuthClient() {
       autoRefreshToken: false,
     },
   });
+}
+
 async function getAuthenticatedUser() {
   try {
     const cookieStore = await cookies();
@@ -61,11 +63,54 @@ export async function getCurrentUserAndTeamAction() {
 
     const adminClient = getAdminClient();
 
-    const { data: profile } = await adminClient
+    let { data: profile } = await adminClient
       .from("users")
       .select("*")
       .eq("id", user.id)
       .maybeSingle();
+
+    // Tự động khởi tạo profile từ Google User Metadata nếu chưa có trong public.users
+    if (!profile) {
+      const fullName =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.email?.split("@")[0] ||
+        "Đội Trưởng Google";
+      const avatarUrl =
+        user.user_metadata?.avatar_url ||
+        user.user_metadata?.picture ||
+        null;
+
+      try {
+        const { data: newProfile } = await adminClient
+          .from("users")
+          .upsert(
+            {
+              id: user.id,
+              full_name: fullName,
+              avatar_url: avatarUrl,
+              phone: user.phone || null,
+            },
+            { onConflict: "id" }
+          )
+          .select("*")
+          .maybeSingle();
+
+        profile = newProfile || {
+          id: user.id,
+          full_name: fullName,
+          avatar_url: avatarUrl,
+          phone: "",
+        };
+      } catch (upsertErr) {
+        profile = {
+          id: user.id,
+          full_name: fullName,
+          avatar_url: avatarUrl,
+          phone: "",
+        };
+      }
+    }
 
     const { data: team } = await adminClient
       .from("teams")
@@ -348,6 +393,73 @@ export async function signInAsDemoCaptainAction() {
       success: false,
       message: err?.message || "Lỗi khi đăng nhập tài khoản mẫu.",
     };
+  }
+}
+
+// 3.2. Kiểm tra xem Google OAuth có đang được bật trên Supabase Dashboard không
+export async function checkGoogleOAuthStatusAction() {
+  try {
+    const rawUrl =
+      process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      "https://lkvrdfqyyigdsxtipfcy.supabase.co";
+    const baseUrl = rawUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, "");
+    const testUrl = `${baseUrl}/auth/v1/authorize?provider=google`;
+
+    const res = await fetch(testUrl, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+
+    if (res.status === 400) {
+      const data = await res.json().catch(() => null);
+      if (
+        data?.msg?.includes("not enabled") ||
+        data?.error_code === "validation_failed"
+      ) {
+        return {
+          enabled: false,
+          message:
+            "Google OAuth chưa được kích hoạt trên Supabase Dashboard (Cần cấu hình Client ID & Secret từ Google Cloud).",
+        };
+      }
+    }
+
+    return { enabled: true };
+  } catch (err: any) {
+    console.error("[checkGoogleOAuthStatusAction Error]", err);
+    return { enabled: true };
+  }
+}
+
+// 3.3. Đồng bộ Session OAuth từ Client sang Server Cookie (khi Google chuyển hướng về kèm token)
+export async function syncClientSessionAction(
+  accessToken: string,
+  userId: string
+) {
+  try {
+    const cookieStore = await cookies();
+    if (accessToken) {
+      cookieStore.set("bk7_access_token", accessToken, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+    }
+    if (userId) {
+      cookieStore.set("bk7_user_id", userId, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+    }
+    revalidatePath("/");
+    return { success: true };
+  } catch (err) {
+    console.error("[syncClientSessionAction Error]", err);
+    return { success: false };
   }
 }
 

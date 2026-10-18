@@ -51,11 +51,64 @@ export function useAuthTeam() {
   }, []);
 
   useEffect(() => {
+    // 1. Kiểm tra tức thì nếu URL chứa hash fragment (#access_token=...) từ chuyển hướng OAuth
+    if (typeof window !== "undefined" && window.location.hash.includes("access_token")) {
+      try {
+        const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        const hashToken = hashParams.get("access_token");
+        if (hashToken) {
+          let userId = "";
+          try {
+            const payload = JSON.parse(atob(hashToken.split(".")[1]));
+            userId = payload.sub || payload.id || "";
+          } catch (e) {}
+
+          import("@/actions/auth").then(({ syncClientSessionAction }) => {
+            syncClientSessionAction(hashToken, userId).then(() => {
+              fetchSession();
+              // Dọn sạch hash trên thanh địa chỉ URL sau khi lưu session thành công
+              window.history.replaceState(null, "", window.location.pathname);
+            });
+          });
+        }
+      } catch (err) {
+        console.error("[useAuthTeam Hash Parser Error]", err);
+      }
+    }
+
+    // 2. Tải phiên hiện tại
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
-      fetchSession();
+    // 3. Kiểm tra Session đã lưu trong Supabase Client (nếu có mà cookie chưa đồng bộ)
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.access_token && session?.user?.id) {
+        try {
+          const { syncClientSessionAction } = await import("@/actions/auth");
+          await syncClientSessionAction(session.access_token, session.user.id);
+          fetchSession();
+        } catch (e) {
+          console.error("Session sync error", e);
+        }
+      }
     });
+
+    // 4. Lắng nghe sự kiện thay đổi trạng thái đăng nhập
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (session?.access_token && session?.user?.id) {
+          try {
+            const { syncClientSessionAction } = await import("@/actions/auth");
+            await syncClientSessionAction(
+              session.access_token,
+              session.user.id
+            );
+          } catch (e) {
+            console.error("Session cookie sync error", e);
+          }
+        }
+        fetchSession();
+      }
+    );
 
     return () => {
       authListener.subscription.unsubscribe();

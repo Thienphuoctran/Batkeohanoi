@@ -6,6 +6,7 @@ import {
   signInWithEmailAction,
   signUpWithEmailAction,
   signInAsDemoCaptainAction,
+  checkGoogleOAuthStatusAction,
 } from "@/actions/auth";
 import {
   LogIn,
@@ -42,39 +43,36 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setErrorMessage(null);
     try {
+      // 1. Kiểm tra trạng thái Google OAuth qua Server Action (chống lỗi CORS & chặn trang đen)
+      const status = await checkGoogleOAuthStatusAction();
+      if (!status.enabled) {
+        setErrorMessage(
+          "⚠️ Google 1-chạm chưa được bật trên Supabase Dashboard của dự án (Cần cấu hình Client ID từ Google Cloud). Vui lòng dùng nút 'Đăng Nhập Nhanh Đội Trưởng Mẫu' (ngay bên dưới) hoặc đăng nhập bằng Email & SĐT Zalo nhé!"
+        );
+        setLoading(false);
+        return;
+      }
+
+      // 2. Nếu đã kích hoạt thì mới thực hiện chuyển hướng OAuth
+      const redirectOrigin =
+        typeof window !== "undefined" && window.location.origin
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_APP_URL || "https://batkeohanoi-wh64.vercel.app";
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          skipBrowserRedirect: true,
+          redirectTo: `${redirectOrigin}/auth/callback`,
+          queryParams: {
+            prompt: "select_account",
+          },
         },
       });
       if (error) throw error;
-      if (data?.url) {
-        // Pre-check xem provider Google có bật trên Supabase không trước khi rời app
-        try {
-          const testRes = await fetch(data.url);
-          if (!testRes.ok) {
-            const errJson = await testRes.json().catch(() => null);
-            if (
-              errJson?.error_code === "validation_failed" ||
-              errJson?.msg?.includes("not enabled")
-            ) {
-              setErrorMessage(
-                "⚠️ Google 1-chạm chưa được kích hoạt trên Supabase Dashboard (Cần cấu hình Client ID & Secret). Bạn vui lòng dùng tab 'Đăng nhập / Tạo tài khoản' bằng Email & SĐT Zalo ngay bên dưới!"
-              );
-              setLoading(false);
-              return;
-            }
-          }
-        } catch {
-          // Bỏ qua nếu có lỗi CORS kiểm tra
-        }
-        window.location.href = data.url;
-      }
     } catch (err: any) {
       setErrorMessage(
-        "⚠️ Google 1-chạm chưa được kích hoạt trên Supabase. Vui lòng đăng nhập hoặc tạo tài khoản bằng Email & SĐT Zalo bên dưới!"
+        err?.message ||
+          "⚠️ Google 1-chạm chưa sẵn sàng. Vui lòng đăng nhập hoặc tạo tài khoản bằng Email & SĐT Zalo bên dưới!"
       );
       setLoading(false);
     }
