@@ -6,9 +6,8 @@ import {
   MapPin, Navigation, Phone, Car, Zap, 
   Sparkles, Share2, CheckCircle2, 
   Compass, Search, Clock,
-  ShieldCheck, Layers, Eye, PlusCircle, Check
+  ExternalLink, Check
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 export interface PitchData {
   id: string;
@@ -32,6 +31,311 @@ export interface PitchData {
 }
 
 export const HANOI_PITCHES: PitchData[] = [
+  // ================= QUẬN THANH XUÂN =================
+  {
+    id: 'khongquan',
+    name: 'Sân Bóng Phòng Không - Không Quân',
+    district: 'ThanhXuan',
+    districtLabel: 'Thanh Xuân',
+    address: 'Ngõ 168 Lê Trọng Tấn, Khương Mai, Thanh Xuân, Hà Nội',
+    lat: 20.9982,
+    lng: 105.8315,
+    phone: '0989332211',
+    managerName: 'Anh Chiến',
+    totalSubPitches: 7,
+    turfType: 'Mặt sân quân đội chuẩn quốc gia, cỏ nhân tạo 50mm giảm chấn',
+    parkingFee: 'Khu đỗ xe quân sự cực an ninh, ô tô 30k, xe máy 5k',
+    floodlight: 'Hệ thống đèn LED thể thao cao cấp không sấp bóng',
+    priceRange: '650.000đ - 900.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.9,
+    reviewCount: 220,
+    amenities: ['Khu an ninh bảo vệ nghiêm ngặt', 'Tắm nóng lạnh', 'Căng tin đồ uống phong phú', 'Áo bib chuẩn', 'Băng ghế dự bị có mái che']
+  },
+  {
+    id: 'kimgiang',
+    name: 'Sân Bóng Đá Kim Giang (Thanh Xuân)',
+    district: 'ThanhXuan',
+    districtLabel: 'Thanh Xuân',
+    address: 'Ngõ 64 Kim Giang, Khương Đình, Thanh Xuân, Hà Nội',
+    lat: 20.9855,
+    lng: 105.8182,
+    phone: '0936112233',
+    managerName: 'Chú Bình',
+    totalSubPitches: 4,
+    turfType: 'Cỏ nhân tạo 5cm lót hạt cao su đen đàn hồi tiêu chuẩn',
+    parkingFee: 'Xe máy 5k, ô tô đỗ ven hồ nước miễn phí thoáng rộng',
+    floodlight: 'Đèn cao áp 800W bảo đảm sáng rõ mọi góc cầu môn',
+    priceRange: '550.000đ - 750.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:30',
+    rating: 4.6,
+    reviewCount: 95,
+    amenities: ['Phục vụ trà đá quạt gió', 'Băng chun sơ cứu cổ chân', 'Áo tập 2 màu', 'Khu ngồi nghỉ ven hồ']
+  },
+  {
+    id: 'viettel1',
+    name: 'Sân Bóng Đá Viettel 1 (Trường Chinh)',
+    district: 'ThanhXuan',
+    districtLabel: 'Thanh Xuân',
+    address: 'Ngõ 155 Trường Chinh, Khương Mai, Thanh Xuân, Hà Nội',
+    lat: 20.9995,
+    lng: 105.8354,
+    phone: '0978665544',
+    managerName: 'Anh Hùng Viettel',
+    totalSubPitches: 5,
+    turfType: 'Mặt cỏ sợi đay cao cấp của trung tâm thể thao Viettel',
+    parkingFee: 'Bãi đỗ ô tô và xe máy rộng rãi có vé tự động (30k/5k)',
+    floodlight: 'Dàn đèn LED 1000W sáng trưng không góc chết',
+    priceRange: '700.000đ - 950.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.8,
+    reviewCount: 168,
+    amenities: ['Phòng thay đồ có tủ cá nhân', 'Tắm nóng lạnh', 'Bình xịt lạnh', 'Wifi Viettel tốc độ cao', 'Căng-tin cà phê nước mía']
+  },
+  {
+    id: 'thuongdinh',
+    name: 'Sân Bóng Đá Thượng Đình (Nguyễn Trãi)',
+    district: 'ThanhXuan',
+    districtLabel: 'Thanh Xuân',
+    address: 'Số 129 Nguyễn Trãi, Thượng Đình, Thanh Xuân, Hà Nội',
+    lat: 20.9961,
+    lng: 105.8142,
+    phone: '0912889900',
+    managerName: 'Anh Hoàng',
+    totalSubPitches: 4,
+    turfType: 'Cỏ nhân tạo chất lượng tốt, bề mặt bằng phẳng',
+    parkingFee: 'Bãi xe khuôn viên công ty Cao su Thượng Đình (30k/5k)',
+    floodlight: 'Đèn cao áp chiếu sáng tốt phục vụ đá tối',
+    priceRange: '600.000đ - 850.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:30',
+    rating: 4.5,
+    reviewCount: 82,
+    amenities: ['Trà đá căng tin sạch', 'Bình xịt y tế', 'Cho mượn áo bib', 'Khu ngồi chờ có mái che']
+  },
+  {
+    id: 'bocongan-nguyenxien',
+    name: 'Sân Bóng Bộ Công An - Nguyễn Xiển',
+    district: 'ThanhXuan',
+    districtLabel: 'Thanh Xuân',
+    address: 'Đường Nguyễn Xiển (gần ngã tư Khuất Duy Tiến), Thanh Xuân, Hà Nội',
+    lat: 20.9912,
+    lng: 105.8085,
+    phone: '0943221199',
+    managerName: 'Anh Tuấn Anh',
+    totalSubPitches: 6,
+    turfType: 'Cỏ nhân tạo kim cương tiêu chuẩn thi đấu nội bộ ngành',
+    parkingFee: 'Bãi đỗ ô tô 60 xe thoải mái (30k), xe máy miễn phí',
+    floodlight: 'Giàn đèn thể thao 12 cột cao áp siêu sáng',
+    priceRange: '650.000đ - 900.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.8,
+    reviewCount: 145,
+    amenities: ['An ninh trật tự tuyệt đối', 'Tắm nóng lạnh', 'Bóng thi đấu Động Lực', 'Trọng tài theo yêu cầu']
+  },
+  {
+    id: 'khuongha',
+    name: 'Sân Bóng Đá Khương Hạ',
+    district: 'ThanhXuan',
+    districtLabel: 'Thanh Xuân',
+    address: 'Ngõ 29 Khương Hạ, Khương Đình, Thanh Xuân, Hà Nội',
+    lat: 20.9888,
+    lng: 105.8215,
+    phone: '0965113355',
+    managerName: 'Bác Thắng',
+    totalSubPitches: 3,
+    turfType: 'Cỏ nhân tạo phong trào lót cao su êm ái',
+    parkingFee: 'Xe máy 5k, ô tô đỗ ngõ rộng miễn phí',
+    floodlight: 'Đèn LED 600W sáng đều mặt sân',
+    priceRange: '500.000đ - 700.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:00',
+    rating: 4.4,
+    reviewCount: 60,
+    amenities: ['Trà đá nước ngọt mát lạnh', 'Bình xịt lạnh', 'Cho mượn bóng và áo tập']
+  },
+  {
+    id: 'c500-anninh',
+    name: 'Cụm Sân Bóng C500 - Học Viện An Ninh',
+    district: 'ThanhXuan',
+    districtLabel: 'Thanh Xuân',
+    address: 'Đường 19/5 (giáp ranh Nguyễn Trãi - Thanh Xuân), Hà Nội',
+    lat: 20.9812,
+    lng: 105.7925,
+    phone: '0984556677',
+    managerName: 'Thầy Đức Quản Lý',
+    totalSubPitches: 8,
+    turfType: 'Cụm sân phủi huyền thoại sinh viên và phủi Hà Thành',
+    parkingFee: 'Bãi đỗ ô tô 80 xe (30k), xe máy 5k trong khuôn viên trường',
+    floodlight: 'Hệ thống đèn cao áp chuyên nghiệp cho 8 sân cùng lúc',
+    priceRange: '600.000đ - 850.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.9,
+    reviewCount: 310,
+    amenities: ['Khán đài rộng rãi', 'Căng tin đồ uống phong phú', 'Tắm nóng lạnh', 'Bình xịt y tế', 'Tủ sạc điện thoại']
+  },
+  {
+    id: 'damhong',
+    name: 'Sân Bóng Đá Đầm Hồng (Khương Đình)',
+    district: 'ThanhXuan',
+    districtLabel: 'Thanh Xuân',
+    address: 'Khu sinh thái Đầm Hồng, Khương Đình, Thanh Xuân, Hà Nội',
+    lat: 20.9935,
+    lng: 105.8268,
+    phone: '0972334411',
+    managerName: 'Anh Quyết',
+    totalSubPitches: 5,
+    turfType: 'Mặt cỏ sợi gân mới thay 2025, thoát nước cực tốt',
+    parkingFee: 'Bãi ô tô rộng ven hồ nước (30k), xe máy 5k',
+    floodlight: 'Đèn LED thể thao 800W bảo vệ mắt cầu thủ',
+    priceRange: '600.000đ - 850.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:30',
+    rating: 4.7,
+    reviewCount: 110,
+    amenities: ['Gió hồ mát tự nhiên', 'Tắm tráng sạch sẽ', 'Nước mía nguyên chất', 'Băng chun quấn cổ chân']
+  },
+
+  // ================= QUẬN HOÀNG MAI =================
+  {
+    id: 'dinhcong',
+    name: 'Cụm Sân Bóng Đá Định Công',
+    district: 'HoangMai',
+    districtLabel: 'Hoàng Mai',
+    address: 'Khu đô thị Định Công (gần cầu Dậu), Hoàng Mai, Hà Nội',
+    lat: 20.9782,
+    lng: 105.8312,
+    phone: '0982554433',
+    managerName: 'Anh Quang',
+    totalSubPitches: 6,
+    turfType: 'Cỏ nhân tạo sợi đôi cao cấp, hạt cao su trải đều giảm chấn',
+    parkingFee: 'Bãi xe ô tô cực rộng chứa 50 xe (30k), xe máy 5k',
+    floodlight: 'Dàn đèn LED 800W sáng rõ như ban ngày',
+    priceRange: '550.000đ - 800.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.8,
+    reviewCount: 175,
+    amenities: ['Căng-tin trà đá quạt hơi nước', 'Bình xịt lạnh chấn thương', 'Tắm nóng lạnh', 'Bóng thi đấu chuẩn FIFA']
+  },
+  {
+    id: 'linhdam',
+    name: 'Cụm Sân Bóng Bán Đảo Linh Đàm',
+    district: 'HoangMai',
+    districtLabel: 'Hoàng Mai',
+    address: 'Khu đô thị Tây Nam Linh Đàm, Hoàng Liệt, Hoàng Mai, Hà Nội',
+    lat: 20.9654,
+    lng: 105.8245,
+    phone: '0979112233',
+    managerName: 'Anh Thành Linh Đàm',
+    totalSubPitches: 8,
+    turfType: 'Cỏ nhân tạo kim cương mới nâng cấp, mặt sân bằng phẳng',
+    parkingFee: 'Bãi đỗ ô tô 80 xe thoải mái (30k), xe máy 5k có camera',
+    floodlight: 'Hệ thống đèn cao áp 1000W sáng khắp 8 sân',
+    priceRange: '600.000đ - 850.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.8,
+    reviewCount: 230,
+    amenities: ['Khu vực ven hồ thoáng đãng', 'Tắm nóng lạnh', 'Wifi miễn phí', 'Tủ sạc pin điện thoại', 'Căng tin giải khát']
+  },
+  {
+    id: 'tanmai',
+    name: 'Sân Bóng Đá Tân Mai',
+    district: 'HoangMai',
+    districtLabel: 'Hoàng Mai',
+    address: 'Ngõ 147 Tân Mai, Hoàng Mai, Hà Nội',
+    lat: 20.9832,
+    lng: 105.8521,
+    phone: '0934112299',
+    managerName: 'Anh Kiên',
+    totalSubPitches: 4,
+    turfType: 'Cỏ nhân tạo sợi đay êm ái, bám giày đinh dăm',
+    parkingFee: 'Bãi đỗ ô tô 20 xe (30k), xe máy 5k',
+    floodlight: 'Đèn LED 800W bảo đảm tầm nhìn ban đêm',
+    priceRange: '550.000đ - 800.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:30',
+    rating: 4.6,
+    reviewCount: 88,
+    amenities: ['Trà đá nước ngọt mát lạnh', 'Bình xịt lạnh y tế', 'Cho thuê áo bib 2 màu']
+  },
+  {
+    id: 'gamuda-yenso',
+    name: 'Cụm Sân Bóng Gamuda City - Yên Sở',
+    district: 'HoangMai',
+    districtLabel: 'Hoàng Mai',
+    address: 'Khuôn viên Công viên Yên Sở, Gamuda City, Hoàng Mai, Hà Nội',
+    lat: 20.9602,
+    lng: 105.8589,
+    phone: '0987661122',
+    managerName: 'Anh Tùng Gamuda',
+    totalSubPitches: 6,
+    turfType: 'Cỏ nhân tạo cao cấp tiêu chuẩn khu đô thị sinh thái quốc tế',
+    parkingFee: 'Bãi đỗ ô tô 100 xe miễn phí, xe máy miễn phí an ninh VIP',
+    floodlight: 'Giàn đèn LED thể thao không chói mắt công nghệ châu Âu',
+    priceRange: '700.000đ - 950.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.9,
+    reviewCount: 190,
+    amenities: ['Không khí trong lành công viên', 'Phòng thay đồ có vòi tắm sen', 'Khu vệ sinh sạch như khách sạn', 'Bình xịt lạnh']
+  },
+  {
+    id: 'hoangmai-arena',
+    name: 'Sân Bóng Hoàng Mai Arena (Lĩnh Nam)',
+    district: 'HoangMai',
+    districtLabel: 'Hoàng Mai',
+    address: 'Đường Lĩnh Nam (gần cầu Thanh Trì), Hoàng Mai, Hà Nội',
+    lat: 20.9795,
+    lng: 105.8741,
+    phone: '0945778899',
+    managerName: 'Anh Vũ',
+    totalSubPitches: 5,
+    turfType: 'Cỏ nhân tạo chất lượng cao, bề mặt thoát nước tức thì',
+    parkingFee: 'Bãi xe ô tô cực rộng không giới hạn (Miễn phí)',
+    floodlight: 'Hệ thống đèn cao áp sáng rõ từng đường bóng',
+    priceRange: '500.000đ - 750.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:30',
+    rating: 4.6,
+    reviewCount: 75,
+    amenities: ['Bãi xe cực lớn cho cả đội đi ô tô', 'Nước giải khát ướp lạnh', 'Áo bib thi đấu']
+  },
+  {
+    id: 'vinhhung',
+    name: 'Sân Bóng Đá Vĩnh Hưng',
+    district: 'HoangMai',
+    districtLabel: 'Hoàng Mai',
+    address: 'Ngõ 321 Vĩnh Hưng, Hoàng Mai, Hà Nội',
+    lat: 20.9912,
+    lng: 105.8785,
+    phone: '0966442211',
+    managerName: 'Chú Dũng',
+    totalSubPitches: 4,
+    turfType: 'Cỏ nhân tạo êm chân, độ bám sân tốt',
+    parkingFee: 'Xe máy 5k, ô tô đỗ ven đường miễn phí',
+    floodlight: 'Đèn LED sáng chuẩn phủi',
+    priceRange: '500.000đ - 700.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:00',
+    rating: 4.5,
+    reviewCount: 62,
+    amenities: ['Trà đá căng tin sạch', 'Bình xịt lạnh y tế', 'Bóng Động Lực']
+  },
+  {
+    id: 'damdoi',
+    name: 'Sân Bóng Đá Đầm Đỗi (Lê Trọng Tấn kéo dài)',
+    district: 'HoangMai',
+    districtLabel: 'Hoàng Mai',
+    address: 'Ngõ 192 Lê Trọng Tấn kéo dài, Định Công, Hoàng Mai, Hà Nội',
+    lat: 20.9875,
+    lng: 105.8291,
+    phone: '0981335577',
+    managerName: 'Anh Quân',
+    totalSubPitches: 6,
+    turfType: 'Cỏ nhân tạo sợi xoắn bền bỉ, giảm chấn va chạm',
+    parkingFee: 'Bãi đỗ ô tô 40 xe (30k), xe máy 5k',
+    floodlight: 'Dàn đèn LED 800W bảo đảm tầm nhìn tối ưu',
+    priceRange: '550.000đ - 800.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.7,
+    reviewCount: 115,
+    amenities: ['Không gian ven hồ thoáng mát', 'Tắm nóng lạnh', 'Căng tin đồ uống', 'Băng dán cơ y tế']
+  },
+
+  // ================= QUẬN CẦU GIẤY =================
   {
     id: 'trungkinh',
     name: 'Sân Bóng Đá Trung Kính Hạ (Tú Mỡ)',
@@ -47,7 +351,7 @@ export const HANOI_PITCHES: PitchData[] = [
     parkingFee: 'Bãi đỗ ô tô 30 xe (30k), xe máy miễn phí an ninh có thẻ',
     floodlight: 'Dàn đèn LED 800W sáng chuẩn không chói mắt hướng gôn',
     priceRange: '650.000đ - 900.000đ / trận 90 phút',
-    openingHours: '06:00 - 23:00 (Mở cửa tất cả các ngày)',
+    openingHours: '06:00 - 23:00',
     rating: 4.8,
     reviewCount: 142,
     amenities: ['Tắm nóng lạnh', 'Bình xịt lạnh y tế', 'Căng-tin trà đá', 'Cho thuê áo pitch', 'Wifi tốc độ cao']
@@ -92,6 +396,48 @@ export const HANOI_PITCHES: PitchData[] = [
     reviewCount: 96,
     amenities: ['Căng tin giải khát', 'Tắm nóng lạnh', 'Bóng thi đấu Động Lực', 'Áo bib thi đấu 2 màu']
   },
+  {
+    id: 'd30-caugiay',
+    name: 'Sân Bóng Đá Cầu Giấy (D30 Tôn Thất Thuyết)',
+    district: 'CauGiay',
+    districtLabel: 'Cầu Giấy',
+    address: 'Số 1 Tôn Thất Thuyết, Dịch Vọng Hậu, Cầu Giấy, Hà Nội',
+    lat: 21.0289,
+    lng: 105.7834,
+    phone: '0913554422',
+    managerName: 'Anh Bảo',
+    totalSubPitches: 4,
+    turfType: 'Cỏ nhân tạo tiêu chuẩn cơ quan, mặt sân phẳng',
+    parkingFee: 'Bãi ô tô 30 xe (30k), xe máy 5k an ninh đảm bảo',
+    floodlight: 'Đèn cao áp sáng tốt',
+    priceRange: '650.000đ - 850.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:30',
+    rating: 4.6,
+    reviewCount: 78,
+    amenities: ['An ninh khu vực tốt', 'Trà đá vỉa hè', 'Tủ để đồ', 'Bình xịt lạnh']
+  },
+  {
+    id: 'yenhoa-arena',
+    name: 'Sân Bóng Đá Yên Hòa Arena',
+    district: 'CauGiay',
+    districtLabel: 'Cầu Giấy',
+    address: 'Ngõ 259 Yên Hòa, Cầu Giấy, Hà Nội',
+    lat: 21.0212,
+    lng: 105.7955,
+    phone: '0977221144',
+    managerName: 'Anh Tuấn',
+    totalSubPitches: 4,
+    turfType: 'Cỏ nhân tạo chất lượng tốt lót cao su chống xước gối',
+    parkingFee: 'Bãi xe máy rộng (5k), ô tô đỗ đường lớn',
+    floodlight: 'Đèn LED thể thao 800W',
+    priceRange: '600.000đ - 800.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:00',
+    rating: 4.5,
+    reviewCount: 68,
+    amenities: ['Nước mía căng tin', 'Bình xịt chấn thương', 'Áo bib thi đấu']
+  },
+
+  // ================= QUẬN NAM TỪ LIÊM =================
   {
     id: 'metri',
     name: 'Sân Bóng Đá Mễ Trì Hạ',
@@ -153,45 +499,47 @@ export const HANOI_PITCHES: PitchData[] = [
     amenities: ['Khán đài hàng ngàn chỗ ngồi', 'Phòng thay đồ VIP', 'Bình xịt y tế', 'Căng-tin đồ ăn nhẹ', 'Trọng tài VFF']
   },
   {
-    id: 'kimgiang',
-    name: 'Sân Bóng Đá Kim Giang (Thanh Xuân)',
-    district: 'ThanhXuan',
-    districtLabel: 'Thanh Xuân',
-    address: 'Ngõ 64 Kim Giang, Khương Đình, Thanh Xuân, Hà Nội',
-    lat: 20.9855,
-    lng: 105.8182,
-    phone: '0936112233',
-    managerName: 'Chú Bình',
-    totalSubPitches: 4,
-    turfType: 'Cỏ nhân tạo 5cm lót hạt cao su đen đàn hồi tiêu chuẩn',
-    parkingFee: 'Xe máy 5k, ô tô đỗ ven hồ nước miễn phí thoáng rộng',
-    floodlight: 'Đèn cao áp 800W bảo đảm sáng rõ mọi góc cầu môn',
-    priceRange: '550.000đ - 750.000đ / trận 90 phút',
-    openingHours: '06:00 - 22:30',
-    rating: 4.5,
-    reviewCount: 74,
-    amenities: ['Phục vụ trà đá quạt gió', 'Băng chun sơ cứu cổ chân', 'Áo tập 2 màu', 'Khu ngồi nghỉ ven hồ']
-  },
-  {
-    id: 'khongquan',
-    name: 'Sân Bóng Phòng Không - Không Quân',
-    district: 'ThanhXuan',
-    districtLabel: 'Thanh Xuân',
-    address: 'Ngõ 168 Lê Trọng Tấn, Khương Mai, Thanh Xuân, Hà Nội',
-    lat: 20.9982,
-    lng: 105.8315,
-    phone: '0989332211',
-    managerName: 'Anh Chiến',
-    totalSubPitches: 7,
-    turfType: 'Mặt sân quân đội chuẩn quốc gia, mặt bằng bằng phẳng tuyệt đối',
-    parkingFee: 'Khu đỗ xe quân sự an ninh tuyệt đối, ô tô 30k, xe máy 5k',
-    floodlight: 'Hệ thống đèn LED thể thao cao cấp không sấp bóng',
+    id: 'vsa2',
+    name: 'Sân Bóng Đá VSA2 Lê Đức Thọ',
+    district: 'NamTuLiem',
+    districtLabel: 'Nam Từ Liêm',
+    address: 'Đường Lê Đức Thọ, Mỹ Đình 2, Nam Từ Liêm, Hà Nội',
+    lat: 21.0315,
+    lng: 105.7682,
+    phone: '0968331155',
+    managerName: 'Anh Hưng VSA',
+    totalSubPitches: 6,
+    turfType: 'Mặt cỏ sợi đay cao cấp, giảm chấn va chạm tuyệt đối',
+    parkingFee: 'Bãi đỗ ô tô 50 xe (30k), xe máy 5k có bảo vệ',
+    floodlight: 'Đèn LED 1000W sáng phủ kín sân',
     priceRange: '650.000đ - 900.000đ / trận 90 phút',
     openingHours: '05:30 - 23:00',
-    rating: 4.9,
-    reviewCount: 195,
-    amenities: ['Khu an ninh bảo vệ nghiêm ngặt', 'Tắm nóng lạnh', 'Căng tin đồ uống phong phú', 'Áo bib chuẩn', 'Băng ghế dự bị có mái che']
+    rating: 4.8,
+    reviewCount: 140,
+    amenities: ['Tắm nóng lạnh', 'Bình xịt lạnh y tế', 'Căng-tin đồ uống giải khát', 'Khán đài theo dõi']
   },
+  {
+    id: 'mic-luongthevinh',
+    name: 'Sân Bóng Đá Mic (Lương Thế Vinh)',
+    district: 'NamTuLiem',
+    districtLabel: 'Nam Từ Liêm',
+    address: 'Đường Lương Thế Vinh, Trung Văn, Nam Từ Liêm, Hà Nội',
+    lat: 20.9954,
+    lng: 105.7942,
+    phone: '0915223388',
+    managerName: 'Anh Việt',
+    totalSubPitches: 6,
+    turfType: 'Cỏ nhân tạo êm ái, sân rộng thoáng mát',
+    parkingFee: 'Bãi đỗ ô tô 40 xe (30k), xe máy 5k an toàn',
+    floodlight: 'Dàn đèn LED cao áp công suất lớn',
+    priceRange: '600.000đ - 850.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.7,
+    reviewCount: 125,
+    amenities: ['Căng tin nước mía sạch', 'Tắm nóng lạnh', 'Bóng thi đấu chuẩn', 'Tủ sạc pin điện thoại']
+  },
+
+  // ================= QUẬN ĐỐNG ĐA =================
   {
     id: 'thuyloi',
     name: 'Sân Cỏ Nhân Tạo ĐH Thủy Lợi',
@@ -213,6 +561,48 @@ export const HANOI_PITCHES: PitchData[] = [
     amenities: ['Khán đài có mái che', 'Nhà vệ sinh sạch sẽ', 'Máy bán nước tự động', 'Tủ để đồ cá nhân']
   },
   {
+    id: 'hoangcau',
+    name: 'Sân Bóng Đá Hoàng Cầu',
+    district: 'DongDa',
+    districtLabel: 'Đống Đa',
+    address: 'Khu Đô Thị Hoàng Cầu, Ô Chợ Dừa, Đống Đa, Hà Nội',
+    lat: 21.0182,
+    lng: 105.8254,
+    phone: '0988443322',
+    managerName: 'Anh Dũng Hoàng Cầu',
+    totalSubPitches: 5,
+    turfType: 'Cỏ nhân tạo sợi kim cương, độ nảy bóng chuẩn',
+    parkingFee: 'Bãi ô tô đỗ ven hồ (30k), xe máy 5k có người trông',
+    floodlight: 'Hệ thống đèn LED thể thao không góc chết',
+    priceRange: '650.000đ - 900.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.8,
+    reviewCount: 155,
+    amenities: ['Gió hồ Hoàng Cầu thoáng mát', 'Tắm nóng lạnh', 'Căng tin đồ uống', 'Áo bib thi đấu']
+  },
+  {
+    id: 'congdoan',
+    name: 'Sân Bóng Đại Học Công Đoàn',
+    district: 'DongDa',
+    districtLabel: 'Đống Đa',
+    address: 'Số 169 Tây Sơn, Quang Trung, Đống Đa, Hà Nội',
+    lat: 21.0092,
+    lng: 105.8215,
+    phone: '0976554411',
+    managerName: 'Thầy Phong',
+    totalSubPitches: 3,
+    turfType: 'Mặt cỏ nhân tạo phong trào êm chân',
+    parkingFee: 'Gửi xe trong trường an toàn (5k)',
+    floodlight: 'Đèn cao áp sáng tốt',
+    priceRange: '550.000đ - 750.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:00',
+    rating: 4.5,
+    reviewCount: 70,
+    amenities: ['Căng tin sinh viên giá rẻ', 'Bình xịt lạnh', 'Cho mượn áo tập']
+  },
+
+  // ================= QUẬN HÀ ĐÔNG =================
+  {
     id: 'cuongquoc',
     name: 'Cụm Sân Bóng Đá Cường Quốc (Hà Đông)',
     district: 'HaDong',
@@ -232,6 +622,90 @@ export const HANOI_PITCHES: PitchData[] = [
     reviewCount: 180,
     amenities: ['Căng tin đồ ăn nhẹ', 'Khu ghế ngồi khán giả VIP', 'Bình xịt lạnh y tế', 'Trọng tài phong trào', 'Tắm tráng']
   },
+  {
+    id: 'caudo-hadong',
+    name: 'Sân Bóng Đá Cầu Đơ (Hà Đông)',
+    district: 'HaDong',
+    districtLabel: 'Hà Đông',
+    address: 'Đường Lê Hồng Phong, Hà Cầu, Hà Đông, Hà Nội',
+    lat: 20.9682,
+    lng: 105.7725,
+    phone: '0983441188',
+    managerName: 'Anh Tuấn Cầu Đơ',
+    totalSubPitches: 5,
+    turfType: 'Cỏ nhân tạo êm chân, bám giày đinh TF',
+    parkingFee: 'Bãi đỗ ô tô 30 xe (20k), xe máy miễn phí',
+    floodlight: 'Đèn LED công nghệ mới',
+    priceRange: '500.000đ - 700.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:30',
+    rating: 4.6,
+    reviewCount: 92,
+    amenities: ['Trà đá nước giải khát', 'Tắm nóng lạnh', 'Bình xịt giảm đau']
+  },
+  {
+    id: 'vanquan',
+    name: 'Sân Bóng Đá KĐT Văn Quán',
+    district: 'HaDong',
+    districtLabel: 'Hà Đông',
+    address: 'Khu đô thị Văn Quán, Yên Phúc, Hà Đông, Hà Nội',
+    lat: 20.9785,
+    lng: 105.7865,
+    phone: '0912667788',
+    managerName: 'Anh Thắng',
+    totalSubPitches: 6,
+    turfType: 'Cỏ nhân tạo sợi đay mới thay, đàn hồi tốt',
+    parkingFee: 'Bãi xe ô tô ven hồ Văn Quán (20k), xe máy 5k',
+    floodlight: 'Dàn đèn LED 800W chiếu sáng đều',
+    priceRange: '550.000đ - 750.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.7,
+    reviewCount: 130,
+    amenities: ['Ven hồ Văn Quán thoáng gió', 'Tắm tráng', 'Căng tin đồ uống', 'Áo bib 2 màu']
+  },
+
+  // ================= QUẬN HAI BÀ TRƯNG =================
+  {
+    id: 'bachkhoa',
+    name: 'Sân Bóng Đá ĐH Bách Khoa Hà Nội',
+    district: 'HaiBaTrung',
+    districtLabel: 'Hai Bà Trưng',
+    address: 'Khu liên hiệp thể thao Bách Khoa, Tạ Quang Bửu, Hai Bà Trưng, Hà Nội',
+    lat: 21.0042,
+    lng: 105.8451,
+    phone: '0989224466',
+    managerName: 'Thầy Hùng Thể Thao',
+    totalSubPitches: 5,
+    turfType: 'Mặt cỏ nhân tạo cụm sân trường đại học kỹ thuật hàng đầu',
+    parkingFee: 'Bãi xe khuôn viên ký túc xá rộng rãi an toàn (5k)',
+    floodlight: 'Giàn đèn thi đấu chuyên nghiệp',
+    priceRange: '600.000đ - 850.000đ / trận 90 phút',
+    openingHours: '05:30 - 22:30',
+    rating: 4.8,
+    reviewCount: 205,
+    amenities: ['Khán đài có mái che', 'Tắm nóng lạnh sạch sẽ', 'Máy bán nước tự động', 'Tủ sạc pin thoại']
+  },
+  {
+    id: 'kinhtequocdan',
+    name: 'Sân Bóng ĐH Kinh Tế Quốc Dân (NEU)',
+    district: 'HaiBaTrung',
+    districtLabel: 'Hai Bà Trưng',
+    address: 'Đường Trần Đại Nghĩa, Đồng Tâm, Hai Bà Trưng, Hà Nội',
+    lat: 20.9985,
+    lng: 105.8425,
+    phone: '0973114422',
+    managerName: 'Thầy Quang NEU',
+    totalSubPitches: 4,
+    turfType: 'Cỏ nhân tạo sợi đôi cao cấp, mặt sân bằng phẳng',
+    parkingFee: 'Nhà để xe trường NEU hiện đại an ninh (5k)',
+    floodlight: 'Đèn LED thể thao 800W',
+    priceRange: '600.000đ - 850.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:30',
+    rating: 4.7,
+    reviewCount: 140,
+    amenities: ['Phòng thay đồ có quạt', 'Tắm nóng lạnh', 'Bình xịt y tế', 'Căng tin đồ uống']
+  },
+
+  // ================= QUẬN BẮC TỪ LIÊM =================
   {
     id: 'modiachat',
     name: 'Sân Bóng ĐH Mỏ - Địa Chất',
@@ -253,6 +727,28 @@ export const HANOI_PITCHES: PitchData[] = [
     amenities: ['Nước mía căng-tin sạch sẽ', 'Khu gửi đồ an toàn', 'Cho mượn áo tập', 'Bình xịt chấn thương']
   },
   {
+    id: 'conhue',
+    name: 'Sân Bóng Đá Cổ Nhuế',
+    district: 'BacTuLiem',
+    districtLabel: 'Bắc Từ Liêm',
+    address: 'Ngõ 145 Cổ Nhuế, Bắc Từ Liêm, Hà Nội',
+    lat: 21.0625,
+    lng: 105.7812,
+    phone: '0984112266',
+    managerName: 'Anh Đức Cổ Nhuế',
+    totalSubPitches: 4,
+    turfType: 'Cỏ nhân tạo phong trào lót cao su chống xước',
+    parkingFee: 'Bãi ô tô 20 xe (20k), xe máy 5k',
+    floodlight: 'Đèn LED 600W',
+    priceRange: '500.000đ - 700.000đ / trận 90 phút',
+    openingHours: '06:00 - 22:00',
+    rating: 4.5,
+    reviewCount: 55,
+    amenities: ['Trà đá nước ngọt', 'Bình xịt giảm đau', 'Áo bib thi đấu']
+  },
+
+  // ================= QUẬN BA ĐÌNH & TÂY HỒ =================
+  {
     id: 'phucxa',
     name: 'Cụm Sân Bóng Đá Phúc Xá (Ba Đình)',
     district: 'BaDinh',
@@ -271,18 +767,37 @@ export const HANOI_PITCHES: PitchData[] = [
     rating: 4.7,
     reviewCount: 112,
     amenities: ['Gió sông thoáng mát tự nhiên', 'Tắm nóng lạnh sạch sẽ', 'Căng-tin trà đá giải khát', 'Áo bib thi đấu']
+  },
+  {
+    id: 'anduong',
+    name: 'Sân Bóng Đá An Dương (Tây Hồ)',
+    district: 'TayHo',
+    districtLabel: 'Tây Hồ',
+    address: 'Ngõ 76 An Dương, Yên Phụ, Tây Hồ, Hà Nội',
+    lat: 21.0535,
+    lng: 105.8395,
+    phone: '0988661133',
+    managerName: 'Anh Thành An Dương',
+    totalSubPitches: 6,
+    turfType: 'Mặt cỏ cao cấp, thoáng đãng không khí trong lành ven hồ',
+    parkingFee: 'Bãi đỗ ô tô 40 xe (30k), xe máy 5k',
+    floodlight: 'Hệ thống đèn chiếu sáng tiêu chuẩn không chói mắt',
+    priceRange: '650.000đ - 900.000đ / trận 90 phút',
+    openingHours: '05:30 - 23:00',
+    rating: 4.8,
+    reviewCount: 145,
+    amenities: ['Không khí trong lành ven hồ', 'Tắm nóng lạnh', 'Căng tin giải khát', 'Bình xịt y tế', 'Wifi miễn phí']
   }
 ];
 
 export const PitchMapSection: React.FC = () => {
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
-  const [selectedPitchId, setSelectedPitchId] = useState<string>('trungkinh');
+  const [selectedPitchId, setSelectedPitchId] = useState<string>('khongquan');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [viewMode, setViewMode] = useState<'radar' | 'google-embed'>('radar');
   const [amenityFilter, setAmenityFilter] = useState<string>('all');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Tính năng chủ kèo tích hợp vị trí Google Maps
+  // Tính năng chủ kèo dán link Google Maps tùy chỉnh
   const [hostCustomGmapsLink, setHostCustomGmapsLink] = useState<string>('');
 
   const showToast = (msg: string) => {
@@ -309,19 +824,28 @@ export const PitchMapSection: React.FC = () => {
     return HANOI_PITCHES.find((p) => p.id === selectedPitchId) || filteredPitches[0] || HANOI_PITCHES[0];
   }, [selectedPitchId, filteredPitches]);
 
-  // Deep-link mở Google Maps dẫn đường chuẩn xác bằng giọng nói
-  const handleOpenGoogleMaps = (pitch: PitchData) => {
-    const url = hostCustomGmapsLink.trim() !== '' 
-      ? hostCustomGmapsLink 
-      : `https://www.google.com/maps/dir/?api=1&destination=${pitch.lat},${pitch.lng}&travelmode=driving`;
-    window.open(url, '_blank');
-  };
+  // Link Google Maps dẫn đường chuẩn xác (bằng thẻ a rel noopener để KHÔNG BAO GIỜ bị chặn popup)
+  const computedDirectionsUrl = useMemo(() => {
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${activePitch.name} ${activePitch.address}`)}`;
+  }, [activePitch]);
+
+  // Link Test Google Maps của ô nhập tùy chỉnh
+  const computedTestGmapsUrl = useMemo(() => {
+    let custom = hostCustomGmapsLink.trim();
+    if (custom) {
+      if (!custom.startsWith('http://') && !custom.startsWith('https://')) {
+        custom = 'https://' + custom;
+      }
+      return custom;
+    }
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${activePitch.name} ${activePitch.address}`)}`;
+  }, [hostCustomGmapsLink, activePitch]);
 
   // Sao chép vị trí và cú pháp tin nhắn Zalo gửi cả đội
   const handleShareZaloLocation = (pitch: PitchData) => {
     const gmapsUrl = hostCustomGmapsLink.trim() !== '' 
-      ? hostCustomGmapsLink 
-      : `https://www.google.com/maps/dir/?api=1&destination=${pitch.lat},${pitch.lng}`;
+      ? (hostCustomGmapsLink.startsWith('http') ? hostCustomGmapsLink : `https://${hostCustomGmapsLink}`)
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${pitch.name} ${pitch.address}`)}`;
 
     const text = 
       `📍 VỊ TRÍ SÂN BÓNG HÔM NAY:\n` +
@@ -360,37 +884,22 @@ export const PitchMapSection: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Định vị cụm sân 7/5 Hà Nội • Tích hợp Google Maps chỉ đường 1-chạm • Bãi đỗ ô tô &amp; Hotline trực tiếp
+                Bản đồ Google Maps tương tác trực tiếp • Chỉ đường bằng giọng nói 1-chạm • Bãi đỗ ô tô &amp; Hotline đặt sân
               </p>
             </div>
           </div>
 
-          {/* Toggle Chế Độ Xem Bản Đồ */}
-          <div className="grid grid-cols-2 gap-1 bg-slate-950 p-1 rounded-xl border border-white/[0.1] text-xs font-semibold">
-            <button
-              type="button"
-              onClick={() => setViewMode('radar')}
-              className={`py-1.5 px-3 rounded-lg transition-all flex items-center justify-center space-x-1.5 ${
-                viewMode === 'radar' 
-                  ? 'bg-emerald-500 text-slate-950 font-black shadow-md' 
-                  : 'text-slate-400 hover:text-white'
-              }`}
+          <div className="flex items-center gap-2">
+            <a
+              href={computedDirectionsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md transition cursor-pointer"
             >
-              <Compass className="w-3.5 h-3.5" />
-              <span>Radar Tọa Độ</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('google-embed')}
-              className={`py-1.5 px-3 rounded-lg transition-all flex items-center justify-center space-x-1.5 ${
-                viewMode === 'google-embed' 
-                  ? 'bg-sky-500 text-slate-950 font-black shadow-md' 
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Google Maps Live</span>
-            </button>
+              <Navigation className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Chỉ Đường Sân Đang Chọn</span>
+              <ExternalLink className="w-3 h-3 opacity-70" />
+            </a>
           </div>
         </div>
 
@@ -402,7 +911,7 @@ export const PitchMapSection: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tìm theo tên sân (Thành Phát, Mễ Trì, Đình Thôn...), đường phố..."
+              placeholder="Tìm theo tên sân (Phòng Không, Kim Giang, Định Công, Linh Đàm, Thành Phát...), đường phố..."
               className="w-full h-9 pl-9 pr-3 rounded-xl bg-slate-950/90 border border-white/[0.1] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
             />
           </div>
@@ -431,20 +940,23 @@ export const PitchMapSection: React.FC = () => {
           </div>
         </div>
 
-        {/* DISTRICT FILTER CHIPS */}
+        {/* DISTRICT FILTER CHIPS - ĐẦY ĐỦ CÁC QUẬN TRỌNG ĐIỂM */}
         <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pt-2 pb-0.5 text-xs">
           <span className="text-slate-400 text-[11px] font-medium shrink-0 mr-1 flex items-center">
             <MapPin className="w-3 h-3 text-emerald-400 mr-0.5" /> Khu vực:
           </span>
           {[
             { id: 'all', label: 'Tất cả Hà Nội' },
+            { id: 'ThanhXuan', label: 'Thanh Xuân' },
+            { id: 'HoangMai', label: 'Hoàng Mai' },
             { id: 'CauGiay', label: 'Cầu Giấy' },
             { id: 'NamTuLiem', label: 'Nam Từ Liêm' },
-            { id: 'ThanhXuan', label: 'Thanh Xuân' },
             { id: 'DongDa', label: 'Đống Đa' },
             { id: 'HaDong', label: 'Hà Đông' },
+            { id: 'HaiBaTrung', label: 'Hai Bà Trưng' },
             { id: 'BacTuLiem', label: 'Bắc Từ Liêm' },
-            { id: 'BaDinh', label: 'Ba Đình' }
+            { id: 'BaDinh', label: 'Ba Đình' },
+            { id: 'TayHo', label: 'Tây Hồ' }
           ].map(d => (
             <button
               key={d.id}
@@ -485,27 +997,23 @@ export const PitchMapSection: React.FC = () => {
             placeholder="Dán link Google Maps hoặc để trống để định vị theo cụm sân đang chọn"
             className="flex-1 bg-slate-950 border border-white/[0.1] rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-sky-500 focus:outline-none font-mono"
           />
-          <button
-            type="button"
-            onClick={() => {
-              if (hostCustomGmapsLink.trim() !== '') {
-                window.open(hostCustomGmapsLink, '_blank');
-              } else {
-                handleOpenGoogleMaps(activePitch);
-              }
-            }}
-            className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold shrink-0 flex items-center justify-center space-x-1.5 transition-all shadow"
+          <a
+            href={computedTestGmapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold shrink-0 flex items-center justify-center space-x-1.5 transition-all shadow cursor-pointer"
           >
             <Navigation className="w-3.5 h-3.5" />
             <span>Test Link Google Maps</span>
-          </button>
+            <ExternalLink className="w-3 h-3 opacity-70" />
+          </a>
         </div>
       </div>
 
       {/* DANH SÁCH CỤM SÂN & BẢN ĐỒ CHI TIẾT */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Cột trái: Danh sách các cụm sân */}
-        <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+        <div className="space-y-2 max-h-[580px] overflow-y-auto pr-1">
           <div className="flex items-center justify-between px-1 text-[11px] font-bold text-slate-400">
             <span>Tìm thấy {filteredPitches.length} cụm sân</span>
             <span>Bấm để xem chi tiết</span>
@@ -556,107 +1064,62 @@ export const PitchMapSection: React.FC = () => {
           )}
         </div>
 
-        {/* Cột phải: Khung bản đồ trực quan & Chi tiết cụm sân đang chọn */}
+        {/* Cột phải: Khung bản đồ Google Maps trực tiếp & Thông số cụm sân đang chọn */}
         <div className="md:col-span-2 space-y-3">
           
-          {/* 1. MÀN HÌNH BẢN ĐỒ (CHUYỂN ĐỔI RADAR HOẶC GOOGLE MAPS EMBED) */}
-          <div className="relative w-full h-72 sm:h-80 rounded-2xl overflow-hidden border border-white/[0.1] bg-slate-950 shadow-inner flex flex-col justify-between">
-            {viewMode === 'radar' ? (
-              <>
-                {/* Visual Stadium Pattern Background */}
-                <div 
-                  className="absolute inset-0 opacity-25 pointer-events-none"
-                  style={{
-                    backgroundImage: `radial-gradient(circle at 50% 50%, rgba(34,197,94,0.22) 0%, transparent 65%), linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)`,
-                    backgroundSize: '100% 100%, 32px 32px, 32px 32px'
-                  }}
-                />
+          {/* 1. MÀN HÌNH BẢN ĐỒ GOOGLE MAPS TƯƠNG TÁC THẬT 100% (KHÔNG DÙNG RADAR ẢO) */}
+          <div className="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-white/[0.1] bg-slate-950 shadow-2xl flex flex-col justify-between">
+            <iframe
+              title={`Google Maps ${activePitch.name}`}
+              src={googleMapsEmbedUrl}
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen={true}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-full"
+            />
 
-                {/* Radar Sweep Animation Effect */}
-                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                  <div className="w-56 h-56 rounded-full border border-emerald-500/20 animate-ping opacity-30" />
-                  <div className="w-36 h-36 rounded-full border border-emerald-500/30" />
-                </div>
+            {/* Floating Top Badge */}
+            <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
+              <span className="text-[11px] bg-slate-950/90 backdrop-blur-md text-emerald-300 font-bold px-2.5 py-1 rounded-lg border border-emerald-500/40 shadow flex items-center gap-1.5 pointer-events-auto">
+                <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="truncate max-w-[200px] sm:max-w-xs">{activePitch.name}</span>
+              </span>
+              <span className="text-[11px] bg-emerald-500 text-slate-950 font-black px-2.5 py-1 rounded-lg shadow pointer-events-auto">
+                {activePitch.districtLabel}
+              </span>
+            </div>
 
-                <div className="relative z-10 flex items-center justify-between p-3">
-                  <span className="text-[11px] bg-slate-900/90 text-white font-mono px-2.5 py-1 rounded-lg border border-slate-700/80 shadow flex items-center space-x-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>GPS: {activePitch.lat.toFixed(4)}, {activePitch.lng.toFixed(4)}</span>
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded border border-emerald-500/30 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      Đang Mở Cửa
-                    </span>
-                    <span className="text-[11px] bg-emerald-600 text-slate-950 font-black px-2.5 py-1 rounded-lg shadow">
-                      {activePitch.districtLabel}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="relative z-10 self-center flex flex-col items-center">
-                  <div className="px-3.5 py-1.5 bg-slate-950/95 text-emerald-300 rounded-xl text-xs font-extrabold border border-emerald-500/50 shadow-2xl flex items-center space-x-1.5 backdrop-blur-md">
-                    <MapPin className="w-4 h-4 text-emerald-400" />
-                    <span>{activePitch.name}</span>
-                  </div>
-                  <div className="w-4 h-4 bg-emerald-400 rounded-full border-2 border-white shadow-lg mt-1 animate-pulse"></div>
-                </div>
-
-                <div className="relative z-10 bg-slate-900/95 backdrop-blur-md p-3 rounded-b-2xl border-t border-white/[0.08] flex items-center justify-between text-xs">
-                  <div className="truncate pr-2">
-                    <span className="font-extrabold text-white block truncate">{activePitch.name}</span>
-                    <span className="text-[11px] text-slate-400 truncate">{activePitch.address}</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => handleShareZaloLocation(activePitch)}
-                      className="p-2 bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded-lg border border-emerald-500/30 transition-all flex items-center space-x-1"
-                      title="Gửi vị trí Zalo"
-                    >
-                      <Share2 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline font-bold text-[11px]">Copy Zalo</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenGoogleMaps(activePitch)}
-                      className="px-3 py-2 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 rounded-lg font-black text-[11px] shadow flex items-center space-x-1 transition-all"
-                    >
-                      <Navigation className="w-3.5 h-3.5 stroke-[2.5]" />
-                      <span>Mở Google Maps</span>
-                    </button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              /* CHẾ ĐỘ XEM GOOGLE MAPS EMBED LIVE TRỰC TIẾP */
-              <div className="w-full h-full relative">
-                <iframe
-                  title={`Google Maps ${activePitch.name}`}
-                  src={googleMapsEmbedUrl}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen={false}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="w-full h-full"
-                />
-                <div className="absolute bottom-2 left-2 right-2 bg-slate-950/90 backdrop-blur-md p-2 rounded-xl border border-white/10 flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-white truncate max-w-[200px] sm:max-w-none">
-                    📍 {activePitch.name}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenGoogleMaps(activePitch)}
-                    className="px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-black text-[10px] flex items-center gap-1 shadow"
-                  >
-                    <Navigation className="w-3 h-3 stroke-[3]" />
-                    <span>Dẫn Đường</span>
-                  </button>
-                </div>
+            {/* Floating Bottom Action Bar */}
+            <div className="absolute bottom-2.5 left-2.5 right-2.5 bg-slate-950/95 backdrop-blur-md p-2.5 rounded-xl border border-white/10 flex items-center justify-between gap-2 shadow-2xl">
+              <div className="truncate text-xs">
+                <span className="font-extrabold text-white block truncate">{activePitch.name}</span>
+                <span className="text-[11px] text-slate-400 truncate block">{activePitch.address}</span>
               </div>
-            )}
+              <div className="flex items-center space-x-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleShareZaloLocation(activePitch)}
+                  className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded-lg border border-emerald-500/30 transition-all flex items-center space-x-1"
+                  title="Gửi vị trí Zalo"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline font-bold text-[11px]">Copy Zalo</span>
+                </button>
+                <a
+                  href={computedDirectionsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 rounded-lg font-black text-[11px] shadow flex items-center space-x-1 transition-all cursor-pointer"
+                >
+                  <Navigation className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>Mở Google Maps</span>
+                  <ExternalLink className="w-3 h-3 opacity-70" />
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* 2. THÔNG SỐ KỸ THUẬT & DỊCH VỤ THỰC TẾ CỦA CỤM SÂN */}
@@ -722,7 +1185,7 @@ export const PitchMapSection: React.FC = () => {
               </div>
               <a
                 href={`tel:${activePitch.phone}`}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center gap-1 shadow transition"
+                className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center gap-1 shadow transition cursor-pointer"
               >
                 <Phone className="w-3.5 h-3.5 fill-current" />
                 <span>{activePitch.phone}</span>

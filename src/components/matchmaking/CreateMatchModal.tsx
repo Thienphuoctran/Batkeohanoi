@@ -115,7 +115,13 @@ export function CreateMatchModal({
 
   const effectiveGmapsUrl = React.useMemo(() => {
     if (!isGmapsIntegrated) return undefined;
-    if (customGmapsUrl.trim()) return customGmapsUrl.trim();
+    let custom = customGmapsUrl.trim();
+    if (custom) {
+      if (!custom.startsWith("http://") && !custom.startsWith("https://")) {
+        custom = "https://" + custom;
+      }
+      return custom;
+    }
     const query = encodeURIComponent(
       `${pitchName.trim()} ${pitchAddress.trim()} ${district.trim()} Hà Nội`.trim()
     );
@@ -592,16 +598,17 @@ export function CreateMatchModal({
                         className="flex-1 h-8 px-2.5 rounded-lg bg-slate-950 border border-white/[0.1] text-sky-300 placeholder:text-slate-500 font-mono text-[11px] focus:outline-none focus:border-sky-400"
                       />
                       {effectiveGmapsUrl && (
-                        <button
-                          type="button"
-                          onClick={() => window.open(effectiveGmapsUrl, "_blank")}
-                          className="h-8 px-2.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-400/40 text-[11px] font-bold flex items-center gap-1 shrink-0 transition"
+                        <a
+                          href={effectiveGmapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="h-8 px-2.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-400/40 text-[11px] font-bold flex items-center gap-1 shrink-0 transition cursor-pointer"
                           title="Mở thử Google Maps kiểm tra vị trí sân"
                         >
                           <Navigation className="w-3 h-3 text-sky-400" />
                           <span>Test vị trí</span>
                           <ExternalLink className="w-2.5 h-2.5 opacity-70" />
-                        </button>
+                        </a>
                       )}
                     </div>
                     <p className="text-[10px] text-slate-400 leading-tight">
