@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
       "https://lkvrdfqyyigdsxtipfcy.supabase.co";
     const supabaseUrl = rawUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, "");
     const supabaseAnonKey =
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy-key";
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrdnJkZnF5eWlnZHN4dGlwZmN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyNDMwMDIsImV4cCI6MjEwNzgxOTAwMn0.6ybeLwIDJeVjgivZ1_znxtAmDRE_sswyv_4XR6fPZEE";
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
