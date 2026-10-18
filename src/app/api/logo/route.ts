@@ -1,42 +1,18 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const sourcePath =
-    "C:/Users/phuoc/.gemini/antigravity/brain/95ae5352-c680-4481-99a8-b2d84d8ab484/.user_uploaded/media_1792334189367_efba5db7.png";
-  const publicDest = path.join(process.cwd(), "public", "logo-giaohuu.png");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+    <circle cx="50" cy="50" r="46" fill="#10b981"/>
+    <circle cx="50" cy="50" r="40" fill="#090d16" stroke="#10b981" stroke-width="4"/>
+    <text x="50" y="58" font-size="28" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="900" fill="#10b981" text-anchor="middle">7v7</text>
+  </svg>`;
 
-  try {
-    if (fs.existsSync(sourcePath)) {
-      if (!fs.existsSync(publicDest)) {
-        try {
-          fs.copyFileSync(sourcePath, publicDest);
-        } catch (copyErr) {
-          console.error("Auto copy logo error:", copyErr);
-        }
-      }
-      const buffer = fs.readFileSync(sourcePath);
-      return new NextResponse(buffer, {
-        headers: {
-          "Content-Type": "image/png",
-          "Cache-Control": "public, max-age=31536000, immutable",
-        },
-      });
-    }
-
-    if (fs.existsSync(publicDest)) {
-      const buffer = fs.readFileSync(publicDest);
-      return new NextResponse(buffer, {
-        headers: {
-          "Content-Type": "image/png",
-          "Cache-Control": "public, max-age=31536000, immutable",
-        },
-      });
-    }
-  } catch (err) {
-    console.error("Failed to serve GiaoHuu logo:", err);
-  }
-
-  return new NextResponse("Logo Not Found", { status: 404 });
+  return new NextResponse(svg, {
+    headers: {
+      "Content-Type": "image/svg+xml",
+      "Cache-Control": "public, max-age=31536000, immutable",
+    },
+  });
 }

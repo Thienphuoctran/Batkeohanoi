@@ -10,8 +10,12 @@ export async function GET(request: NextRequest) {
 
   // 1. Trường hợp PKCE Code Flow: Đổi code lấy session trên Server
   if (code) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const rawUrl =
+      process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      "https://lkvrdfqyyigdsxtipfcy.supabase.co";
+    const supabaseUrl = rawUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, "");
+    const supabaseAnonKey =
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy-key";
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
