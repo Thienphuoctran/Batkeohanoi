@@ -417,3 +417,46 @@ export async function createMatchInDatabaseAction(payload: {
     return { success: false, error: err?.message || "Unknown error" };
   }
 }
+
+// 7. Cập nhật hồ sơ Đội bóng chính chủ trên Supabase
+export async function updateTeamProfileAction(payload: {
+  teamId: string;
+  teamName: string;
+  captainName: string;
+  captainPhone: string;
+  captainZalo?: string;
+  jerseyColor?: string;
+  avgAge?: number;
+  skillTier?: number;
+  homeDistrict?: string;
+}) {
+  try {
+    const adminClient = getAdminClient();
+    const { data, error } = await adminClient
+      .from("teams")
+      .update({
+        team_name: payload.teamName,
+        captain_name: payload.captainName,
+        captain_phone: payload.captainPhone,
+        captain_zalo: payload.captainZalo || payload.captainPhone,
+        jersey_color: payload.jerseyColor,
+        avg_age: payload.avgAge,
+        skill_tier: payload.skillTier,
+        home_district: payload.homeDistrict,
+      })
+      .eq("id", payload.teamId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("[updateTeamProfileAction Error]", error);
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/");
+    return { success: true, team: data };
+  } catch (err: any) {
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+

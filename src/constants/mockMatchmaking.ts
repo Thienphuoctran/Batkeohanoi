@@ -120,50 +120,7 @@ export const MOCK_TEAMS: TeamProfile[] = [
   },
 ];
 
-export const MOCK_MATCH_FEEDS: MatchFeedItem[] = [
-  {
-    id: "feed-1",
-    hostTeam: MOCK_TEAMS[0],
-    district: "Cầu Giấy",
-    pitchName: "Sân Bóng Đá Trung Kính Hạ",
-    pitchAddress: "Ngõ 112 Trung Kính, Cầu Giấy, Hà Nội",
-    matchDate: "Hôm nay",
-    startTime: "19:00",
-    endTime: "20:30",
-    totalCostVnd: 800000,
-    shareCostVnd: 400000,
-    splitRatio: "50_50",
-    splitRatioLabel: "50/50",
-    requiredTier: 2,
-    status: "OPEN",
-    isSOS: false,
-    notes: "Đội anh em văn phòng, đá văn minh không cay cú. Giao lưu vui vẻ sau giờ làm.",
-    createdAt: "10 phút trước",
-    handshakePin: "7829",
-    isHandshakeVerified: false,
-  },
-  {
-    id: "feed-2",
-    hostTeam: MOCK_TEAMS[1],
-    district: "Nam Từ Liêm",
-    pitchName: "Sân Bóng Mễ Trì Hạ",
-    pitchAddress: "Đường Mễ Trì Hạ, Nam Từ Liêm, Hà Nội",
-    matchDate: "Hôm nay",
-    startTime: "19:30",
-    endTime: "21:00",
-    totalCostVnd: 900000,
-    shareCostVnd: 270000,
-    splitRatio: "70_30",
-    splitRatioLabel: "70/30",
-    requiredTier: 3,
-    status: "OPEN",
-    isSOS: false,
-    notes: "Kèo chia 70/30, tìm đối đá đều chân nhiệt tình, sân cỏ đẹp.",
-    createdAt: "25 phút trước",
-    handshakePin: "4512",
-    isHandshakeVerified: false,
-  },
-];
+export const MOCK_MATCH_FEEDS: MatchFeedItem[] = [];
 
 export const MOCK_FREE_AGENTS: FreeAgentScoutCard[] = [
   {

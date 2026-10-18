@@ -27,7 +27,7 @@ import { LiveMatchBar } from "@/components/matchmaking/LiveMatchBar";
 import { EscrowWalletModal } from "@/components/escrow/EscrowWalletModal";
 import { HandshakeModal } from "@/components/matchmaking/HandshakeModal";
 import { SubMarketAndRollCall } from "@/components/matchmaking/SubMarketAndRollCall";
-import { TeamTrustProfile } from "@/components/matchmaking/TeamTrustProfile";
+import { PersonalTeamProfileHub } from "@/components/team/PersonalTeamProfileHub";
 import {
   getZaloDeepLink,
   normalizeVietnamPhone,
@@ -37,7 +37,6 @@ import { useRealtimeMatchFeed } from "@/hooks/useRealtimeMatches";
 import { useAuthTeam } from "@/hooks/useAuthTeam";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { TeamOnboardingModal } from "@/components/team/TeamOnboardingModal";
-import { DigitalTeamCard } from "@/components/team/DigitalTeamCard";
 import { signOutAction, createMatchInDatabaseAction } from "@/actions/auth";
 
 interface BotLogItem {
@@ -669,8 +668,7 @@ export default function HanoiMatchmakingPlatform() {
                   {regularMatches.map((match) => {
                     const isOwner =
                       Boolean(match.isCreatedByCurrentUser) ||
-                      (Boolean(team?.team_name) && match.hostTeam.name === team?.team_name) ||
-                      match.id === "feed-1";
+                      (Boolean(team?.team_name) && match.hostTeam.name === team?.team_name);
                     return (
                       <MatchFeedCard
                         key={match.id}
@@ -730,18 +728,21 @@ export default function HanoiMatchmakingPlatform() {
             <SubMarketAndRollCall viewMode="sub-market" />
           )}
 
-          {/* WORKSPACE 6: HỒ SƠ ĐỘI TÔI & THẺ CĂN CƯỚC BÓNG ĐÁ SỐ */}
+          {/* WORKSPACE 6: HỒ SƠ ĐỘI TÔI & THẺ CĂN CƯỚC BÓNG ĐÁ SỐ CHÍNH CHỦ */}
           {activeTab === "trust-profile" && (
             <div className="space-y-4">
               {hasTeam && team ? (
-                <DigitalTeamCard
+                <PersonalTeamProfileHub
                   team={team}
                   profile={profile}
+                  escrowWallet={escrowWallet}
+                  onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
                   onQuickCreateMatch={() => setIsCreateOpen(true)}
                   onSignOut={async () => {
                     await signOutAction();
                     await refreshAuth();
                   }}
+                  onRefreshTeam={refreshAuth}
                 />
               ) : (
                 <div className="surface-card rounded-2xl border border-emerald-500/35 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -778,14 +779,6 @@ export default function HanoiMatchmakingPlatform() {
                   </button>
                 </div>
               )}
-
-              <TeamTrustProfile
-                myTrustScore={team?.trust_score ?? myTrustScore}
-                setMyTrustScore={setMyTrustScore}
-                onPushBotLog={pushBotLog}
-                escrowWallet={escrowWallet}
-                onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
-              />
             </div>
           )}
         </main>
