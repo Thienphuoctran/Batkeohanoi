@@ -23,6 +23,7 @@ import { MatchFeedCard } from "@/components/matchmaking/MatchFeedCard";
 import { MatchChallengeModal } from "@/components/matchmaking/MatchChallengeModal";
 import { CreateMatchModal } from "@/components/matchmaking/CreateMatchModal";
 import { EditMatchModal } from "@/components/matchmaking/EditMatchModal";
+import { CancelMatchAppealModal } from "@/components/matchmaking/CancelMatchAppealModal";
 import { LiveMatchBar } from "@/components/matchmaking/LiveMatchBar";
 import { EscrowWalletModal } from "@/components/escrow/EscrowWalletModal";
 import { HandshakeModal } from "@/components/matchmaking/HandshakeModal";
@@ -43,6 +44,11 @@ import {
   createMatchInDatabaseAction,
   requestWithdrawEscrowAction,
 } from "@/actions/auth";
+import {
+  addStoredEscrowRecord,
+  getStoredBroadcasts,
+  EmergencyBroadcastItem,
+} from "@/lib/adminStore";
 
 interface BotLogItem {
   id: string;
@@ -82,6 +88,8 @@ export default function HanoiMatchmakingPlatform() {
   const [activeChallengeMatch, setActiveChallengeMatch] =
     useState<MatchFeedItem | null>(null);
   const [editingMatch, setEditingMatch] = useState<MatchFeedItem | null>(null);
+  const [cancellingMatch, setCancellingMatch] = useState<MatchFeedItem | null>(null);
+  const [latestBroadcast, setLatestBroadcast] = useState<EmergencyBroadcastItem | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isBotDrawerOpen, setIsBotDrawerOpen] = useState(false);
   const [unreadBotCount, setUnreadBotCount] = useState(1);
@@ -111,6 +119,28 @@ export default function HanoiMatchmakingPlatform() {
       };
     });
   }, [effectiveTrustScore]);
+
+  // Lắng nghe sự kiện từ Admin Hub (/admin): Duyệt kháng cáo khôi phục 100đ & Phát sóng khẩn cấp
+  React.useEffect(() => {
+    const syncAdminBroadcasts = () => {
+      const list = getStoredBroadcasts();
+      if (list.length > 0) {
+        setLatestBroadcast(list[0]);
+      }
+      const restored = localStorage.getItem("batkeo7_restored_trust_score");
+      if (restored === "100") {
+        setMyTrustScore(100);
+        localStorage.removeItem("batkeo7_restored_trust_score");
+      }
+    };
+    syncAdminBroadcasts();
+    window.addEventListener("batkeo7-admin-sync", syncAdminBroadcasts);
+    window.addEventListener("storage", syncAdminBroadcasts);
+    return () => {
+      window.removeEventListener("batkeo7-admin-sync", syncAdminBroadcasts);
+      window.removeEventListener("storage", syncAdminBroadcasts);
+    };
+  }, []);
 
   const [botLogs, setBotLogs] = useState<BotLogItem[]>([
     {
@@ -209,6 +239,27 @@ export default function HanoiMatchmakingPlatform() {
         canWithdraw: effectiveTrustScore >= 70,
       };
     });
+
+    // Đồng bộ sang Admin Hub (Đề xuất 3 - Bước 1: Chờ duyệt nạp cọc)
+    addStoredEscrowRecord({
+      id: `ESC-${Math.floor(100 + Math.random() * 900)}`,
+      matchId: "m-wallet",
+      teamId: team?.id,
+      teamName: team?.team_name || "Đội Chủ Sân",
+      captainName: profile?.full_name || "Đội trưởng",
+      captainPhone: profile?.phone || team?.captain_phone || "0988666888",
+      amount,
+      transferCode: `BK7 ${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+      pitchName: "Nạp Ví Ký Quỹ Bảo Chứng",
+      timeSlot: "Hôm nay",
+      bankBin: "970422",
+      bankShortName: "MBBank",
+      bankAccountNo: "07440948327598",
+      bankAccountName: "TRAN QUOC THIEN PHUOC",
+      status: "PENDING_APPROVAL",
+      createdAt: "Vừa xong",
+    });
+
     pushBotLog(
       `💰 Nạp Ví Ký Quỹ Thành Công (+${amount.toLocaleString("vi-VN")}đ)`,
       `Bạn đã nạp thành công ${amount.toLocaleString("vi-VN")}đ vào Ví Ký Quỹ Nội Bộ qua VietQR Napas247. Số dư đã sẵn sàng bảo chứng cho các trận đấu.`,
@@ -234,6 +285,27 @@ export default function HanoiMatchmakingPlatform() {
     const accNumber = bankInfo.accountNumber || bankInfo.account || "";
     const accName = bankInfo.accountName || bankInfo.name || "";
     const customQrImage = bankInfo.customQrImage;
+
+    // Đồng bộ sang Admin Hub (Đề xuất 3 - Bước 2: Yêu cầu hoàn cọc kèm VietQR)
+    addStoredEscrowRecord({
+      id: `ESC-${Math.floor(100 + Math.random() * 900)}`,
+      matchId: "m-withdraw",
+      teamId: team?.id,
+      teamName: team?.team_name || "Đội Chủ Ví",
+      captainName: accName || profile?.full_name || "Đội trưởng",
+      captainPhone: profile?.phone || team?.captain_phone || "0988666888",
+      amount,
+      transferCode: `BK7 ${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+      pitchName: "Lệnh Rút Tiền Ví Ký Quỹ",
+      timeSlot: "Trước 22h00 hôm nay",
+      bankBin: bankCode,
+      bankShortName: bankName,
+      bankAccountNo: accNumber,
+      bankAccountName: accName,
+      customQrImageUrl: customQrImage,
+      status: "WITHDRAW_REQUESTED",
+      createdAt: "Vừa xong",
+    });
 
     // Gửi cảnh báo Telegram khẩn cấp đến Quản trị viên kèm ảnh mã QR
     await requestWithdrawEscrowAction({
@@ -441,15 +513,48 @@ export default function HanoiMatchmakingPlatform() {
 
   const handleDeleteMatch = (matchId: string) => {
     const target = matches.find((m) => m.id === matchId);
-    setMatches((prev) => prev.filter((m) => m.id !== matchId));
+    if (!target) return;
     if (editingMatch?.id === matchId) {
       setEditingMatch(null);
     }
-    pushBotLog(
-      "🗑️ Đã Xóa Kèo Đấu",
-      `Kèo đấu tại ${target?.pitchName || "sân"} (${target?.startTime || ""}) đã được gỡ bỏ khỏi bảng tin.`,
-      "Đã Xóa Kèo"
-    );
+    setCancellingMatch(target);
+  };
+
+  const handleConfirmCancelMatch = (
+    matchId: string,
+    options: {
+      incurredPenalty: boolean;
+      penaltyPoints: number;
+      submittedAppeal?: any;
+    }
+  ) => {
+    const target = matches.find((m) => m.id === matchId);
+    setMatches((prev) => prev.filter((m) => m.id !== matchId));
+    setCancellingMatch(null);
+
+    if (options.incurredPenalty && options.penaltyPoints > 0) {
+      setMyTrustScore((prev) => Math.max(0, prev - options.penaltyPoints));
+    }
+
+    if (options.submittedAppeal) {
+      pushBotLog(
+        `🛡️ Đã Gửi Đơn Kháng Cáo (#${options.submittedAppeal.id}) Lên BQT`,
+        `Kèo tại ${target?.pitchName || "sân"} đã hủy. Đơn kháng cáo của bạn đã được chuyển tới Trạm Xét Duyệt 1-Chạm (/admin) & Telegram BQT để khôi phục 100 điểm Uy Tín!`,
+        "Chờ Duyệt Kháng Cáo"
+      );
+    } else if (options.incurredPenalty) {
+      pushBotLog(
+        `⚠️ Đã Hủy Kèo Sát Giờ (Trừ -${options.penaltyPoints}đ Uy Tín)`,
+        `Kèo đấu tại ${target?.pitchName || "sân"} (${target?.startTime || ""}) đã bị hủy không kèm kháng cáo. Đội bị trừ -${options.penaltyPoints} điểm Uy Tín theo quy định.`,
+        `-${options.penaltyPoints}đ Uy Tín`
+      );
+    } else {
+      pushBotLog(
+        "🗑️ Đã Xóa Kèo Đấu Hợp Lệ (Không Trừ Điểm)",
+        `Kèo đấu tại ${target?.pitchName || "sân"} (${target?.startTime || ""}) đã được gỡ bỏ khỏi bảng tin trước giờ quy định.`,
+        "Đã Xóa Kèo"
+      );
+    }
   };
 
   return (
@@ -527,6 +632,29 @@ export default function HanoiMatchmakingPlatform() {
           escrowWallet={escrowWallet}
           onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
         />
+
+        {/* Banner Phát Sóng Khẩn Cấp Từ BQT (/admin - Đề xuất 5) */}
+        {latestBroadcast && (
+          <div className="mx-3 mt-3 p-3 rounded-2xl bg-gradient-to-r from-purple-950/90 via-indigo-950/90 to-slate-900/90 border border-purple-500/40 flex items-start justify-between gap-3 shadow-lg">
+            <div className="space-y-0.5 text-xs">
+              <div className="font-black text-purple-300 flex items-center gap-1.5">
+                <span>📢 THÔNG BÁO TỪ BAN QUẢN TRỊ:</span>
+                <span className="text-white">{latestBroadcast.title}</span>
+              </div>
+              <p className="text-[11px] text-slate-200 leading-relaxed">
+                {latestBroadcast.message}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setLatestBroadcast(null)}
+              className="p-1 rounded-lg bg-slate-800/80 text-slate-400 hover:text-white shrink-0"
+              title="Đóng thông báo"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
 
         {/* Main Content Container */}
         <main className="px-4 pt-4 space-y-5">
@@ -848,6 +976,14 @@ export default function HanoiMatchmakingPlatform() {
         match={editingMatch}
         onSaveMatch={handleSaveEditedMatch}
         onDeleteMatch={handleDeleteMatch}
+      />
+
+      {/* Modal Xác Nhận Hủy / Xóa Kèo & Hộp Kháng Cáo Giải Oan (Đề xuất 2) */}
+      <CancelMatchAppealModal
+        match={cancellingMatch}
+        open={!!cancellingMatch}
+        onClose={() => setCancellingMatch(null)}
+        onConfirmCancelMatch={handleConfirmCancelMatch}
       />
 
       {/* Modal Đăng Nhập / Đăng Ký Đội Trưởng */}

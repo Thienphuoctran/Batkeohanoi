@@ -541,4 +541,130 @@ export async function requestWithdrawEscrowAction(payload: {
   }
 }
 
+export async function submitMatchAppealAction(payload: {
+  appealId: string;
+  matchId: string;
+  teamId?: string;
+  teamName: string;
+  captainName: string;
+  captainPhone: string;
+  pitchName: string;
+  district: string;
+  timeSlot: string;
+  penaltyPoints: number;
+  reasonLabel: string;
+  reasonDetail: string;
+  managerVerifyPhone?: string;
+}) {
+  try {
+    const alertText =
+      `⚖️ <b>ĐƠN KHÁNG CÁO HỦY KÈO BẤT KHẢ KHÁNG (${payload.appealId})</b>\n` +
+      `• Đội gửi kháng cáo: <b>${payload.teamName}</b>\n` +
+      `• Đội trưởng: <b>${payload.captainName} (${payload.captainPhone})</b>\n` +
+      `• Sân bóng: <b>${payload.pitchName} (${payload.district})</b>\n` +
+      `• Khung giờ: <b>${payload.timeSlot}</b>\n` +
+      `• Mức trừ điểm tạm tính: <b>-${payload.penaltyPoints} điểm Uy Tín</b>\n` +
+      `--------------------------------\n` +
+      `📌 <b>Lý do kháng cáo:</b> ${payload.reasonLabel}\n` +
+      `📝 <b>Chi tiết sự cố:</b> <i>${payload.reasonDetail}</i>\n` +
+      `📞 <b>SĐT Chủ sân / Đối chứng:</b> <code>${payload.managerVerifyPhone || "Không cung cấp"}</code>\n` +
+      `👉 <i>Admin vui lòng vào Trung Tâm Quản Trị (/admin) để Duyệt Kháng Cáo (Khôi phục 100đ) hoặc Bác Bỏ!</i>`;
 
+    await sendTelegramAlert(alertText);
+
+    try {
+      const adminClient = getAdminClient();
+      await adminClient.from("match_appeals").insert({
+        appeal_code: payload.appealId,
+        match_id: payload.matchId,
+        team_id: payload.teamId || null,
+        team_name: payload.teamName,
+        captain_name: payload.captainName,
+        captain_phone: payload.captainPhone,
+        pitch_name: payload.pitchName,
+        district: payload.district,
+        time_slot: payload.timeSlot,
+        penalty_points: payload.penaltyPoints,
+        reason_label: payload.reasonLabel,
+        reason_detail: payload.reasonDetail,
+        manager_verify_phone: payload.managerVerifyPhone || null,
+        status: "PENDING",
+      });
+    } catch {
+      // Fallback an toàn nếu bảng match_appeals chưa tạo trong Supabase
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    console.error("[submitMatchAppealAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+
+export async function resolveMatchAppealAction(payload: {
+  appealId: string;
+  teamId?: string;
+  teamName: string;
+  decision: "APPROVED" | "REJECTED";
+  adminNote?: string;
+}) {
+  try {
+    if (payload.decision === "APPROVED" && payload.teamId) {
+      try {
+        const adminClient = getAdminClient();
+        await adminClient
+          .from("teams")
+          .update({ trust_score: 100 })
+          .eq("id", payload.teamId);
+      } catch {
+        // Fallback nếu là team mock
+      }
+    }
+
+    try {
+      const adminClient = getAdminClient();
+      await adminClient
+        .from("match_appeals")
+        .update({
+          status: payload.decision,
+          admin_note: payload.adminNote || null,
+        })
+        .eq("appeal_code", payload.appealId);
+    } catch {
+      // Fallback an toàn
+    }
+
+    const decisionText =
+      payload.decision === "APPROVED"
+        ? `✅ <b>ĐÃ DUYỆT KHÁNG CÁO (${payload.appealId})</b>\n• Đội bóng: <b>${payload.teamName}</b>\n• Kết quả: <b>Khôi phục 100 Điểm Uy Tín & Gỡ án phạt hủy kèo</b>`
+        : `❌ <b>ĐÃ BÁC BỎ KHÁNG CÁO (${payload.appealId})</b>\n• Đội bóng: <b>${payload.teamName}</b>\n• Kết quả: <b>Giữ nguyên mức phạt trừ điểm Uy Tín</b>\n• Lý do từ BQT: <i>${payload.adminNote || "Không đủ căn cứ bất khả kháng"}</i>`;
+
+    await sendTelegramAlert(decisionText);
+    return { success: true };
+  } catch (err: any) {
+    console.error("[resolveMatchAppealAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+
+export async function sendEmergencyBroadcastAction(payload: {
+  title: string;
+  message: string;
+  category: string;
+}) {
+  try {
+    const broadcastAlert =
+      `📢 <b>THÔNG BÁO KHẨN CẤP TỪ BQT BẮTKÈO7</b>\n` +
+      `🏷️ <b>Chủ đề:</b> ${payload.title}\n` +
+      `--------------------------------\n` +
+      `${payload.message}\n` +
+      `--------------------------------\n` +
+      `🕒 <i>Phát sóng lúc: ${new Date().toLocaleString("vi-VN")}</i>`;
+
+    await sendTelegramAlert(broadcastAlert);
+    return { success: true };
+  } catch (err: any) {
+    console.error("[sendEmergencyBroadcastAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}

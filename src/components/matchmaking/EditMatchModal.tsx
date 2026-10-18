@@ -395,46 +395,17 @@ export function EditMatchModal({
             />
           </div>
 
-          {/* Khu vực Xóa kèo */}
-          {showConfirmDelete ? (
-            <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/40 space-y-2">
-              <div className="flex items-center gap-2 text-rose-300 font-bold text-xs">
-                <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                <span>Xác nhận xóa hoàn toàn kèo này?</span>
-              </div>
-              <p className="text-[11px] text-slate-300">
-                Kèo sẽ bị gỡ bỏ khỏi bảng tin. Các đội khác sẽ không thể tìm thấy hoặc nhận kèo này nữa.
-              </p>
-              <div className="flex gap-2 pt-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setShowConfirmDelete(false)}
-                  className="flex-1 h-8 rounded-lg text-slate-300 hover:text-white"
-                >
-                  Hủy bỏ
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleDelete}
-                  className="flex-1 h-8 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold"
-                >
-                  Đồng ý Xóa Kèo
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="pt-1 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => setShowConfirmDelete(true)}
-                className="text-rose-400 hover:text-rose-300 font-bold text-xs inline-flex items-center gap-1.5 transition"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Xóa kèo đấu này</span>
-              </button>
-            </div>
-          )}
+          {/* Khu vực Hủy / Xóa kèo kèm Kháng Cáo */}
+          <div className="pt-1 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="text-rose-400 hover:text-rose-300 font-bold text-xs inline-flex items-center gap-1.5 transition px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Hủy / Xóa kèo đấu này (Mở Hộp Kháng Cáo nếu hủy sát giờ)</span>
+            </button>
+          </div>
 
           {/* Action buttons */}
           <div className="flex gap-2 pt-2 border-t border-white/[0.08]">

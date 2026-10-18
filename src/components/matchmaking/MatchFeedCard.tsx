@@ -290,15 +290,12 @@ export function MatchFeedCard({
             )}
             {isOwner && onDeleteMatch && (
               <button
-                onClick={() => {
-                  if (window.confirm("Kèo này đã có đối thủ nhận. Bạn có chắc chắn muốn hủy và xóa kèo?")) {
-                    onDeleteMatch(match.id);
-                  }
-                }}
-                className="p-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 transition active:scale-95"
-                title="Xóa kèo"
+                onClick={() => onDeleteMatch(match.id)}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 text-xs font-black transition active:scale-95"
+                title="Hủy kèo & Gửi kháng cáo bất khả kháng"
               >
                 <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                <span>Hủy Kèo</span>
               </button>
             )}
             {onOpenBlindReview && (
@@ -324,16 +321,12 @@ export function MatchFeedCard({
             )}
             {onDeleteMatch && (
               <button
-                onClick={() => {
-                  if (window.confirm("Bạn có chắc chắn muốn xóa kèo này không? Kèo sẽ được gỡ khỏi bảng tin.")) {
-                    onDeleteMatch(match.id);
-                  }
-                }}
+                onClick={() => onDeleteMatch(match.id)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 text-xs font-black transition shadow-sm active:scale-95"
-                title="Xóa kèo này khỏi bảng tin"
+                title="Hủy / Xóa kèo này (Kèm hộp kháng cáo nếu sát giờ)"
               >
                 <Trash2 className="w-3.5 h-3.5 text-rose-400" />
-                <span>Xóa Kèo</span>
+                <span>Hủy / Xóa Kèo</span>
               </button>
             )}
           </div>

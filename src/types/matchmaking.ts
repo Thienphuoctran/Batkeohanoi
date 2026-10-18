@@ -196,3 +196,55 @@ export interface BankWithdrawInfo {
   account?: string;
   name?: string;
 }
+
+export type AppealReasonCategory =
+  | "WEATHER"
+  | "PITCH_ISSUE"
+  | "MEDICAL_EMERGENCY"
+  | "MUTUAL_AGREEMENT"
+  | "OTHER";
+
+export interface MatchAppealItem {
+  id: string;
+  matchId: string;
+  teamId?: string;
+  teamName: string;
+  captainName: string;
+  captainPhone: string;
+  pitchName: string;
+  district: string;
+  matchTime: string;
+  penaltyPoints: number; // -25đ hoặc -40đ
+  previousTrustScore: number;
+  currentTrustScore: number;
+  reasonCategory: AppealReasonCategory;
+  reasonLabel: string;
+  reasonDetail: string;
+  proofContact: string; // SĐT Quản lý sân hoặc đối thủ xác minh
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  adminNote?: string;
+  createdAt: string;
+}
+
+export interface EscrowRecordItem {
+  id: string;
+  teamId?: string;
+  teamName: string;
+  captainPhone: string;
+  amount: number;
+  type: "DEPOSIT" | "WITHDRAW_REQUEST";
+  status:
+    | "PENDING_DEPOSIT"
+    | "VERIFIED_HELD"
+    | "WITHDRAW_REQUESTED"
+    | "REFUNDED"
+    | "FORFEITED";
+  bankCode?: string;
+  bankName?: string;
+  accountNumber?: string;
+  accountName?: string;
+  qrImageUrl?: string;
+  matchInfo?: string;
+  createdAt: string;
+}
+
