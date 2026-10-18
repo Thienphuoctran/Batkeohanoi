@@ -23,6 +23,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { generateVietQRQuickUrl } from "@/constants/mockMatchmaking";
 import { EscrowWallet, BankWithdrawInfo } from "@/types/matchmaking";
+import {
+  getLatestRefundReceipt,
+  clearLatestRefundReceipt,
+  RefundReceiptItem,
+} from "@/lib/adminStore";
 
 export const VIETNAM_BANKS = [
   { code: "MB", name: "MBBank (Ngân hàng Quân Đội)" },
@@ -76,6 +81,29 @@ export function EscrowWalletModal({
   const [customQrImage, setCustomQrImage] = useState<string>("");
   const [withdrawSuccessMsg, setWithdrawSuccessMsg] = useState(false);
   const [mockDepositing, setMockDepositing] = useState(false);
+  const [refundReceipt, setRefundReceipt] = useState<RefundReceiptItem | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const existing = getLatestRefundReceipt();
+      if (existing) setRefundReceipt(existing);
+
+      const handleRefundEvent = (e: any) => {
+        if (e.detail) {
+          setRefundReceipt(e.detail);
+        } else {
+          setRefundReceipt(getLatestRefundReceipt());
+        }
+      };
+
+      window.addEventListener("batkeo7-refund-success", handleRefundEvent);
+      window.addEventListener("batkeo7-admin-sync", handleRefundEvent);
+      return () => {
+        window.removeEventListener("batkeo7-refund-success", handleRefundEvent);
+        window.removeEventListener("batkeo7-admin-sync", handleRefundEvent);
+      };
+    }
+  }, []);
 
   if (!isOpen) return null;
 
@@ -216,6 +244,94 @@ export function EscrowWalletModal({
             </div>
           </div>
 
+          {/* DÒNG LƯU Ý CỐ ĐỊNH CỌC SÂN CHỈ 200.000Đ */}
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-sky-500/10 border border-emerald-500/30 flex items-start gap-2.5 shadow-sm">
+            <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="space-y-0.5 text-xs">
+              <div className="font-black text-emerald-300 uppercase tracking-wide flex items-center gap-1.5">
+                <span>🛡️ LƯU Ý QUAN TRỌNG: TIỀN CỌC SÂN CỐ ĐỊNH CHỈ LÀ 200.000Đ</span>
+              </div>
+              <p className="text-[11px] text-slate-200 leading-relaxed">
+                Hệ thống BắtKèo7 áp dụng mức cọc bảo chứng duy nhất <strong>200.000đ/trận</strong> (không thu thêm bất kỳ chi phí nào). Số tiền này dùng để cam kết chống bùng kèo và sẽ được <strong>hoàn trả 100% về tài khoản ngân hàng của bạn</strong> ngay sau khi hoàn tất trận đấu!
+              </p>
+            </div>
+          </div>
+
+          {/* THÔNG BÁO / BIÊN LAI HOÀN TIỀN CỌC THÀNH CÔNG KHI BQT CHUYỂN KHOẢN */}
+          {refundReceipt && (
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-teal-950/90 border-2 border-emerald-500/70 shadow-2xl space-y-3 animate-in zoom-in-95 duration-200">
+              <div className="flex items-start justify-between gap-2 border-b border-emerald-500/30 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/20">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
+                      GIAO DỊCH HOÀN TẤT
+                    </span>
+                    <h4 className="text-sm font-black text-white">
+                      ✅ ĐÃ HOÀN TIỀN CỌC THÀNH CÔNG!
+                    </h4>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearLatestRefundReceipt();
+                    setRefundReceipt(null);
+                  }}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white"
+                  title="Đóng thông báo"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-950/80 border border-emerald-500/30 space-y-2 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Số tiền BQT đã hoàn:</span>
+                  <span className="text-base font-black text-emerald-400 font-mono">
+                    +{refundReceipt.amount.toLocaleString("vi-VN")} VNĐ
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-slate-300">
+                  <span className="text-slate-400">Ngân hàng nhận:</span>
+                  <strong className="text-white">{refundReceipt.bankShortName}</strong>
+                </div>
+                <div className="flex justify-between items-center text-slate-300">
+                  <span className="text-slate-400">Số tài khoản:</span>
+                  <strong className="text-white font-mono">{refundReceipt.bankAccountNo}</strong>
+                </div>
+                <div className="flex justify-between items-center text-slate-300">
+                  <span className="text-slate-400">Chủ tài khoản:</span>
+                  <strong className="text-white uppercase">{refundReceipt.bankAccountName}</strong>
+                </div>
+                <div className="flex justify-between items-center text-slate-300 border-t border-slate-800 pt-1.5">
+                  <span className="text-slate-400">Thời gian BQT gửi:</span>
+                  <span className="text-slate-300">{refundReceipt.refundedAt}</span>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-emerald-200/90 leading-relaxed italic">
+                💬 {refundReceipt.note || "BQT BắtKèo7 đã hoàn tất chuyển khoản 200.000đ trả về số tài khoản của bạn qua Napas247. Vui lòng kiểm tra biến động số dư trên App Ngân Hàng của bạn!"}
+              </p>
+
+              <div className="flex gap-2 pt-1">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    clearLatestRefundReceipt();
+                    setRefundReceipt(null);
+                  }}
+                  className="w-full h-9 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20"
+                >
+                  <Check className="w-3.5 h-3.5 mr-1" />
+                  Đã Nhận Được Tiền Hoàn Cọc
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Cảnh Báo Nếu Tín Nhiệm Dưới 70 Điểm */}
           {isRestricted ? (
             <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/40 space-y-2">
@@ -279,20 +395,31 @@ export function EscrowWalletModal({
                 </span>
               </div>
 
-              {/* Chọn số tiền */}
+              {/* LƯU Ý MỨC CỌC CỐ ĐỊNH 200K NGAY TRONG TAB NẠP */}
+              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-200 flex items-center justify-between">
+                <span>📌 Mức cọc quy định chống bùng kèo:</span>
+                <strong className="text-white font-mono font-black text-xs">200.000 VNĐ / Trận</strong>
+              </div>
+
+              {/* Chọn số tiền nạp */}
               <div className="grid grid-cols-3 gap-2">
-                {[100000, 200000, 500000].map((amt) => (
+                {[
+                  { amt: 200000, label: "200k (Chuẩn cọc sân)" },
+                  { amt: 400000, label: "400k (Cọc 2 trận)" },
+                  { amt: 600000, label: "600k (Cọc 3 trận)" },
+                ].map(({ amt, label }) => (
                   <button
                     key={amt}
                     type="button"
                     onClick={() => setDepositAmount(amt)}
-                    className={`py-2 rounded-xl text-xs font-bold border transition ${
+                    className={`py-2 px-1 rounded-xl text-[11px] font-bold border transition text-center ${
                       depositAmount === amt
-                        ? "bg-emerald-500 text-slate-950 border-emerald-400 font-black"
+                        ? "bg-emerald-500 text-slate-950 border-emerald-400 font-black shadow-md shadow-emerald-500/20"
                         : "bg-slate-900 border-white/[0.08] text-slate-300 hover:text-white"
                     }`}
                   >
-                    {amt.toLocaleString("vi-VN")}đ
+                    <div>{amt.toLocaleString("vi-VN")}đ</div>
+                    <div className="text-[9px] opacity-80 mt-0.5 font-normal">{amt === 200000 ? "✨ Chuẩn cọc" : `Cọc ${amt / 200000} trận`}</div>
                   </button>
                 ))}
               </div>

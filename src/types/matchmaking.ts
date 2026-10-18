@@ -198,10 +198,14 @@ export interface BankWithdrawInfo {
 }
 
 export type AppealReasonCategory =
-  | "WEATHER"
-  | "PITCH_ISSUE"
+  | "WEATHER_FLOOD"
+  | "FLOODLIGHT_OUTAGE"
+  | "PITCH_DOUBLE_BOOKED"
   | "MEDICAL_EMERGENCY"
   | "MUTUAL_AGREEMENT"
+  | "OTHER_FORCE_MAJEURE"
+  | "WEATHER"
+  | "PITCH_ISSUE"
   | "OTHER";
 
 export interface MatchAppealItem {
@@ -213,38 +217,57 @@ export interface MatchAppealItem {
   captainPhone: string;
   pitchName: string;
   district: string;
-  matchTime: string;
+  matchDate?: string;
+  timeSlot?: string;
+  matchTime?: string;
   penaltyPoints: number; // -25đ hoặc -40đ
   previousTrustScore: number;
   currentTrustScore: number;
   reasonCategory: AppealReasonCategory;
-  reasonLabel: string;
+  reasonLabel?: string;
   reasonDetail: string;
-  proofContact: string; // SĐT Quản lý sân hoặc đối thủ xác minh
+  managerVerifyPhone?: string;
+  proofContact?: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   adminNote?: string;
   createdAt: string;
+  resolvedAt?: string;
 }
 
 export interface EscrowRecordItem {
   id: string;
+  matchId?: string;
   teamId?: string;
   teamName: string;
+  captainName?: string;
   captainPhone: string;
   amount: number;
-  type: "DEPOSIT" | "WITHDRAW_REQUEST";
+  transferCode?: string;
+  pitchName?: string;
+  timeSlot?: string;
+  type?: "DEPOSIT" | "WITHDRAW_REQUEST";
   status:
+    | "PENDING_APPROVAL"
     | "PENDING_DEPOSIT"
+    | "LOCKED_IN_MATCH"
     | "VERIFIED_HELD"
     | "WITHDRAW_REQUESTED"
     | "REFUNDED"
-    | "FORFEITED";
+    | "FORFEITED"
+    | "FORFEITED_TO_SOS_FUND";
+  bankBin?: string;
   bankCode?: string;
   bankName?: string;
+  bankShortName?: string;
+  bankAccountNo?: string;
   accountNumber?: string;
+  bankAccountName?: string;
   accountName?: string;
   qrImageUrl?: string;
+  customQrImageUrl?: string;
   matchInfo?: string;
+  note?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 

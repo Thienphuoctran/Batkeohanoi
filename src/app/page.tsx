@@ -133,11 +133,26 @@ export default function HanoiMatchmakingPlatform() {
         localStorage.removeItem("batkeo7_restored_trust_score");
       }
     };
+
+    const handleRefundEvent = (e: any) => {
+      const receipt = e.detail;
+      if (receipt) {
+        pushBotLog(
+          `🎉 ĐÃ HOÀN TRẢ CỌC (+${receipt.amount?.toLocaleString("vi-VN") || "200.000"}đ) THÀNH CÔNG`,
+          `BQT BắtKèo7 đã chuyển khoản trả về STK ${receipt.bankShortName} - ${receipt.bankAccountNo} (${receipt.bankAccountName}). Vui lòng kiểm tra biến động số dư ngân hàng!`,
+          "Đã Hoàn Tiền"
+        );
+        setUnreadBotCount((prev) => prev + 1);
+      }
+    };
+
     syncAdminBroadcasts();
     window.addEventListener("batkeo7-admin-sync", syncAdminBroadcasts);
+    window.addEventListener("batkeo7-refund-success", handleRefundEvent);
     window.addEventListener("storage", syncAdminBroadcasts);
     return () => {
       window.removeEventListener("batkeo7-admin-sync", syncAdminBroadcasts);
+      window.removeEventListener("batkeo7-refund-success", handleRefundEvent);
       window.removeEventListener("storage", syncAdminBroadcasts);
     };
   }, []);

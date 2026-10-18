@@ -261,3 +261,40 @@ export function addStoredBroadcast(item: EmergencyBroadcastItem): EmergencyBroad
   window.dispatchEvent(new CustomEvent('batkeo7-admin-sync'));
   return next;
 }
+
+export interface RefundReceiptItem {
+  id: string;
+  teamName: string;
+  captainName: string;
+  captainPhone: string;
+  amount: number;
+  bankShortName: string;
+  bankAccountNo: string;
+  bankAccountName: string;
+  transferCode: string;
+  refundedAt: string;
+  note?: string;
+}
+
+const LATEST_REFUND_KEY = 'batkeo7_latest_refund_receipt';
+
+export function getLatestRefundReceipt(): RefundReceiptItem | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(LATEST_REFUND_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveLatestRefundReceipt(receipt: RefundReceiptItem): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(LATEST_REFUND_KEY, JSON.stringify(receipt));
+  window.dispatchEvent(new CustomEvent('batkeo7-refund-success', { detail: receipt }));
+}
+
+export function clearLatestRefundReceipt(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(LATEST_REFUND_KEY);
+}

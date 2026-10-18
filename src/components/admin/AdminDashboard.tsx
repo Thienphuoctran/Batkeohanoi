@@ -42,6 +42,7 @@ import {
   addStoredBroadcast,
   APPEAL_REASON_LABELS,
   EmergencyBroadcastItem,
+  saveLatestRefundReceipt,
 } from '@/lib/adminStore';
 import {
   resolveMatchAppealAction,
@@ -286,6 +287,22 @@ export function AdminDashboard() {
     );
     setEscrowRecords(next);
     setQrPreviewRecord(null);
+
+    // Bắn thông báo hoàn tiền cọc thành công sang giao diện khách hàng (web & ví)
+    saveLatestRefundReceipt({
+      id: record.id,
+      teamName: record.teamName,
+      captainName: record.captainName,
+      captainPhone: record.captainPhone,
+      amount: record.amount,
+      bankShortName: record.bankShortName,
+      bankAccountNo: record.bankAccountNo,
+      bankAccountName: record.bankAccountName,
+      transferCode: record.transferCode,
+      refundedAt: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+      note: 'BQT BắtKèo7 đã hoàn tất chuyển khoản 200.000đ hoàn cọc về STK của bạn qua Napas247.',
+    });
+
     showToast(`💸 Bước 2 hoàn tất: Đã xác nhận hoàn cọc 200.000đ về ${record.bankShortName} cho ${record.teamName}!`);
   };
 
