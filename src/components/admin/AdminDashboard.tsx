@@ -30,6 +30,9 @@ import {
   TrendingUp,
   Building2,
   Eye,
+  ShieldAlert,
+  KeyRound,
+  LogOut,
 } from 'lucide-react';
 import { MOCK_MATCH_FEEDS } from '@/constants/mockMatchmaking';
 import { MatchFeedItem, MatchAppealItem, EscrowRecordItem } from '@/types/matchmaking';
@@ -48,9 +51,15 @@ import {
 import {
   resolveMatchAppealAction,
   sendEmergencyBroadcastAction,
+  signOutAction,
 } from '@/actions/auth';
+import { useAuthTeam } from '@/hooks/useAuthTeam';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { supabase } from '@/lib/supabase';
 
-const ADMIN_SECRET_PIN = '777888';
+const AUTHORIZED_ADMIN_EMAIL = 'phuoct998@gmail.com';
+const PIN_STORAGE_KEY = 'batkeo7_custom_admin_pin';
+const DEFAULT_ADMIN_PIN = '777888';
 const PIN_SESSION_KEY = 'batkeo7_admin_pin_unlocked';
 
 const MATRIX_DISTRICTS = [
@@ -98,9 +107,19 @@ const BROADCAST_TEMPLATES = [
 ];
 
 export function AdminDashboard() {
+  const { user, loading: authLoading, refreshAuth } = useAuthTeam();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState<string | null>(null);
+
+  // Change PIN states
+  const [isChangePinOpen, setIsChangePinOpen] = useState(false);
+  const [currentPinInput, setCurrentPinInput] = useState('');
+  const [newPinInput, setNewPinInput] = useState('');
+  const [confirmPinInput, setConfirmPinInput] = useState('');
+  const [changePinError, setChangePinError] = useState<string | null>(null);
 
   const [matches, setMatches] = useState<MatchFeedItem[]>(MOCK_MATCH_FEEDS);
   const [appeals, setAppeals] = useState<MatchAppealItem[]>([]);
@@ -130,6 +149,11 @@ export function AdminDashboard() {
   const showToast = (msg: string) => {
     setActionToast(msg);
     setTimeout(() => setActionToast(null), 4500);
+  };
+
+  const getEffectivePin = () => {
+    if (typeof window === 'undefined') return DEFAULT_ADMIN_PIN;
+    return localStorage.getItem(PIN_STORAGE_KEY) || DEFAULT_ADMIN_PIN;
   };
 
   const syncDataFromStorage = () => {
@@ -167,13 +191,61 @@ export function AdminDashboard() {
 
   const handleUnlockPin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pinInput.trim() === ADMIN_SECRET_PIN) {
+    const effectivePin = getEffectivePin();
+    if (pinInput.trim() === effectivePin) {
       sessionStorage.setItem(PIN_SESSION_KEY, 'true');
       setIsUnlocked(true);
       setPinError(null);
     } else {
-      setPinError('Mã PIN Quản Trị không chính xác! (Gợi ý mặc định cho Founder: 777888)');
+      setPinError('Mã PIN Quản Trị không chính xác! Vui lòng kiểm tra lại.');
     }
+  };
+
+  const handleLockPin = () => {
+    sessionStorage.removeItem(PIN_SESSION_KEY);
+    setIsUnlocked(false);
+    setPinInput('');
+    setPinError(null);
+    showToast('🔒 Đã khóa phiên Quản Trị.');
+  };
+
+  const handleChangePinSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangePinError(null);
+    const effectivePin = getEffectivePin();
+
+    if (currentPinInput.trim() !== effectivePin) {
+      setChangePinError('Mã PIN hiện tại không chính xác!');
+      return;
+    }
+    const cleanNewPin = newPinInput.trim();
+    if (!/^\d{6}$/.test(cleanNewPin)) {
+      setChangePinError('Mã PIN mới phải gồm đúng 6 chữ số (0-9)!');
+      return;
+    }
+    if (cleanNewPin === effectivePin) {
+      setChangePinError('Mã PIN mới không được trùng với mã PIN hiện tại!');
+      return;
+    }
+    if (cleanNewPin !== confirmPinInput.trim()) {
+      setChangePinError('Xác nhận mã PIN mới không khớp!');
+      return;
+    }
+
+    localStorage.setItem(PIN_STORAGE_KEY, cleanNewPin);
+    setCurrentPinInput('');
+    setNewPinInput('');
+    setConfirmPinInput('');
+    setIsChangePinOpen(false);
+    showToast('🔑 Đã cập nhật Mã PIN Quản Trị mới thành công!');
+  };
+
+  const handleSignOutAdmin = async () => {
+    sessionStorage.removeItem(PIN_SESSION_KEY);
+    setIsUnlocked(false);
+    await signOutAction();
+    await supabase.auth.signOut();
+    refreshAuth();
   };
 
   // KPI Metrics
@@ -366,11 +438,124 @@ export function AdminDashboard() {
     showToast('📢 Đã phát sóng thông báo khẩn cấp tới Telegram @BatKeo7_AlertBot và Chuông thông báo toàn sàn!');
   };
 
-  // Lock Screen if PIN not entered
-  if (!isUnlocked) {
+  const userEmail = user?.email?.toLowerCase().trim();
+  const isAuthorizedEmail =
+    !!userEmail && userEmail === AUTHORIZED_ADMIN_EMAIL.toLowerCase().trim();
+
+  // 1. Loading Authentication State
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-[#060913] text-slate-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-slate-900/95 border border-emerald-500/30 rounded-3xl shadow-2xl overflow-hidden">
+        <div className="text-center space-y-3">
+          <div className="w-12 h-12 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin mx-auto" />
+          <p className="text-sm font-semibold text-slate-300">
+            Đang xác thực quyền Quản trị viên BắtKèo7...
+          </p>
+          <p className="text-xs text-slate-500 font-mono">Chỉ cấp quyền cho {AUTHORIZED_ADMIN_EMAIL}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Email Authorization Gate (Chỉ tài khoản phuoct998@gmail.com)
+  if (!isAuthorizedEmail) {
+    return (
+      <div className="min-h-screen bg-[#060913] text-slate-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-slate-900/95 border border-rose-500/40 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl">
+          <CardHeader className="text-center space-y-2 pb-4 border-b border-slate-800">
+            <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/40 flex items-center justify-center mx-auto text-rose-400 shadow-lg shadow-rose-500/10">
+              <ShieldAlert className="w-7 h-7" />
+            </div>
+            <CardTitle className="text-lg font-black text-white tracking-tight">
+              KHU VỰC QUẢN TRỊ TỐI MẬT
+            </CardTitle>
+            <CardDescription className="text-xs text-slate-400">
+              BắtKèo7 Founder & Core Admin Access Only
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6 space-y-4">
+            <div className="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-xs text-rose-200 space-y-2">
+              <p className="font-bold flex items-center gap-1.5 text-rose-300">
+                <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                Quyền truy cập bị từ chối
+              </p>
+              <p className="text-[12px] text-slate-300 leading-relaxed">
+                Hệ thống Admin Hub yêu cầu đăng nhập bằng đúng tài khoản Gmail của Chủ dự án (Founder):{' '}
+                <strong className="text-emerald-400 font-mono underline block mt-1">{AUTHORIZED_ADMIN_EMAIL}</strong>
+              </p>
+              {user ? (
+                <div className="pt-2 border-t border-rose-500/20 text-[11px] text-slate-400">
+                  Tài khoản đang đăng nhập:{' '}
+                  <span className="font-bold text-white font-mono">{user.email || 'Ẩn danh'}</span>
+                </div>
+              ) : (
+                <div className="pt-2 border-t border-rose-500/20 text-[11px] text-slate-400">
+                  Bạn hiện chưa đăng nhập tài khoản nào.
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2 pt-1">
+              {user ? (
+                <>
+                  <Button
+                    onClick={handleSignOutAdmin}
+                    variant="outline"
+                    className="w-full h-11 rounded-xl border-slate-700 bg-slate-950 hover:bg-slate-800 text-slate-200 font-bold text-xs"
+                  >
+                    <LogOut className="w-4 h-4 mr-2 text-rose-400" />
+                    Đăng xuất tài khoản hiện tại
+                  </Button>
+                  <Button
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="w-full h-11 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20"
+                  >
+                    <KeyRound className="w-4 h-4 mr-2" />
+                    Đăng nhập bằng {AUTHORIZED_ADMIN_EMAIL}
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="w-full h-11 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20"
+                >
+                  <KeyRound className="w-4 h-4 mr-2" />
+                  Đăng nhập tài khoản Admin
+                </Button>
+              )}
+
+              <div className="pt-2 text-center">
+                <Link
+                  href="/"
+                  className="text-xs text-slate-400 hover:text-white inline-flex items-center gap-1.5 transition"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  Quay về Trang Chủ BắtKèo7
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          onSuccess={() => {
+            setIsAuthModalOpen(false);
+            refreshAuth();
+          }}
+        />
+      </div>
+    );
+  }
+
+  // 3. Khóa PIN Bảo Mật (Lớp bảo vệ thứ 2)
+  if (!isUnlocked) {
+    const isCustomPinSet =
+      typeof window !== 'undefined' && !!localStorage.getItem(PIN_STORAGE_KEY);
+    return (
+      <div className="min-h-screen bg-[#060913] text-slate-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-slate-900/95 border border-emerald-500/30 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl">
           <CardHeader className="text-center space-y-2 pb-4 border-b border-slate-800">
             <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center mx-auto text-emerald-400 shadow-lg shadow-emerald-500/10">
               <Lock className="w-7 h-7" />
@@ -379,33 +564,43 @@ export function AdminDashboard() {
               BẮTKÈO7 ADMIN HUB
             </CardTitle>
             <CardDescription className="text-xs text-slate-400">
-              Trung Tâm Chỉ Huy & Điều Phối Sàn Bóng Đá Phủi Hà Nội
+              Xác thực Mã PIN bảo vệ Trung Tâm Điều Phối
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
+            <div className="mb-4 p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-emerald-400 font-semibold truncate">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                {userEmail}
+              </span>
+              <button
+                type="button"
+                onClick={handleSignOutAdmin}
+                className="text-slate-400 hover:text-rose-400 font-medium shrink-0 ml-2 text-[10px]"
+              >
+                Đăng xuất
+              </button>
+            </div>
+
             <form onSubmit={handleUnlockPin} className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-xs font-bold text-slate-300">
-                  Nhập Mã PIN Bí Mật Dành Cho Founder / BQT:
+                  Nhập Mã PIN Quản Trị (6 số):
                 </Label>
                 <Input
                   type="password"
+                  maxLength={6}
                   value={pinInput}
                   onChange={(e) => setPinInput(e.target.value)}
-                  placeholder="Nhập mã PIN 6 số (Mặc định: 777888)"
-                  className="bg-slate-950 border-slate-700 text-center text-lg font-black tracking-[0.35em] text-emerald-400 h-12 rounded-xl"
+                  placeholder="••••••"
+                  className="bg-slate-950 border-slate-700 text-center text-xl font-black tracking-[0.4em] text-emerald-400 h-12 rounded-xl"
                   autoFocus
                 />
-                <p className="text-[11px] text-slate-400 text-center">
-                  💡 Mã PIN mặc định cho Chủ dự án (Founder):{' '}
-                  <button
-                    type="button"
-                    onClick={() => setPinInput('777888')}
-                    className="text-emerald-400 font-bold underline hover:text-emerald-300"
-                  >
-                    777888 (Bấm để điền nhanh)
-                  </button>
-                </p>
+                {!isCustomPinSet && (
+                  <p className="text-[11px] text-slate-400 text-center">
+                    💡 Mã PIN mặc định khởi tạo: <span className="text-emerald-400 font-mono font-bold">777888</span> (Bạn có thể đổi mã mới sau khi vào Hub)
+                  </p>
+                )}
               </div>
 
               {pinError && (
@@ -474,19 +669,42 @@ export function AdminDashboard() {
               className="border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800 text-xs h-9 rounded-xl"
             >
               <RefreshCw className="w-3.5 h-3.5 mr-1.5 text-emerald-400" />
-              Làm mới dữ liệu
+              Làm mới
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setChangePinError(null);
+                setCurrentPinInput('');
+                setNewPinInput('');
+                setConfirmPinInput('');
+                setIsChangePinOpen(true);
+              }}
+              className="border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800 text-xs h-9 rounded-xl"
+            >
+              <KeyRound className="w-3.5 h-3.5 mr-1.5 text-amber-400" />
+              Đổi Mã PIN
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => {
-                sessionStorage.removeItem(PIN_SESSION_KEY);
-                setIsUnlocked(false);
-              }}
-              className="text-slate-400 hover:text-rose-400 text-xs h-9"
+              onClick={handleLockPin}
+              className="text-slate-400 hover:text-amber-400 text-xs h-9"
+              title="Khóa bảo vệ tức thì"
             >
               <Lock className="w-3.5 h-3.5 mr-1" />
               Khóa PIN
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOutAdmin}
+              className="text-slate-400 hover:text-rose-400 text-xs h-9"
+              title="Đăng xuất quyền Admin"
+            >
+              <LogOut className="w-3.5 h-3.5 mr-1" />
+              Đăng xuất
             </Button>
           </div>
         </div>
@@ -1379,6 +1597,90 @@ export function AdminDashboard() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Modal Đổi Mã PIN Quản Trị */}
+      <Dialog open={isChangePinOpen} onOpenChange={setIsChangePinOpen}>
+        <DialogContent className="bg-slate-900 border border-slate-700 text-white max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base font-bold text-white">
+              <KeyRound className="w-5 h-5 text-amber-400" />
+              Đổi Mã PIN Quản Trị (Admin PIN)
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-400">
+              Mã PIN dùng để mở khóa nhanh Admin Hub cho Founder {AUTHORIZED_ADMIN_EMAIL}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleChangePinSubmit} className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-slate-300">
+                Mã PIN hiện tại:
+              </Label>
+              <Input
+                type="password"
+                maxLength={6}
+                value={currentPinInput}
+                onChange={(e) => setCurrentPinInput(e.target.value)}
+                placeholder="Nhập mã PIN hiện tại (mặc định: 777888)"
+                className="bg-slate-950 border-slate-800 text-emerald-400 font-mono tracking-widest text-center"
+                autoFocus
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-slate-300">
+                Mã PIN mới (6 chữ số):
+              </Label>
+              <Input
+                type="password"
+                maxLength={6}
+                value={newPinInput}
+                onChange={(e) => setNewPinInput(e.target.value)}
+                placeholder="Ví dụ: 123456"
+                className="bg-slate-950 border-slate-800 text-emerald-400 font-mono tracking-widest text-center"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-slate-300">
+                Nhập lại mã PIN mới:
+              </Label>
+              <Input
+                type="password"
+                maxLength={6}
+                value={confirmPinInput}
+                onChange={(e) => setConfirmPinInput(e.target.value)}
+                placeholder="Nhập lại đúng 6 số PIN mới"
+                className="bg-slate-950 border-slate-800 text-emerald-400 font-mono tracking-widest text-center"
+              />
+            </div>
+
+            {changePinError && (
+              <div className="p-2.5 rounded-xl bg-rose-950/60 border border-rose-500/40 text-xs text-rose-300 text-center font-medium">
+                {changePinError}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsChangePinOpen(false)}
+                className="text-xs text-slate-400 hover:text-white"
+              >
+                Hủy bỏ
+              </Button>
+              <Button
+                type="submit"
+                className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs h-10 px-4 rounded-xl shadow-lg shadow-emerald-500/20"
+              >
+                <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                Lưu Mã PIN Mới
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

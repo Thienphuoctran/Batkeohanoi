@@ -1181,6 +1181,21 @@ export default function HanoiMatchmakingPlatform() {
         </div>
       )}
 
+      {/* Footer kín đáo */}
+      <footer className="mt-14 py-8 border-t border-slate-900 text-center text-xs text-slate-600">
+        <p className="flex items-center justify-center gap-2">
+          <span>© 2026 BắtKèo7 • Sàn Bắt Đối Phủi Hà Nội</span>
+          <span>•</span>
+          <Link
+            href="/admin"
+            className="hover:text-slate-400 transition inline-flex items-center gap-1 text-slate-600 hover:underline"
+          >
+            <Lock className="w-3 h-3" />
+            <span>Quản trị</span>
+          </Link>
+        </p>
+      </footer>
+
       {/* Nút Nổi Tư Vấn Khách Hàng (AI Agent & Zalo BQT) */}
       <div className="fixed bottom-5 right-4 sm:right-6 z-40">
         <button
