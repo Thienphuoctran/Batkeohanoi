@@ -19,6 +19,8 @@ import { MatchFeedItem } from "@/types/matchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { Button } from "@/components/ui/button";
 import { maskPhoneNumber, getZaloDeepLink } from "@/lib/zalo";
+import { SpotlightCard } from "@/components/reactbits/SpotlightCard";
+import { ClickSpark } from "@/components/reactbits/ClickSpark";
 
 interface MatchFeedCardProps {
   match: MatchFeedItem;
@@ -56,9 +58,9 @@ export function MatchFeedCard({
   };
 
   return (
-    <div
-      onMouseMove={handleMouseMove}
-      className={`spotlight-card rounded-2xl border p-4 transition-all flex flex-col justify-between ${
+    <SpotlightCard
+      spotlightColor="rgba(16, 185, 129, 0.18)"
+      className={`rounded-2xl border p-4 transition-all flex flex-col justify-between ${
         isMatched
           ? "border-emerald-500/25 bg-slate-900/60"
           : "border-white/[0.09] hover:border-emerald-500/45 hover:-translate-y-0.5"
@@ -331,15 +333,17 @@ export function MatchFeedCard({
             )}
           </div>
         ) : (
-          <Button
-            onClick={() => onSelectMatch(match)}
-            className="h-9 px-4 rounded-xl bg-[#2dd4bf] hover:bg-[#14b8a6] text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-teal-500/20 active:scale-95 transition-all"
-          >
-            <Handshake className="w-4 h-4 stroke-[2.5]" />
-            <span>Nhận Kèo</span>
-          </Button>
+          <ClickSpark sparkColor={["#10b981", "#84cc16", "#38bdf8", "#fbbf24"]} sparkCount={8}>
+            <Button
+              onClick={() => onSelectMatch(match)}
+              className="h-9 px-4 rounded-xl bg-[#2dd4bf] hover:bg-[#14b8a6] text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-teal-500/20 active:scale-95 transition-all"
+            >
+              <Handshake className="w-4 h-4 stroke-[2.5]" />
+              <span>Nhận Kèo</span>
+            </Button>
+          </ClickSpark>
         )}
       </div>
-    </div>
+    </SpotlightCard>
   );
 }

@@ -31,6 +31,8 @@ import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { Button } from "@/components/ui/button";
 import { getZaloDeepLink, normalizeVietnamPhone } from "@/lib/zalo";
 import { FutCardModal } from "./FutCardModal";
+import { SpotlightCard } from "@/components/reactbits/SpotlightCard";
+import { ClickSpark } from "@/components/reactbits/ClickSpark";
 
 interface SubMarketAndRollCallProps {
   viewMode?: "sub-market" | "roll-call" | "both";
@@ -618,9 +620,10 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               const tierInfo = SKILL_TIERS_CONFIG[agent.skillTier];
 
               return (
-                <div
+                <SpotlightCard
                   key={agent.id}
-                  className={`spotlight-card rounded-2xl border p-4 flex flex-col justify-between transition-all ${
+                  spotlightColor={isGK ? "rgba(245, 158, 11, 0.2)" : "rgba(16, 185, 129, 0.15)"}
+                  className={`rounded-2xl border p-4 flex flex-col justify-between transition-all ${
                     isGK
                       ? "bg-gradient-to-br from-amber-950/35 via-slate-900/95 to-slate-950 border-amber-500/50 shadow-lg shadow-amber-500/5"
                       : "surface-card border-white/[0.08]"
@@ -758,15 +761,17 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     )}
 
                     <div className="flex items-center gap-2">
-                      <a
-                        href={getZaloDeepLink(agent.phone, agent.zaloPhone)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="h-9 px-3 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-blue-600/20 transition active:scale-95"
-                      >
-                        <MessageSquare className="w-3.5 h-3.5 fill-current" />
-                        <span>Mời vào đội (Zalo)</span>
-                      </a>
+                      <ClickSpark sparkColor={["#0068FF", "#38bdf8", "#ffffff"]}>
+                        <a
+                          href={getZaloDeepLink(agent.phone, agent.zaloPhone)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="h-9 px-3 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-blue-600/20 transition active:scale-95"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5 fill-current" />
+                          <span>Mời vào đội (Zalo)</span>
+                        </a>
+                      </ClickSpark>
                       <a
                         href={`tel:${normalizeVietnamPhone(agent.phone)}`}
                         className="h-9 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/15 transition active:scale-95"
@@ -776,7 +781,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       </a>
                     </div>
                   </div>
-                </div>
+                </SpotlightCard>
               );
             })
           ) : (

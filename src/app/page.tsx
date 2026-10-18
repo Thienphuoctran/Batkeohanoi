@@ -43,6 +43,12 @@ import {
 } from "@/lib/zalo";
 import { useRealtimeMatchFeed } from "@/hooks/useRealtimeMatches";
 import { useAuthTeam } from "@/hooks/useAuthTeam";
+import {
+  ShinyText,
+  CountUpNumber,
+  ClickSpark,
+  SpotlightCard,
+} from "@/components/reactbits";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { TeamOnboardingModal } from "@/components/team/TeamOnboardingModal";
 import {
@@ -713,6 +719,54 @@ export default function HanoiMatchmakingPlatform() {
           {/* WORKSPACE 1: BẢNG TIN KÈO ĐẤU */}
           {activeTab === "feed" && (
             <div className="space-y-4">
+              {/* 🏟️ STADIUM NIGHTS HERO & TELEMETRY BANNER (React Bits) */}
+              <div className="relative rounded-3xl overflow-hidden border border-emerald-500/25 bg-gradient-to-br from-slate-950 via-[#0a1120] to-emerald-950/30 p-4 sm:p-5 shadow-2xl backdrop-blur-xl">
+                {/* Ambient Floodlight Glow */}
+                <div className="pointer-events-none absolute -top-12 -right-12 w-48 h-48 rounded-full bg-emerald-500/15 blur-3xl" />
+                <div className="pointer-events-none absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-lime-400/10 blur-3xl" />
+
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[10px] font-black text-emerald-300 uppercase tracking-wider">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                        SÂN ĐÈN CAO ÁP 1000W
+                      </span>
+                      <span className="text-[11px] text-slate-400">• Ghép Đối Tốc Hành 5 Phút</span>
+                    </div>
+                    <h2 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap">
+                      <span>SÀN BẮT ĐỐI SÂN 7</span>
+                      <ShinyText text="CHỐNG BÙNG KÈO" speed={3} className="text-emerald-400" />
+                    </h2>
+                    <p className="text-xs text-slate-300/80 mt-1 max-w-xl leading-relaxed">
+                      Cọc bảo chứng 200k • Hủy sát giờ &lt; 1h đền 100% tiền sân • Xác thực mã bắt tay OTP 4 số tại cổng sân.
+                    </p>
+                  </div>
+
+                  {/* Rolling Telemetry Odometer */}
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 bg-slate-950/80 border border-white/10 rounded-2xl p-2.5 sm:p-3 shrink-0 shadow-inner">
+                    <div className="text-center px-1">
+                      <div className="text-[10px] text-slate-400 font-bold uppercase">Cọc Bảo Chứng</div>
+                      <div className="text-sm sm:text-base font-black text-emerald-400">
+                        <CountUpNumber end={200000} duration={1200} suffix="đ" />
+                      </div>
+                    </div>
+                    <div className="text-center px-1 border-x border-white/10">
+                      <div className="text-[10px] text-slate-400 font-bold uppercase">Uy Tín Chuẩn</div>
+                      <div className="text-sm sm:text-base font-black text-amber-300">
+                        <CountUpNumber end={100} duration={1500} suffix="/100" />
+                      </div>
+                    </div>
+                    <div className="text-center px-1">
+                      <div className="text-[10px] text-slate-400 font-bold uppercase">Trận Đã Ghép</div>
+                      <div className="text-sm sm:text-base font-black text-sky-400">
+                        <CountUpNumber end={1450} duration={1400} suffix="+" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* LIVE TELEMETRY STRIP (Đồng hồ đếm ngược + Thời tiết + Live HN + Sân 2D) */}
               <LiveMatchBar
                 onOpenCreateModal={() => setIsCreateOpen(true)}
@@ -843,23 +897,35 @@ export default function HanoiMatchmakingPlatform() {
 
               {/* Danh sách Kèo Thường */}
               {filteredMatches.length === 0 ? (
-                <div className="surface-card rounded-2xl border border-white/[0.08] p-10 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 mx-auto flex items-center justify-center">
-                    <Trophy className="w-6 h-6" />
+                <div className="relative rounded-3xl border border-dashed border-emerald-500/30 bg-gradient-to-b from-slate-900/60 to-slate-950/80 p-10 text-center space-y-4 overflow-hidden backdrop-blur-xl">
+                  {/* Glowing Radar Pulse Sphere */}
+                  <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
+                    <span className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping opacity-60" />
+                    <span className="absolute -inset-2 rounded-full border border-emerald-400/30 animate-pulse" />
+                    <div className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                      <Trophy className="w-8 h-8 stroke-[2.5]" />
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-white">Chưa có kèo đấu nào đang mở</h3>
-                    <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-                      Hãy là đội đầu tiên mở kèo giao lưu hôm nay hoặc bấm tạo kèo để tìm đối thủ ngay!
+
+                  <div className="space-y-1.5">
+                    <h3 className="text-base font-black text-white tracking-tight flex items-center justify-center gap-2">
+                      <span>RADAR ĐANG QUÉT KÈO PHỦI</span>
+                      <ShinyText text="HÀ NỘI" speed={2.5} className="text-emerald-400" />
+                    </h3>
+                    <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+                      Chưa có đội nào mở kèo tại khu vực hoặc khung giờ này. Hãy là đội tiên phong mở bát để nhận đối thủ ngay trong 5 phút!
                     </p>
                   </div>
-                  <button
-                    onClick={() => setIsCreateOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs shadow-md shadow-emerald-500/15 transition"
-                  >
-                    <Plus className="w-4 h-4 stroke-[2.5]" />
-                    <span>Tạo Kèo Mới Ngay</span>
-                  </button>
+
+                  <ClickSpark sparkColor={["#10b981", "#84cc16", "#ffffff"]}>
+                    <button
+                      onClick={() => setIsCreateOpen(true)}
+                      className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/30 transition active:scale-95"
+                    >
+                      <Plus className="w-4 h-4 stroke-[3]" />
+                      <span>Mở Kèo Mới Ngay</span>
+                    </button>
+                  </ClickSpark>
                 </div>
               ) : (
                 <div
@@ -896,7 +962,7 @@ export default function HanoiMatchmakingPlatform() {
                 <div>
                   <h2 className="text-sm sm:text-base font-black text-rose-400 flex items-center gap-2">
                     <Flame className="w-4 h-4 fill-current animate-bounce" />
-                    <span>TRẠM CỨU HỘ KÈO PHÚT CHÓT (&lt; 2 TIẾNG)</span>
+                    <span>TRẠM CỨU HỘ KÈO PHÚT CHÓT (&lt; 1 TIẾNG)</span>
                   </h2>
                   <p className="text-xs text-slate-300 mt-0.5">
                     Cứu kèo giúp sân không bị bỏ trống • Giảm ngay 125.000đ tiền sân &amp; Thưởng +8 điểm tín nhiệm

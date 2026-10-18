@@ -37,6 +37,7 @@ import { SkillTier, EscrowWallet } from "@/types/matchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { Button } from "@/components/ui/button";
 import { updateTeamProfileAction } from "@/actions/auth";
+import { ShinyText, CountUpNumber } from "@/components/reactbits";
 
 export interface TeamMember {
   id: string;
@@ -650,9 +651,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
               </div>
 
               <div className="flex items-center space-x-2 pt-0.5">
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  {teamName || "Chưa đặt tên đội"}
-                </h2>
+                <ShinyText
+                  text={teamName || "Chưa đặt tên đội"}
+                  speed={3}
+                  className="text-xl sm:text-2xl font-black text-white tracking-tight"
+                />
                 <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
               </div>
 
@@ -699,7 +702,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
               Điểm Tín Nhiệm
             </span>
             <div className="text-2xl sm:text-3xl font-mono font-black text-emerald-400">
-              {team.trust_score}
+              <CountUpNumber end={team.trust_score} duration={1200} />
               <span className="text-xs text-slate-500 font-bold">/100</span>
             </div>
             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">

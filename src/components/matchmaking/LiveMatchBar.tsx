@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { District, SkillTier } from "@/types/matchmaking";
 import { ActiveTab } from "./HeaderBar";
+import { ClickSpark } from "@/components/reactbits/ClickSpark";
 
 interface LiveMatchBarProps {
   onOpenCreateModal: () => void;
@@ -75,18 +76,20 @@ export function LiveMatchBar({
       {/* KHỐI PHẢI: NÚT GIẢI CỨU KÈO 📣 + ĐÁNH GIÁ KÈO + TẠO KÈO */}
       <div className="flex items-center gap-2 w-full md:w-auto justify-end">
         {/* Nút Giải Cứu Kèo Ngay 📣 */}
-        <button
-          onClick={() => onSwitchTab("sos")}
-          className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 hover:brightness-110 text-white font-black text-xs shadow-lg shadow-red-600/25 active:scale-95 transition-all inline-flex items-center gap-1.5 animate-pulse"
-        >
-          <span>Giải Cứu Kèo Ngay</span>
-          <span>📣</span>
-          {sosCount > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-white text-red-600 font-black">
-              {sosCount}
-            </span>
-          )}
-        </button>
+        <ClickSpark sparkColor={["#ef4444", "#f97316", "#fbbf24"]} sparkCount={8}>
+          <button
+            onClick={() => onSwitchTab("sos")}
+            className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 hover:brightness-110 text-white font-black text-xs shadow-lg shadow-red-600/25 active:scale-95 transition-all inline-flex items-center gap-1.5 animate-pulse"
+          >
+            <span>Giải Cứu Kèo Ngay</span>
+            <span>📣</span>
+            {sosCount > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-white text-red-600 font-black">
+                {sosCount}
+              </span>
+            )}
+          </button>
+        </ClickSpark>
 
         {/* Nút Đánh giá kèo (Vàng dạ quang) */}
         <button
@@ -97,13 +100,15 @@ export function LiveMatchBar({
         </button>
 
         {/* Nút Tạo Kèo (Xanh cỏ neon) */}
-        <button
-          onClick={onOpenCreateModal}
-          className="h-9 px-3.5 rounded-xl bg-[#22c55e] hover:bg-[#16a34a] text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-1"
-        >
-          <Plus className="w-3.5 h-3.5 stroke-[3]" />
-          <span>Tạo Kèo</span>
-        </button>
+        <ClickSpark sparkColor={["#22c55e", "#84cc16", "#38bdf8", "#ffffff"]} sparkCount={10}>
+          <button
+            onClick={onOpenCreateModal}
+            className="h-9 px-3.5 rounded-xl bg-[#22c55e] hover:bg-[#16a34a] text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-1"
+          >
+            <Plus className="w-3.5 h-3.5 stroke-[3]" />
+            <span>Tạo Kèo</span>
+          </button>
+        </ClickSpark>
       </div>
     </div>
   );

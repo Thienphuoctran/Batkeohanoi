@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { EscrowWallet } from "@/types/matchmaking";
 import { Button } from "@/components/ui/button";
+import { ShinyText } from "@/components/reactbits/ShinyText";
 
 export type ActiveTab =
   | "feed"
@@ -161,8 +162,9 @@ export function HeaderBar({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h1 className="font-extrabold text-base tracking-tight text-white">
-                  BắtKèo7<span className="text-emerald-400">.vn</span>
+                <h1 className="font-extrabold text-base tracking-tight text-white flex items-center">
+                  <ShinyText text="BắtKèo7" speed={3.5} className="text-white" />
+                  <span className="text-emerald-400 font-black">.vn</span>
                 </h1>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                   Hà Nội v2.0

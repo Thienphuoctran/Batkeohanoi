@@ -12,6 +12,8 @@ import {
 import { MatchFeedItem } from "@/types/matchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { Button } from "@/components/ui/button";
+import { ClickSpark } from "@/components/reactbits/ClickSpark";
+import { LaserGlowCard } from "@/components/reactbits/LaserGlowCard";
 
 interface SosAlertCardProps {
   match: MatchFeedItem;
@@ -44,7 +46,7 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
   const discountedShare = Math.max(150000, match.shareCostVnd - 125000);
 
   return (
-    <div className="relative rounded-2xl border-2 border-rose-500/75 bg-gradient-to-br from-rose-950/40 via-[#131826] to-[#0f1420] p-4 sos-card-glow transition-all">
+    <LaserGlowCard glowColor="red" speed={3.5} className="w-full">
       {/* Top Urgent Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-rose-500/25">
         <div className="flex items-center gap-2">
@@ -53,7 +55,7 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
             SOS CẦN ĐỐI GẤP
           </span>
           <span className="text-xs font-semibold text-rose-200/90">
-            {match.cancellationReason || "Đối thủ hủy sát giờ (< 2 tiếng)"}
+            {match.cancellationReason || "Đối thủ hủy sát giờ (< 1 tiếng)"}
           </span>
         </div>
 
@@ -123,15 +125,21 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
             </div>
           </div>
 
-          <Button
-            onClick={() => onSelectMatch(match)}
-            className="w-full sm:w-auto md:w-full h-10 px-5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 hover:brightness-110 text-white font-black text-xs tracking-wide shadow-lg shadow-red-600/30 flex items-center justify-center gap-1.5 active:scale-95 transition"
+          <ClickSpark
+            sparkColor={["#ef4444", "#f97316", "#fbbf24", "#ffffff"]}
+            sparkCount={10}
+            className="w-full sm:w-auto md:w-full"
           >
-            <span>Giải Cứu Kèo Ngay</span>
-            <span>📣</span>
-          </Button>
+            <Button
+              onClick={() => onSelectMatch(match)}
+              className="w-full h-10 px-5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 hover:brightness-110 text-white font-black text-xs tracking-wide shadow-lg shadow-red-600/30 flex items-center justify-center gap-1.5 active:scale-95 transition"
+            >
+              <span>Giải Cứu Kèo Ngay</span>
+              <span>📣</span>
+            </Button>
+          </ClickSpark>
         </div>
       </div>
-    </div>
+    </LaserGlowCard>
   );
 }

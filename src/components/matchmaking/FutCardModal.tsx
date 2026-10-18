@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { FreeAgentScoutCard } from "@/types/matchmaking";
 import { getZaloDeepLink, normalizeVietnamPhone } from "@/lib/zalo";
+import { HoloCard } from "@/components/reactbits/HoloCard";
 
 interface FutCardModalProps {
   player: FreeAgentScoutCard | null;
@@ -45,8 +46,8 @@ export function FutCardModal({ player, onClose }: FutCardModalProps) {
           <X className="w-4 h-4" />
         </button>
 
-        {/* KHUNG THẺ EA FC / FIFA FUT CARD KIM LOẠI */}
-        <div
+        {/* KHUNG THẺ EA FC / FIFA FUT CARD KIM LOẠI 3D HOLO */}
+        <HoloCard
           className={`w-full rounded-[28px] p-5 border-2 shadow-2xl relative overflow-hidden ${
             isGK
               ? "bg-gradient-to-b from-amber-500/30 via-[#1e1b0f] to-[#0f172a] border-amber-400/80 shadow-amber-500/20"
@@ -192,7 +193,7 @@ export function FutCardModal({ player, onClose }: FutCardModalProps) {
               Verified Sân 7 HN
             </span>
           </div>
-        </div>
+        </HoloCard>
 
         {/* Các nút tương tác dưới thẻ */}
         <div className="w-full mt-3 grid grid-cols-3 gap-2">

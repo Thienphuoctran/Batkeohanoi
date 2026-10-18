@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MatchFeedItem } from "@/types/matchmaking";
+import { ShinyText } from "@/components/reactbits/ShinyText";
 
 interface HandshakeModalProps {
   isOpen: boolean;
@@ -148,9 +149,11 @@ export function HandshakeModal({
                     Khi Đội Khách lên sân, bạn hãy đọc hoặc đưa mã 4 số này cho Đội trưởng đội bạn nhập vào app:
                   </p>
                   <div className="bg-slate-950 border-2 border-dashed border-emerald-400/60 rounded-2xl py-3 px-6 inline-block shadow-inner">
-                    <span className="text-4xl font-black font-mono tracking-widest text-emerald-300">
-                      {expectedPin}
-                    </span>
+                    <ShinyText
+                      text={expectedPin}
+                      speed={2.5}
+                      className="text-4xl font-black font-mono tracking-widest text-emerald-300"
+                    />
                   </div>
                   <p className="text-[10px] text-slate-400">
                     🔒 Khi Đội Khách nhập đúng mã, hệ thống ghi nhận 100% hai đội đã có mặt, nhả cọc về ví và vô hiệu hóa nút báo bùng kèo.
