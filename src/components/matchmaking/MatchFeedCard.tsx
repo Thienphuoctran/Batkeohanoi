@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { maskPhoneNumber, getZaloDeepLink } from "@/lib/zalo";
 import { SpotlightCard } from "@/components/reactbits/SpotlightCard";
 import { ClickSpark } from "@/components/reactbits/ClickSpark";
+import { PhuiStamp } from "@/components/phui";
 
 interface MatchFeedCardProps {
   match: MatchFeedItem;
@@ -59,13 +60,26 @@ export function MatchFeedCard({
 
   return (
     <SpotlightCard
-      spotlightColor="rgba(16, 185, 129, 0.18)"
-      className={`rounded-2xl border p-4 transition-all flex flex-col justify-between ${
+      spotlightColor="rgba(16, 185, 129, 0.2)"
+      className={`rounded-2xl border p-4 transition-all flex flex-col justify-between relative overflow-hidden backdrop-blur-xl ${
         isMatched
-          ? "border-emerald-500/25 bg-slate-900/60"
-          : "border-white/[0.09] hover:border-emerald-500/45 hover:-translate-y-0.5"
+          ? "border-emerald-500/25 bg-[#04160d]/80 shadow-lg"
+          : "border-emerald-500/20 bg-[#061e13]/90 hover:border-emerald-400/50 hover:-translate-y-0.5 shadow-xl"
       }`}
     >
+      {/* Phủi Stamp Watermark for Trust & Match Status */}
+      <div className="absolute top-2.5 right-12 pointer-events-none select-none z-10 hidden sm:block">
+        {isPlayingVerified ? (
+          <PhuiStamp variant="coc-200k" size="sm" angle={-8} />
+        ) : isMatched ? (
+          <PhuiStamp variant="da-ghep" size="sm" angle={6} />
+        ) : host.credit.score >= 90 ? (
+          <PhuiStamp variant="keo-uy-tin" size="sm" angle={-6} />
+        ) : (
+          <PhuiStamp variant="san-da-dat" size="sm" angle={-4} />
+        )}
+      </div>
+
       <div>
         {/* Warning Banner for Red-Flagged Team */}
         {host.credit.warningBadge === "TUNG_BUNG_KEO" && (
@@ -141,13 +155,13 @@ export function MatchFeedCard({
         </div>
 
         {/* Pitch & Time Box */}
-        <div className="mt-3 rounded-xl bg-slate-950/75 border border-white/[0.06] p-3 space-y-2">
+        <div className="mt-3 rounded-xl bg-[#020d07]/90 border border-emerald-500/20 p-3 space-y-2">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-300 font-semibold flex items-center gap-1.5 truncate">
+            <span className="text-slate-200 font-semibold flex items-center gap-1.5 truncate">
               <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span className="truncate">{match.pitchName}</span>
             </span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 shrink-0">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#0a2318] text-emerald-300 border border-emerald-500/30 shrink-0">
               {match.district}
             </span>
           </div>
@@ -177,7 +191,7 @@ export function MatchFeedCard({
             )}
           </div>
 
-          <div className="flex items-center justify-between text-xs pt-1.5 border-t border-slate-800/80">
+          <div className="flex items-center justify-between text-xs pt-1.5 border-t border-emerald-500/15">
             <span className="text-amber-300 font-bold flex items-center gap-1.5 tabular-nums">
               <Clock className="w-3.5 h-3.5" />
               {match.startTime} - {match.endTime} ({match.matchDate})
@@ -336,7 +350,7 @@ export function MatchFeedCard({
           <ClickSpark sparkColor={["#10b981", "#84cc16", "#38bdf8", "#fbbf24"]} sparkCount={8}>
             <Button
               onClick={() => onSelectMatch(match)}
-              className="h-9 px-4 rounded-xl bg-[#2dd4bf] hover:bg-[#14b8a6] text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-teal-500/20 active:scale-95 transition-all"
+              className="h-9 px-4 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-emerald-400/25 active:scale-95 transition-all"
             >
               <Handshake className="w-4 h-4 stroke-[2.5]" />
               <span>Nhận Kèo</span>

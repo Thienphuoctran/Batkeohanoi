@@ -134,9 +134,9 @@ export function HeaderBar({
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#0B1120]/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-emerald-500/20 bg-[#04160d]/85 backdrop-blur-xl">
       {/* 1. Magic UI Live Marquee Ticker */}
-      <div className="bg-slate-950/90 border-b border-slate-800/80 py-1.5 px-3 overflow-hidden flex items-center gap-2">
+      <div className="bg-[#020d07]/90 border-b border-emerald-950/80 py-1.5 px-3 overflow-hidden flex items-center gap-2">
         <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-black text-emerald-400 uppercase tracking-wider">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
           LIVE HN
@@ -157,7 +157,7 @@ export function HeaderBar({
       <div className="px-4 pt-3 pb-2.5 space-y-2.5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-slate-950 font-black text-base">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/25 text-slate-950 font-black text-base">
               7v7
             </div>
             <div>
@@ -180,7 +180,7 @@ export function HeaderBar({
             <button
               onClick={onToggleWideLayout}
               title="Chuyển đổi khung nhìn Mobile / Bento Dashboard"
-              className="hidden md:inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
+              className="hidden md:inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-slate-300 border border-emerald-500/25 transition"
             >
               {isWideLayout ? (
                 <Minimize2 className="w-4 h-4 text-emerald-400" />
@@ -192,7 +192,7 @@ export function HeaderBar({
             <button
               onClick={onOpenBotDrawer}
               title="Telegram Bot Webhook Logs (@BatkeoHanoi_bot)"
-              className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+              className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-slate-200 border border-emerald-500/25 transition"
             >
               <Bell className="w-4 h-4 text-sky-400" />
               {unreadBotCount > 0 && (
@@ -206,7 +206,7 @@ export function HeaderBar({
               <button
                 onClick={onOpenGuide}
                 title="Cẩm Nang Hướng Dẫn Sử Dụng BắtKèo7"
-                className="inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm"
+                className="inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-slate-200 border border-emerald-500/25 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm"
               >
                 <BookOpen className="w-3.5 h-3.5 text-sky-400" />
                 <span className="hidden sm:inline">Hướng Dẫn</span>
@@ -217,7 +217,7 @@ export function HeaderBar({
               <button
                 onClick={onOpenSupport}
                 title="Tư Vấn Khách Hàng & AI Trợ Lý BắtKèo7"
-                className="relative inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shadow-emerald-500/10"
+                className="relative inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/35 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shadow-emerald-500/10"
               >
                 <Bot className="w-4 h-4 text-emerald-400" />
                 <span className="hidden sm:inline">Tư Vấn</span>
@@ -228,7 +228,7 @@ export function HeaderBar({
             {!isAuthenticated ? (
               <button
                 onClick={onOpenAuthModal}
-                className="h-9 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition"
+                className="h-9 px-3 rounded-xl bg-[#0a2318] hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Đăng nhập / Tạo Đội</span>
@@ -244,7 +244,7 @@ export function HeaderBar({
             ) : (
               <button
                 onClick={() => setActiveTab("trust-profile")}
-                className="h-9 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition max-w-[140px]"
+                className="h-9 px-3 rounded-xl bg-[#0a2318] hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition max-w-[140px]"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <span className="truncate">{currentTeamName}</span>
@@ -255,11 +255,11 @@ export function HeaderBar({
             <button
               onClick={onOpenEscrowModal}
               title="Ví Ký Quỹ Nội Bộ (Bảo chứng 200k & Hoàn tiền tự động)"
-              className="h-9 px-2.5 sm:px-3 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/35 font-extrabold text-xs inline-flex items-center gap-1.5 transition"
+              className="h-9 px-2.5 sm:px-3 rounded-xl bg-[#0a2318] hover:bg-[#0e2f20] text-amber-300 border border-amber-500/35 font-extrabold text-xs inline-flex items-center gap-1.5 transition"
             >
-              <Wallet className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+              <Wallet className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="hidden sm:inline">Ví:</span>
-              <span className="tabular-nums font-mono text-sky-200">
+              <span className="tabular-nums font-mono text-amber-200">
                 {(escrowWallet?.balance ?? 0).toLocaleString("vi-VN")}đ
               </span>
               {escrowWallet && escrowWallet.lockedAmount > 0 && (
@@ -270,9 +270,10 @@ export function HeaderBar({
               )}
             </button>
 
+            {/* Concept 2: Nút Tạo Kèo Cam Lửa Bắt Mắt */}
             <Button
               onClick={onOpenCreateModal}
-              className="h-9 px-3.5 rounded-xl bg-[#22c55e] hover:bg-[#16a34a] text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-emerald-500/25 active:scale-95 transition-all"
+              className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-black text-xs gap-1.5 shadow-lg shadow-orange-500/30 active:scale-95 transition-all"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Tạo Kèo</span>
@@ -281,7 +282,7 @@ export function HeaderBar({
         </div>
 
         {/* 3. Hyper-Local Pitch Weather Radar Selector */}
-        <div className="rounded-xl bg-slate-900/95 border border-slate-800/90 px-3 py-2 flex flex-col gap-1.5">
+        <div className="rounded-xl bg-[#061e13]/90 border border-emerald-500/25 px-3 py-2 flex flex-col gap-1.5">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
               <CloudSun className="w-4 h-4 text-amber-400 shrink-0" />
@@ -320,7 +321,7 @@ export function HeaderBar({
         </div>
 
         {/* 4. 5-Tab Navigation Bar + Trust Profile Pill */}
-        <div className="grid grid-cols-5 gap-1.5 bg-slate-900/95 p-1 rounded-xl border border-slate-800/90 text-[11px] font-semibold">
+        <div className="grid grid-cols-5 gap-1.5 bg-[#061e13]/90 p-1.5 rounded-xl border border-emerald-500/20 text-[11px] font-semibold backdrop-blur-md">
           {navTabs.map((tab) => {
             const active = activeTab === tab.id;
             return (
@@ -329,10 +330,10 @@ export function HeaderBar({
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-2 px-1 rounded-lg flex items-center justify-center gap-1 transition-all ${
                   active
-                    ? "bg-emerald-500 text-slate-950 font-extrabold shadow-sm"
+                    ? "bg-emerald-500 text-slate-950 font-extrabold shadow-md shadow-emerald-500/20"
                     : tab.isSos
-                    ? "text-rose-400 hover:bg-slate-800/60 font-bold"
-                    : "text-slate-300 hover:text-white hover:bg-slate-800/50"
+                    ? "text-rose-400 hover:bg-[#0a2318] font-bold"
+                    : "text-slate-300 hover:text-white hover:bg-[#0a2318]"
                 }`}
               >
                 {tab.icon}
@@ -349,8 +350,8 @@ export function HeaderBar({
             onClick={() => setActiveTab("trust-profile")}
             className={`py-2 px-1 rounded-lg flex items-center justify-center gap-1 transition-all ${
               activeTab === "trust-profile"
-                ? "bg-emerald-500 text-slate-950 font-extrabold shadow-sm"
-                : "text-slate-300 hover:text-white hover:bg-slate-800/50"
+                ? "bg-emerald-500 text-slate-950 font-extrabold shadow-md shadow-emerald-500/20"
+                : "text-slate-300 hover:text-white hover:bg-[#0a2318]"
             }`}
           >
             <ShieldCheck className="w-3.5 h-3.5" />

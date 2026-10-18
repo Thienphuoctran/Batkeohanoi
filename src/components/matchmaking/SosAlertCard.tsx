@@ -14,6 +14,7 @@ import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { Button } from "@/components/ui/button";
 import { ClickSpark } from "@/components/reactbits/ClickSpark";
 import { LaserGlowCard } from "@/components/reactbits/LaserGlowCard";
+import { PhuiStamp } from "@/components/phui";
 
 interface SosAlertCardProps {
   match: MatchFeedItem;
@@ -46,7 +47,7 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
   const discountedShare = Math.max(150000, match.shareCostVnd - 125000);
 
   return (
-    <LaserGlowCard glowColor="red" speed={3.5} className="w-full">
+    <LaserGlowCard glowColor="red" speed={3.5} className="w-full relative overflow-hidden">
       {/* Top Urgent Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-rose-500/25">
         <div className="flex items-center gap-2">
@@ -54,6 +55,7 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
             <Flame className="w-3.5 h-3.5 fill-current animate-bounce" />
             SOS CẦN ĐỐI GẤP
           </span>
+          <PhuiStamp variant="sos-khan-cap" size="sm" angle={-6} className="hidden sm:inline-flex" />
           <span className="text-xs font-semibold text-rose-200/90">
             {match.cancellationReason || "Đối thủ hủy sát giờ (< 1 tiếng)"}
           </span>
