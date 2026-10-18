@@ -15,6 +15,8 @@ export interface PitchLocation {
     lat: number;
     lng: number;
   };
+  phone?: string;
+  managerPhone?: string;
 }
 
 export const SKILL_TIERS_CONFIG: Record<1 | 2 | 3, SkillTierInfo> = {

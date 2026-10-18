@@ -75,7 +75,7 @@ export function CancelMatchAppealModal({
         match.pitchName.toLowerCase().includes(p.name.toLowerCase()) ||
         p.name.toLowerCase().includes(match.pitchName.toLowerCase())
     );
-    return found?.phone || '';
+    return found?.phone || found?.managerPhone || '';
   }, [match]);
 
   const [reasonCategory, setReasonCategory] = useState<AppealReasonCategory>('WEATHER_FLOOD');
