@@ -8,41 +8,47 @@ import { sendTelegramAlert, sendTelegramPhoto } from "./telegram";
 import { normalizeVietnamPhone, isValidVietnamPhone } from "@/lib/zalo";
 
 function getAnonAuthClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    }
-  );
-}
-
+  const url = (
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    "https://lkvrdfqyyigdsxtipfcy.supabase.co"
+  )
+    .replace(/\/rest\/v1\/?$/, "")
+    .replace(/\/+$/, "");
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  return createClient(url, key, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
 async function getAuthenticatedUser() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("bk7_access_token")?.value;
-  const fallbackUserId = cookieStore.get("bk7_user_id")?.value;
-  const adminClient = getAdminClient();
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("bk7_access_token")?.value;
+    const fallbackUserId = cookieStore.get("bk7_user_id")?.value;
+    const adminClient = getAdminClient();
 
-  if (accessToken) {
-    const { data, error } = await adminClient.auth.getUser(accessToken);
-    if (!error && data.user) {
-      return data.user;
+    if (accessToken) {
+      const { data, error } = await adminClient.auth.getUser(accessToken);
+      if (!error && data?.user) {
+        return data.user;
+      }
     }
-  }
 
-  if (fallbackUserId) {
-    const { data, error } = await adminClient.auth.admin.getUserById(
-      fallbackUserId
-    );
-    if (!error && data.user) {
-      return data.user;
+    if (fallbackUserId) {
+      const { data, error } = await adminClient.auth.admin.getUserById(
+        fallbackUserId
+      );
+      if (!error && data?.user) {
+        return data.user;
+      }
     }
-  }
 
-  return null;
+    return null;
+  } catch (err) {
+    console.error("[getAuthenticatedUser Error]", err);
+    return null;
+  }
 }
 
 // 1. Lấy thông tin User hiện tại & Đội bóng họ đang làm Đội trưởng
@@ -80,162 +86,269 @@ export async function getCurrentUserAndTeamAction() {
 
 // 2. Đăng ký tài khoản bằng Email, SĐT Zalo & Mật khẩu (1 SĐT = 1 Đội trưởng duy nhất)
 export async function signUpWithEmailAction(formData: FormData) {
-  const email = (formData.get("email") as string)?.trim().toLowerCase();
-  const password = formData.get("password") as string;
-  const fullName = (formData.get("fullName") as string)?.trim();
-  const rawPhone = (formData.get("phone") as string)?.trim();
-  const phone = normalizeVietnamPhone(rawPhone || "");
+  try {
+    const email = (formData.get("email") as string)?.trim().toLowerCase();
+    const password = (formData.get("password") as string)?.trim();
+    const fullName = (formData.get("fullName") as string)?.trim();
+    const rawPhone = (formData.get("phone") as string)?.trim();
+    const phone = normalizeVietnamPhone(rawPhone || "");
 
-  if (!email || !password || !fullName || !phone) {
-    return {
-      success: false,
-      message: "Vui lòng điền đầy đủ các thông tin bắt buộc.",
-    };
-  }
+    if (!email || !password || !fullName || !phone) {
+      return {
+        success: false,
+        message: "Vui lòng điền đầy đủ các thông tin bắt buộc.",
+      };
+    }
 
-  if (!isValidVietnamPhone(phone)) {
-    return {
-      success: false,
-      message:
-        "Số điện thoại không hợp lệ. Vui lòng nhập đúng SĐT di động 10 số Việt Nam (09/03/07/08/05).",
-    };
-  }
+    if (!isValidVietnamPhone(phone)) {
+      return {
+        success: false,
+        message:
+          "Số điện thoại không hợp lệ. Vui lòng nhập đúng SĐT di động 10 số Việt Nam (09/03/07/08/05).",
+      };
+    }
 
-  const adminClient = getAdminClient();
+    const adminClient = getAdminClient();
 
-  // Kiểm tra SĐT đã gắn với Đội trưởng nào chưa (Chống tạo acc phụ bùng kèo)
-  const { data: existingUser } = await adminClient
-    .from("users")
-    .select("id, full_name")
-    .eq("phone", phone)
-    .maybeSingle();
+    // Kiểm tra SĐT đã gắn với Đội trưởng nào chưa (Chống tạo acc phụ bùng kèo)
+    const { data: existingUser } = await adminClient
+      .from("users")
+      .select("id, full_name")
+      .eq("phone", phone)
+      .maybeSingle();
 
-  if (existingUser) {
-    return {
-      success: false,
-      message: `Số điện thoại ${phone} đã được đăng ký bởi đội trưởng ${existingUser.full_name}. Mỗi số điện thoại chỉ gắn với 1 đội bóng duy nhất để đảm bảo tính minh bạch!`,
-    };
-  }
+    if (existingUser) {
+      return {
+        success: false,
+        message: `Số điện thoại ${phone} đã được đăng ký bởi đội trưởng ${existingUser.full_name}. Mỗi số điện thoại chỉ gắn với 1 đội bóng duy nhất để đảm bảo tính minh bạch!`,
+      };
+    }
 
-  // Tạo tài khoản qua Admin API với email_confirm: true để vào thẳng không bị kẹt mail xác nhận
-  const { data: createdAuth, error: createError } =
-    await adminClient.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { full_name: fullName, phone },
+    // Tạo tài khoản qua Admin API với email_confirm: true để vào thẳng không bị kẹt mail xác nhận
+    const { data: createdAuth, error: createError } =
+      await adminClient.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { full_name: fullName, phone },
+      });
+
+    if (createError || !createdAuth?.user) {
+      const msg = createError?.message?.includes("already")
+        ? "Email này đã được đăng ký. Vui lòng chuyển sang tab Đăng nhập!"
+        : createError?.message || "Không thể tạo tài khoản.";
+      return { success: false, message: msg };
+    }
+
+    // Lưu vào bảng public.users
+    await adminClient.from("users").upsert({
+      id: createdAuth.user.id,
+      full_name: fullName,
+      phone: phone,
+      is_phone_verified: true,
     });
 
-  if (createError || !createdAuth.user) {
-    const msg = createError?.message?.includes("already")
-      ? "Email này đã được đăng ký. Vui lòng chuyển sang tab Đăng nhập!"
-      : createError?.message || "Không thể tạo tài khoản.";
-    return { success: false, message: msg };
-  }
+    // Đăng nhập tự động lấy session token lưu vào Cookie
+    const anonClient = getAnonAuthClient();
+    const { data: signInData } = await anonClient.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  // Lưu vào bảng public.users
-  await adminClient.from("users").upsert({
-    id: createdAuth.user.id,
-    full_name: fullName,
-    phone: phone,
-    is_phone_verified: true,
-  });
-
-  // Đăng nhập tự động lấy session token lưu vào Cookie
-  const anonClient = getAnonAuthClient();
-  const { data: signInData } = await anonClient.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  const cookieStore = await cookies();
-  if (signInData.session) {
-    cookieStore.set("bk7_access_token", signInData.session.access_token, {
+    const cookieStore = await cookies();
+    if (signInData?.session?.access_token) {
+      cookieStore.set("bk7_access_token", signInData.session.access_token, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+    }
+    cookieStore.set("bk7_user_id", createdAuth.user.id, {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 30,
     });
-  }
-  cookieStore.set("bk7_user_id", createdAuth.user.id, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 30,
-  });
 
-  revalidatePath("/");
-  return {
-    success: true,
-    message:
-      "Đăng ký tài khoản thành công! Hãy tiếp tục tạo hồ sơ đội bóng của bạn.",
-  };
+    revalidatePath("/");
+    return {
+      success: true,
+      message:
+        "Đăng ký tài khoản thành công! Hãy tiếp tục tạo hồ sơ đội bóng của bạn.",
+    };
+  } catch (err: any) {
+    console.error("[signUpWithEmailAction Error]", err);
+    return {
+      success: false,
+      message: err?.message || "Đã xảy ra lỗi khi tạo tài khoản. Vui lòng thử lại.",
+    };
+  }
 }
 
 // 3. Đăng nhập bằng Email (hoặc Số điện thoại) & Mật khẩu
 export async function signInWithEmailAction(formData: FormData) {
-  let identifier = (formData.get("email") as string)?.trim();
-  const password = formData.get("password") as string;
+  try {
+    let identifier = (formData.get("email") as string)?.trim();
+    const password = (formData.get("password") as string)?.trim();
 
-  if (!identifier || !password) {
-    return {
-      success: false,
-      message: "Vui lòng nhập Email (hoặc SĐT) và mật khẩu.",
-    };
-  }
+    if (!identifier || !password) {
+      return {
+        success: false,
+        message: "Vui lòng nhập Email (hoặc SĐT) và mật khẩu.",
+      };
+    }
 
-  const adminClient = getAdminClient();
+    const adminClient = getAdminClient();
 
-  // Hỗ trợ đăng nhập thông minh bằng cả Số điện thoại lẫn Email
-  if (!identifier.includes("@")) {
-    const normalizedPhone = normalizeVietnamPhone(identifier);
-    const { data: userByPhone } = await adminClient
-      .from("users")
-      .select("id")
-      .eq("phone", normalizedPhone)
-      .maybeSingle();
+    // Hỗ trợ đăng nhập thông minh bằng cả Số điện thoại lẫn Email
+    if (!identifier.includes("@")) {
+      const normalizedPhone = normalizeVietnamPhone(identifier);
+      const { data: userByPhone } = await adminClient
+        .from("users")
+        .select("id")
+        .eq("phone", normalizedPhone)
+        .maybeSingle();
 
-    if (userByPhone?.id) {
-      const { data: authUser } = await adminClient.auth.admin.getUserById(
-        userByPhone.id
-      );
-      if (authUser?.user?.email) {
-        identifier = authUser.user.email;
+      if (userByPhone?.id) {
+        const { data: authUser } = await adminClient.auth.admin.getUserById(
+          userByPhone.id
+        );
+        if (authUser?.user?.email) {
+          identifier = authUser.user.email;
+        }
+      } else {
+        return {
+          success: false,
+          message: `Số điện thoại ${identifier} chưa từng đăng ký tài khoản. Vui lòng bấm tab "Tạo tài khoản" bên cạnh để đăng ký nhé!`,
+        };
       }
     }
-  }
 
-  const anonClient = getAnonAuthClient();
-  const { data, error } = await anonClient.auth.signInWithPassword({
-    email: identifier,
-    password,
-  });
+    const anonClient = getAnonAuthClient();
+    const { data, error } = await anonClient.auth.signInWithPassword({
+      email: identifier,
+      password,
+    });
 
-  if (error || !data.user) {
+    if (error || !data?.user) {
+      const isInvalidCreds =
+        error?.message?.toLowerCase().includes("invalid login credentials") ||
+        error?.message?.toLowerCase().includes("invalid grant");
+      return {
+        success: false,
+        message: isInvalidCreds
+          ? "Sai mật khẩu hoặc tài khoản chưa từng được đăng ký. Nếu chưa có tài khoản, vui lòng bấm tab 'Tạo tài khoản' bên cạnh!"
+          : error?.message || "Sai thông tin đăng nhập. Vui lòng kiểm tra lại.",
+      };
+    }
+
+    const cookieStore = await cookies();
+    if (data?.session?.access_token) {
+      cookieStore.set("bk7_access_token", data.session.access_token, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+    }
+    if (data?.user?.id) {
+      cookieStore.set("bk7_user_id", data.user.id, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+    }
+
+    revalidatePath("/");
+    return { success: true, message: "Đăng nhập thành công!" };
+  } catch (err: any) {
+    console.error("[signInWithEmailAction Error]", err);
     return {
       success: false,
-      message: "Sai thông tin Email/SĐT hoặc mật khẩu đăng nhập.",
+      message: err?.message || "Lỗi hệ thống khi đăng nhập. Vui lòng thử lại.",
     };
   }
+}
 
-  const cookieStore = await cookies();
-  if (data.session) {
-    cookieStore.set("bk7_access_token", data.session.access_token, {
-      path: "/",
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 30,
-    });
+// 3.1. Đăng nhập nhanh Trải nghiệm Đội trưởng Mẫu (1-Chạm không cần mật khẩu)
+export async function signInAsDemoCaptainAction() {
+  try {
+    const adminClient = getAdminClient();
+    const demoPhone = "0988666888";
+    const demoEmail = "fc.caugiay.captain@giaohuu.vn";
+    const demoName = "Đội Trưởng FC Cầu Giấy";
+
+    let { data: existingUser } = await adminClient
+      .from("users")
+      .select("id, full_name, phone")
+      .eq("phone", demoPhone)
+      .maybeSingle();
+
+    let userId = existingUser?.id;
+
+    if (!userId) {
+      const { data: authUser } = await adminClient.auth.admin.createUser({
+        email: demoEmail,
+        password: "Demopassword123@",
+        email_confirm: true,
+        user_metadata: { full_name: demoName, phone: demoPhone },
+      });
+
+      if (authUser?.user?.id) {
+        userId = authUser.user.id;
+        await adminClient.from("users").upsert({
+          id: userId,
+          full_name: demoName,
+          phone: demoPhone,
+          is_phone_verified: true,
+        });
+      }
+    }
+
+    if (userId) {
+      const { data: existingTeam } = await adminClient
+        .from("teams")
+        .select("id")
+        .eq("captain_id", userId)
+        .maybeSingle();
+
+      if (!existingTeam) {
+        await adminClient.from("teams").insert({
+          captain_id: userId,
+          team_name: "FC Cầu Giấy Phủi",
+          captain_name: demoName,
+          captain_phone: demoPhone,
+          captain_zalo: demoPhone,
+          jersey_color: "Xanh lá / Đen",
+          avg_age: 26,
+          skill_tier: 2,
+          trust_score: 100,
+          home_district: "CauGiay",
+        });
+      }
+
+      const cookieStore = await cookies();
+      cookieStore.set("bk7_user_id", userId, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+
+      revalidatePath("/");
+      return { success: true, message: "Đăng nhập Đội trưởng Mẫu thành công!" };
+    }
+
+    return { success: false, message: "Không thể tạo tài khoản mẫu." };
+  } catch (err: any) {
+    console.error("[signInAsDemoCaptainAction Error]", err);
+    return {
+      success: false,
+      message: err?.message || "Lỗi khi đăng nhập tài khoản mẫu.",
+    };
   }
-  cookieStore.set("bk7_user_id", data.user.id, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 30,
-  });
-
-  revalidatePath("/");
-  return { success: true, message: "Đăng nhập thành công!" };
 }
 
 // 4. Đăng xuất
