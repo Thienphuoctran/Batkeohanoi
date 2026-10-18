@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   MapPin,
   Shield,
@@ -14,6 +15,7 @@ import {
   Volume2,
   Trophy,
   Plus,
+  Lock,
 } from "lucide-react";
 import { MOCK_MATCH_FEEDS, MOCK_TEAMS } from "@/constants/mockMatchmaking";
 import { District, MatchFeedItem, SkillTier, EscrowWallet, BankWithdrawInfo } from "@/types/matchmaking";
@@ -954,6 +956,27 @@ export default function HanoiMatchmakingPlatform() {
             </div>
           )}
         </main>
+
+        {/* Footer kín đáo & liên kết Quản trị ẩn */}
+        <footer className="mt-12 pb-6 border-t border-slate-900/90 pt-6 text-center text-xs text-slate-500 space-y-2">
+          <p className="font-medium text-slate-400">
+            © 2026 BắtKèo7 Hà Nội • Nền tảng Ghép Đối & Chống Bùng Kèo Sân Cỏ Phủi
+          </p>
+          <div className="flex items-center justify-center gap-3 text-[11px] text-slate-600">
+            <span>Tiêu chuẩn Sân 7 Hà Nội</span>
+            <span>•</span>
+            <span>Bảo chứng VietQR Napas247</span>
+            <span>•</span>
+            <Link
+              href="/admin"
+              className="text-slate-600 hover:text-slate-400 transition-colors inline-flex items-center gap-1 opacity-50 hover:opacity-100"
+              title="Quản trị hệ thống (Khóa PIN)"
+            >
+              <Lock className="w-2.5 h-2.5" />
+              <span>Quản trị</span>
+            </Link>
+          </div>
+        </footer>
       </div>
 
       {/* Modal Khớp Kèo */}

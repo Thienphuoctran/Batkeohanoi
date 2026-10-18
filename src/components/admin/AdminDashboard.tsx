@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import {
   ShieldCheck,
   Lock,
@@ -111,6 +112,12 @@ export function AdminDashboard() {
   const [rejectingAppealId, setRejectingAppealId] = useState<string | null>(null);
   const [rejectNote, setRejectNote] = useState('');
   const [qrPreviewRecord, setQrPreviewRecord] = useState<EscrowRecordItem | null>(null);
+  const [forfeitingRecord, setForfeitingRecord] = useState<EscrowRecordItem | null>(null);
+  const [victimTeamName, setVictimTeamName] = useState('');
+  const [victimBankBin, setVictimBankBin] = useState('MB');
+  const [victimAccountNo, setVictimAccountNo] = useState('');
+  const [victimAccountName, setVictimAccountName] = useState('');
+  const [forfeitOption, setForfeitOption] = useState<'VICTIM' | 'SOS'>('VICTIM');
   const [actionToast, setActionToast] = useState<string | null>(null);
 
   // Broadcast form
@@ -194,7 +201,7 @@ export function AdminDashboard() {
     () =>
       escrowRecords
         .filter((r) => r.status === 'FORFEITED_TO_SOS_FUND')
-        .reduce((sum, r) => sum + r.amount, 0) + 400000, // Kèm 400k quỹ ban đầu
+        .reduce((sum, r) => sum + r.amount, 0),
     [escrowRecords]
   );
 
@@ -306,14 +313,30 @@ export function AdminDashboard() {
     showToast(`💸 Bước 2 hoàn tất: Đã xác nhận hoàn cọc 200.000đ về ${record.bankShortName || 'ngân hàng'} cho ${record.teamName}!`);
   };
 
-  const handleEscrowStep3Forfeit = (record: EscrowRecordItem) => {
-    const next = updateStoredEscrowStatus(
-      record.id,
-      'FORFEITED_TO_SOS_FUND',
-      'Tịch thu 200.000đ do vi phạm bùng kèo sát giờ — Chuyển vào Quỹ Cứu Trợ Kèo SOS.'
-    );
+  const handleOpenForfeitModal = (record: EscrowRecordItem) => {
+    setForfeitingRecord(record);
+    setForfeitOption('VICTIM');
+    setVictimTeamName('');
+    setVictimAccountNo('');
+    setVictimAccountName('');
+  };
+
+  const handleConfirmForfeitToVictim = () => {
+    if (!forfeitingRecord) return;
+    const note = `Đã tịch thu cọc 200.000đ của ${forfeitingRecord.teamName} do bùng kèo & bồi hoàn tiền sân cho ${victimTeamName || 'Đội bị bùng'} (${victimBankBin} - ${victimAccountNo || 'Đã nhận'}).`;
+    const next = updateStoredEscrowStatus(forfeitingRecord.id, 'FORFEITED', note);
     setEscrowRecords(next);
-    showToast(`🔥 Bước 3: Đã tịch thu 200.000đ của ${record.teamName} nạp vào Quỹ Cứu Trợ Kèo SOS!`);
+    setForfeitingRecord(null);
+    showToast(`🛡️ Đã tịch thu cọc 200.000đ của ${forfeitingRecord.teamName} & bồi hoàn tiền sân cho ${victimTeamName || 'Đội bị bùng'}!`);
+  };
+
+  const handleConfirmForfeitToSos = () => {
+    if (!forfeitingRecord) return;
+    const note = `Tịch thu 200.000đ của ${forfeitingRecord.teamName} do bùng kèo — Chuyển vào Quỹ Cứu Trợ Kèo SOS.`;
+    const next = updateStoredEscrowStatus(forfeitingRecord.id, 'FORFEITED_TO_SOS_FUND', note);
+    setEscrowRecords(next);
+    setForfeitingRecord(null);
+    showToast(`🔥 Đã tịch thu 200.000đ của ${forfeitingRecord.teamName} nạp vào Quỹ Cứu Trợ Kèo SOS!`);
   };
 
   // Proposal 5: Emergency Broadcast Handler
@@ -590,14 +613,6 @@ export function AdminDashboard() {
                     Khi đội bóng bấm <strong>&quot;Hủy Kèo / Xóa Kèo&quot;</strong> trên trang chủ trong trường hợp bị trừ điểm (hủy sát giờ hoặc đã chốt đối), đơn kháng cáo từ <strong>Hộp Kháng Cáo</strong> sẽ đổ trực tiếp về đây.
                   </CardDescription>
                 </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleCreateDemoAppeal}
-                  className="border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 text-xs font-bold rounded-xl"
-                >
-                  + Tạo Đơn Kháng Cáo Mẫu Để Test
-                </Button>
               </CardHeader>
 
               <CardContent className="p-4 space-y-3.5">
@@ -797,114 +812,120 @@ export function AdminDashboard() {
               </CardHeader>
 
               <CardContent className="p-4 space-y-3">
-                {escrowRecords.map((rec) => {
-                  const bin = rec.bankBin || rec.bankCode || '970422';
-                  const accNo = rec.bankAccountNo || rec.accountNumber || '07440948327598';
-                  const code = rec.transferCode || rec.id;
-                  const accName = rec.bankAccountName || rec.accountName || 'CHU TAI KHOAN';
+                {escrowRecords.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400 text-sm">
+                    Hiện chưa có giao dịch ký quỹ nào trong hệ thống.
+                  </div>
+                ) : (
+                  escrowRecords.map((rec) => {
+                    const bin = rec.bankBin || rec.bankCode || '970422';
+                    const accNo = rec.bankAccountNo || rec.accountNumber || '07440948327598';
+                    const code = rec.transferCode || rec.id;
+                    const accName = rec.bankAccountName || rec.accountName || 'CHU TAI KHOAN';
 
-                  const vietQrUrl = `https://img.vietqr.io/image/${bin}-${accNo}-compact2.png?amount=${rec.amount}&addInfo=${encodeURIComponent(
-                    `HOAN COC ${code}`
-                  )}&accountName=${encodeURIComponent(accName)}`;
+                    const vietQrUrl = `https://img.vietqr.io/image/${bin}-${accNo}-compact2.png?amount=${rec.amount}&addInfo=${encodeURIComponent(
+                      `HOAN COC ${code}`
+                    )}&accountName=${encodeURIComponent(accName)}`;
 
-                  return (
-                    <div
-                      key={rec.id}
-                      className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
-                    >
-                      <div className="space-y-1.5">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Badge className="bg-sky-500/15 text-sky-300 border-sky-500/30 font-mono text-xs">
-                            {rec.transferCode}
-                          </Badge>
-                          <span className="text-sm font-black text-white">{rec.teamName}</span>
-                          <span className="text-xs text-slate-400">
-                            • ĐT: {rec.captainName} ({rec.captainPhone})
-                          </span>
-                          <Badge
-                            className={
-                              rec.status === 'PENDING_APPROVAL'
-                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 text-[10px]'
-                                : rec.status === 'LOCKED_IN_MATCH'
-                                ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 text-[10px]'
-                                : rec.status === 'WITHDRAW_REQUESTED'
-                                ? 'bg-purple-500/20 text-purple-300 border-purple-500/40 text-[10px] animate-pulse'
-                                : rec.status === 'REFUNDED'
-                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px]'
-                                : 'bg-rose-500/20 text-rose-300 border-rose-500/40 text-[10px]'
-                            }
-                          >
-                            {rec.status === 'PENDING_APPROVAL' && '⏳ BƯỚC 1: CHỜ DUYỆT NẠP CỌC 200K'}
-                            {rec.status === 'LOCKED_IN_MATCH' && '🔒 ĐANG TẠM GIỮ TRONG KÈO'}
-                            {rec.status === 'WITHDRAW_REQUESTED' && '💸 BƯỚC 2: YÊU CẦU RÚT / HOÀN CỌC 200K'}
-                            {rec.status === 'REFUNDED' && '✅ ĐÃ HOÀN CỌC 100% VỀ STK ĐỘI'}
-                            {rec.status === 'FORFEITED_TO_SOS_FUND' && '🔥 ĐÃ TỊCH THU VÀO QUỸ SOS'}
-                          </Badge>
-                        </div>
-
-                        <div className="text-xs text-slate-400 flex flex-wrap items-center gap-3">
-                          <span>🏟️ {rec.pitchName}</span>
-                          <span>🕒 {rec.timeSlot}</span>
-                          <span className="text-slate-300">
-                            <Building2 className="w-3.5 h-3.5 inline mr-1 text-sky-400" />
-                            STK Nhận hoàn:{' '}
-                            <strong>
-                              {rec.bankShortName} - {rec.bankAccountNo} ({rec.bankAccountName})
-                            </strong>
-                          </span>
-                        </div>
-
-                        {rec.note && (
-                          <p className="text-[11px] text-emerald-400/90 italic">📌 {rec.note}</p>
-                        )}
-                      </div>
-
-                      {/* 3-Step Action Buttons */}
-                      <div className="flex flex-wrap items-center gap-2 shrink-0">
-                        {rec.status === 'PENDING_APPROVAL' && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleEscrowStep1ApproveDeposit(rec)}
-                            className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs h-9 rounded-xl"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
-                            Bước 1: Duyệt Cọc 200k & Mở Khóa Kèo
-                          </Button>
-                        )}
-
-                        {(rec.status === 'LOCKED_IN_MATCH' ||
-                          rec.status === 'WITHDRAW_REQUESTED') && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() =>
-                                setQrPreviewRecord(qrPreviewRecord?.id === rec.id ? null : rec)
+                    return (
+                      <div
+                        key={rec.id}
+                        className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+                      >
+                        <div className="space-y-1.5">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge className="bg-sky-500/15 text-sky-300 border-sky-500/30 font-mono text-xs">
+                              {rec.transferCode}
+                            </Badge>
+                            <span className="text-sm font-black text-white">{rec.teamName}</span>
+                            <span className="text-xs text-slate-400">
+                              • ĐT: {rec.captainName} ({rec.captainPhone})
+                            </span>
+                            <Badge
+                              className={
+                                rec.status === 'PENDING_APPROVAL'
+                                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 text-[10px]'
+                                  : rec.status === 'LOCKED_IN_MATCH'
+                                  ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 text-[10px]'
+                                  : rec.status === 'WITHDRAW_REQUESTED'
+                                  ? 'bg-purple-500/20 text-purple-300 border-purple-500/40 text-[10px] animate-pulse'
+                                  : rec.status === 'REFUNDED'
+                                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px]'
+                                  : 'bg-rose-500/20 text-rose-300 border-rose-500/40 text-[10px]'
                               }
-                              className="border-sky-500/40 bg-sky-500/10 text-sky-300 hover:bg-sky-500/20 font-bold text-xs h-9 rounded-xl"
                             >
-                              <QrCode className="w-3.5 h-3.5 mr-1.5" />
-                              Quét VietQR Hoàn 200k
-                            </Button>
+                              {rec.status === 'PENDING_APPROVAL' && '⏳ BƯỚC 1: CHỜ DUYỆT NẠP CỌC 200K'}
+                              {rec.status === 'LOCKED_IN_MATCH' && '🔒 ĐANG TẠM GIỮ TRONG KÈO'}
+                              {rec.status === 'WITHDRAW_REQUESTED' && '💸 BƯỚC 2: YÊU CẦU RÚT / HOÀN CỌC 200K'}
+                              {rec.status === 'REFUNDED' && '✅ ĐÃ HOÀN CỌC 100% VỀ STK ĐỘI'}
+                              {rec.status === 'FORFEITED' && '🛡️ ĐÃ BỒI THƯỜNG CHO ĐỘI BỊ BÙNG'}
+                              {rec.status === 'FORFEITED_TO_SOS_FUND' && '🔥 ĐÃ TỊCH THU VÀO QUỸ SOS'}
+                            </Badge>
+                          </div>
+
+                          <div className="text-xs text-slate-400 flex flex-wrap items-center gap-3">
+                            <span>🏟️ {rec.pitchName}</span>
+                            <span>🕒 {rec.timeSlot}</span>
+                            <span className="text-slate-300">
+                              <Building2 className="w-3.5 h-3.5 inline mr-1 text-sky-400" />
+                              STK Nhận hoàn:{' '}
+                              <strong>
+                                {rec.bankShortName} - {rec.bankAccountNo} ({rec.bankAccountName})
+                              </strong>
+                            </span>
+                          </div>
+
+                          {rec.note && (
+                            <p className="text-[11px] text-emerald-400/90 italic">📌 {rec.note}</p>
+                          )}
+                        </div>
+
+                        {/* 3-Step Action Buttons */}
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          {rec.status === 'PENDING_APPROVAL' && (
                             <Button
                               size="sm"
-                              onClick={() => handleEscrowStep2Refund(rec)}
+                              onClick={() => handleEscrowStep1ApproveDeposit(rec)}
                               className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs h-9 rounded-xl"
                             >
                               <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
-                              Bước 2: Xác Nhận Đã Hoàn 100%
+                              Bước 1: Duyệt Cọc 200k & Mở Khóa Kèo
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleEscrowStep3Forfeit(rec)}
-                              className="border-rose-500/40 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 font-bold text-xs h-9 rounded-xl"
-                            >
-                              <AlertTriangle className="w-3.5 h-3.5 mr-1.5" />
-                              Bước 3: Tịch Thu Cọc (Bùng Kèo)
-                            </Button>
-                          </>
-                        )}
+                          )}
+
+                          {(rec.status === 'LOCKED_IN_MATCH' ||
+                            rec.status === 'WITHDRAW_REQUESTED') && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  setQrPreviewRecord(qrPreviewRecord?.id === rec.id ? null : rec)
+                                }
+                                className="border-sky-500/40 bg-sky-500/10 text-sky-300 hover:bg-sky-500/20 font-bold text-xs h-9 rounded-xl"
+                              >
+                                <QrCode className="w-3.5 h-3.5 mr-1.5" />
+                                Quét VietQR Hoàn 200k
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => handleEscrowStep2Refund(rec)}
+                                className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs h-9 rounded-xl"
+                              >
+                                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
+                                Bước 2: Xác Nhận Đã Hoàn 100%
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleOpenForfeitModal(rec)}
+                                className="border-rose-500/40 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 font-bold text-xs h-9 rounded-xl"
+                              >
+                                <AlertTriangle className="w-3.5 h-3.5 mr-1.5" />
+                                Bước 3: Tịch Thu Cọc (Bùng Kèo)
+                              </Button>
+                            </>
+                          )}
 
                         {/* VietQR Inline Drawer when clicked */}
                         {qrPreviewRecord?.id === rec.id && (
@@ -936,7 +957,7 @@ export function AdminDashboard() {
                       </div>
                     </div>
                   );
-                })}
+                }))}
               </CardContent>
             </Card>
           </TabsContent>
@@ -1184,6 +1205,180 @@ export function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* MODAL TỊCH THU CỌC & BỒI THƯỜNG ĐỘI BỊ BÙNG */}
+      {forfeitingRecord && (
+        <Dialog open={!!forfeitingRecord} onOpenChange={(open) => !open && setForfeitingRecord(null)}>
+          <DialogContent className="bg-slate-950 border border-slate-800 text-slate-100 max-w-lg p-5 rounded-2xl shadow-2xl space-y-4">
+            <DialogHeader>
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-400 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div>
+                  <DialogTitle className="text-base font-black text-white">
+                    Tịch Thu Cọc 200k &amp; Bồi Thường Bùng Kèo
+                  </DialogTitle>
+                  <DialogDescription className="text-xs text-slate-400">
+                    Xử lý chế tài vi phạm bùng kèo sân cỏ nhân tạo
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+
+            {/* Thông tin đội bùng */}
+            <div className="p-3 rounded-xl bg-rose-950/20 border border-rose-500/30 text-xs space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-rose-300 font-bold">Đội vi phạm bùng kèo:</span>
+                <Badge className="bg-rose-500/20 text-rose-300 border-rose-500/40 text-[10px]">
+                  Tịch thu: 200.000 VNĐ
+                </Badge>
+              </div>
+              <p className="text-white font-black text-sm">{forfeitingRecord.teamName}</p>
+              <p className="text-slate-400">
+                Đội trưởng: <strong>{forfeitingRecord.captainName}</strong> ({forfeitingRecord.captainPhone})
+              </p>
+              <p className="text-slate-400">
+                Trận đấu: <strong>{forfeitingRecord.pitchName}</strong> ({forfeitingRecord.timeSlot})
+              </p>
+            </div>
+
+            {/* Chọn hướng giải quyết 200k */}
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-slate-200">
+                Chọn phương án xử lý số tiền 200.000đ tịch thu:
+              </Label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setForfeitOption('VICTIM')}
+                  className={`p-3 rounded-xl border text-left transition ${
+                    forfeitOption === 'VICTIM'
+                      ? 'bg-emerald-500/15 border-emerald-500/60 text-white shadow-sm'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  <div className="text-xs font-black text-emerald-300">
+                    🎯 Đền Bù Đội Bị Bùng
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">
+                    Chuyển 200k bù tiền sân cho đội có mặt
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForfeitOption('SOS')}
+                  className={`p-3 rounded-xl border text-left transition ${
+                    forfeitOption === 'SOS'
+                      ? 'bg-amber-500/15 border-amber-500/60 text-white shadow-sm'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  <div className="text-xs font-black text-amber-300">
+                    🔥 Quỹ Cứu Trợ SOS
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">
+                    Nạp vào quỹ trợ giá kèo thiếu người
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Form chi tiết khi chọn bồi thường cho đội bị bùng */}
+            {forfeitOption === 'VICTIM' ? (
+              <div className="space-y-3 p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs">
+                <div className="space-y-1">
+                  <Label className="text-[11px] font-bold text-slate-300">
+                    Tên Đội bóng bị bùng (Đội nạn nhân có mặt tại sân):
+                  </Label>
+                  <Input
+                    placeholder="VD: FC Anh Em Cầu Giấy"
+                    value={victimTeamName}
+                    onChange={(e) => setVictimTeamName(e.target.value)}
+                    className="h-9 bg-slate-950 border-slate-800 text-xs text-white"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[11px] font-bold text-slate-300">Ngân hàng:</Label>
+                    <select
+                      value={victimBankBin}
+                      onChange={(e) => setVictimBankBin(e.target.value)}
+                      className="w-full h-9 rounded-xl bg-slate-950 border border-slate-800 px-2.5 text-xs text-white"
+                    >
+                      <option value="MB">MBBank</option>
+                      <option value="VCB">Vietcombank</option>
+                      <option value="TCB">Techcombank</option>
+                      <option value="BIDV">BIDV</option>
+                      <option value="ICB">VietinBank</option>
+                      <option value="ACB">ACB</option>
+                      <option value="VPB">VPBank</option>
+                      <option value="TPB">TPBank</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11px] font-bold text-slate-300">Số tài khoản nhận bồi thường:</Label>
+                    <Input
+                      placeholder="VD: 0988777666"
+                      value={victimAccountNo}
+                      onChange={(e) => setVictimAccountNo(e.target.value)}
+                      className="h-9 bg-slate-950 border-slate-800 text-xs text-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-[11px] font-bold text-slate-300">Tên chủ tài khoản:</Label>
+                  <Input
+                    placeholder="VD: NGUYEN VAN A"
+                    value={victimAccountName}
+                    onChange={(e) => setVictimAccountName(e.target.value.toUpperCase())}
+                    className="h-9 bg-slate-950 border-slate-800 text-xs text-white font-mono uppercase"
+                  />
+                </div>
+
+                {victimAccountNo.trim() && (
+                  <div className="pt-2 flex items-center gap-3 bg-slate-950 p-2.5 rounded-xl border border-emerald-500/30">
+                    <img
+                      src={`https://img.vietqr.io/image/${victimBankBin}-${victimAccountNo.trim()}-compact2.png?amount=200000&addInfo=${encodeURIComponent(
+                        'BOI THUONG TIEN SAN'
+                      )}&accountName=${encodeURIComponent(victimAccountName.trim() || 'DOI BI BUNG')}`}
+                      alt="VietQR Bồi Thường"
+                      className="w-24 h-24 bg-white p-1 rounded-lg shrink-0 object-contain"
+                    />
+                    <div className="space-y-1 text-[11px] text-slate-300">
+                      <p className="font-bold text-emerald-300">⚡ Quét VietQR Bắn 200.000đ Bồi Thường</p>
+                      <p className="text-slate-400">Admin mở app ngân hàng quét mã để chuyển 200k đền bù tiền sân cho đội bị bùng.</p>
+                    </div>
+                  </div>
+                )}
+
+                <Button
+                  onClick={handleConfirmForfeitToVictim}
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs h-10 rounded-xl shadow-lg shadow-emerald-500/20"
+                >
+                  <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                  Xác Nhận Đã Chuyển 200.000đ Đền Bù Tiền Sân
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3 p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs">
+                <p className="text-slate-300 leading-relaxed">
+                  Toàn bộ <strong>200.000 VNĐ</strong> tiền cọc của đội bùng kèo sẽ được chuyển thẳng vào <strong>Quỹ Cứu Trợ Kèo SOS</strong>. Quỹ này dùng để tài trợ 100.000đ - 150.000đ tiền nước cho các đội nhận kèo cứu hộ giờ vàng tối nay!
+                </p>
+                <Button
+                  onClick={handleConfirmForfeitToSos}
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs h-10 rounded-xl shadow-lg shadow-amber-500/20"
+                >
+                  <Flame className="w-4 h-4 mr-1.5" />
+                  Nạp 200.000đ Vào Quỹ Cứu Trợ SOS
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

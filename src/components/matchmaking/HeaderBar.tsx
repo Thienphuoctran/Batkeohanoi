@@ -181,15 +181,6 @@ export function HeaderBar({
               )}
             </button>
 
-            <Link
-              href="/admin"
-              title="Trung Tâm Quản Trị Dự Án BắtKèo7 (Admin Hub - PIN: 777888)"
-              className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 font-extrabold text-xs transition"
-            >
-              <Scale className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span className="hidden sm:inline">Admin Hub</span>
-            </Link>
-
             <button
               onClick={onOpenBotDrawer}
               title="Telegram Bot Webhook Logs (@BatkeoHanoi_bot)"

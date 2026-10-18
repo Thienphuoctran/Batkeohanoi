@@ -1,8 +1,8 @@
 import { MatchAppealItem, EscrowRecordItem, AppealReasonCategory } from '@/types/matchmaking';
 
-const APPEALS_STORAGE_KEY = 'batkeo7_admin_appeals_v1';
-const ESCROW_STORAGE_KEY = 'batkeo7_admin_escrow_v1';
-const BROADCAST_STORAGE_KEY = 'batkeo7_admin_broadcasts_v1';
+const APPEALS_STORAGE_KEY = 'batkeo7_admin_appeals_v2';
+const ESCROW_STORAGE_KEY = 'batkeo7_admin_escrow_v2';
+const BROADCAST_STORAGE_KEY = 'batkeo7_admin_broadcasts_v2';
 
 export interface EmergencyBroadcastItem {
   id: string;
@@ -12,105 +12,9 @@ export interface EmergencyBroadcastItem {
   createdAt: string;
 }
 
-export const INITIAL_APPEALS: MatchAppealItem[] = [
-  {
-    id: 'AP-01',
-    matchId: 'm-appeal-1',
-    teamId: 'team-hust-98',
-    teamName: 'FC Bách Khoa K62',
-    captainName: 'Tuấn Anh (C)',
-    captainPhone: '0988712345',
-    pitchName: 'Cụm Sân Bách Khoa - Lê Thanh Nghị',
-    district: 'Hai Bà Trưng',
-    matchDate: 'Hôm nay',
-    timeSlot: '19:00 - 20:30',
-    penaltyPoints: 25,
-    previousTrustScore: 100,
-    currentTrustScore: 75,
-    reasonCategory: 'FLOODLIGHT_OUTAGE',
-    reasonDetail: 'Chủ sân báo nổ tụ điện dàn đèn sân số 3 lúc 18h15, cả 2 đội có mặt tại sân nhưng không thể thi đấu được.',
-    managerVerifyPhone: '0903218899',
-    status: 'PENDING',
-    createdAt: '15 phút trước',
-  },
-  {
-    id: 'AP-02',
-    matchId: 'm-appeal-2',
-    teamId: 'team-phonui',
-    teamName: 'FC Phố Núi Hà Đông',
-    captainName: 'Minh Hoàng',
-    captainPhone: '0912668990',
-    pitchName: 'Sân bóng Bộ Công An - Nguyễn Xiển',
-    district: 'Thanh Xuân',
-    matchDate: 'Hôm nay',
-    timeSlot: '20:30 - 22:00',
-    penaltyPoints: 40,
-    previousTrustScore: 100,
-    currentTrustScore: 60,
-    reasonCategory: 'PITCH_DOUBLE_BOOKED',
-    reasonDetail: 'Ban quản lý sân xếp trùng lịch giải nội bộ công ty, đã xác nhận hoàn cọc sân cho 2 đội.',
-    managerVerifyPhone: '0989112233',
-    status: 'PENDING',
-    createdAt: '32 phút trước',
-  },
-];
+export const INITIAL_APPEALS: MatchAppealItem[] = [];
 
-export const INITIAL_ESCROW_RECORDS: EscrowRecordItem[] = [
-  {
-    id: 'ESC-901',
-    matchId: 'm-1',
-    teamId: 'team-1',
-    teamName: 'FC Anh Em Cầu Giấy',
-    captainName: 'Phước Trần',
-    captainPhone: '0978123456',
-    amount: 200000,
-    transferCode: 'BK7 C78F91',
-    pitchName: 'Sân bóng Thành Phát',
-    timeSlot: '19:00 - 20:30 (Hôm nay)',
-    bankBin: '970422',
-    bankShortName: 'MBBank',
-    bankAccountNo: '07440948327598',
-    bankAccountName: 'TRAN QUOC THIEN PHUOC',
-    status: 'PENDING_APPROVAL',
-    createdAt: '5 phút trước',
-  },
-  {
-    id: 'ESC-902',
-    matchId: 'm-2',
-    teamId: 'team-2',
-    teamName: 'FC Gió Mới Thanh Xuân',
-    captainName: 'Hoàng Nam',
-    captainPhone: '0915888999',
-    amount: 200000,
-    transferCode: 'BK7 A42B10',
-    pitchName: 'Sân bóng Đầm Hồng 2',
-    timeSlot: '17:30 - 19:00 (Hôm nay)',
-    bankBin: '970436',
-    bankShortName: 'Vietcombank',
-    bankAccountNo: '0011004321987',
-    bankAccountName: 'NGUYEN HOANG NAM',
-    status: 'LOCKED_IN_MATCH',
-    createdAt: '2 giờ trước',
-  },
-  {
-    id: 'ESC-903',
-    matchId: 'm-3',
-    teamId: 'team-3',
-    teamName: 'FC Văn Phòng Mỹ Đình',
-    captainName: 'Đức Thịnh',
-    captainPhone: '0904555666',
-    amount: 200000,
-    transferCode: 'BK7 M99K12',
-    pitchName: 'Cụm Sân Mỹ Đình 1',
-    timeSlot: '20:30 - 22:00 (Hôm qua)',
-    bankBin: '970407',
-    bankShortName: 'Techcombank',
-    bankAccountNo: '19034567891011',
-    bankAccountName: 'LE DUC THINH',
-    status: 'WITHDRAW_REQUESTED',
-    createdAt: '25 phút trước',
-  },
-];
+export const INITIAL_ESCROW_RECORDS: EscrowRecordItem[] = [];
 
 export const APPEAL_REASON_LABELS: Record<
   string,
