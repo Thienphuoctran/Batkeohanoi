@@ -663,6 +663,7 @@ export async function createMatchInDatabaseAction(payload: {
   notes?: string;
   gmapsUrl?: string;
   isGmapsIntegrated?: boolean;
+  pitchAddress?: string;
   botHoneypot?: string;
 }) {
   try {
@@ -716,6 +717,10 @@ export async function createMatchInDatabaseAction(payload: {
       status: "open",
     };
 
+    if (payload.pitchAddress) {
+      insertObj.pitch_address = payload.pitchAddress;
+    }
+
     if (payload.gmapsUrl) {
       insertObj.gmaps_url = payload.gmapsUrl;
       insertObj.is_gmaps_integrated = payload.isGmapsIntegrated ?? true;
@@ -727,8 +732,11 @@ export async function createMatchInDatabaseAction(payload: {
       .select("*, teams:host_team_id(team_name, trust_score)")
       .single();
 
-    // Fallback nếu CSDL chưa thêm cột gmaps hoặc expires_at
-    if (error && (error.message?.includes("gmaps") || error.message?.includes("expires"))) {
+    // Fallback nếu CSDL chưa thêm cột gmaps, expires_at hoặc pitch_address
+    if (error && (error.message?.includes("gmaps") || error.message?.includes("expires") || error.message?.includes("pitch_address"))) {
+      if (error.message.includes("pitch_address")) {
+        delete insertObj.pitch_address;
+      }
       if (error.message.includes("gmaps")) {
         delete insertObj.gmaps_url;
         delete insertObj.is_gmaps_integrated;
@@ -1072,6 +1080,50 @@ export async function cleanupExpiredMatchesServerAction() {
     };
   } catch (err: any) {
     console.error("[cleanupExpiredMatchesServerAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+
+// 12. Đội Khách Xin Rút Lui / Hủy Nhận Kèo Đột Xuất (Tự động mở lại slot hoặc nâng cấp thành SOS)
+export async function guestWithdrawFromMatchAction(payload: {
+  matchId: string;
+  guestTeamName: string;
+  captainPhone?: string;
+  reasonCategory: string;
+  reasonDetail: string;
+  penaltyPoints: number;
+  pitchName: string;
+  timeSlot: string;
+  isConvertedToSos: boolean;
+  appealSubmitted?: boolean;
+}) {
+  try {
+    const adminClient = getAdminClient();
+
+    // 1. Cập nhật trận đấu trên Supabase: gỡ bỏ guest_team_id, reset status về 'open', kích hoạt is_sos nếu < 2h
+    const updateObj: Record<string, any> = {
+      guest_team_id: null,
+      status: "open",
+      is_sos: payload.isConvertedToSos,
+    };
+    await adminClient.from("matches").update(updateObj).eq("id", payload.matchId);
+
+    // 2. Gửi cảnh báo khẩn cấp tới Telegram BQT
+    const alertText =
+      `⚠️ <b>ĐỘI KHÁCH XIN RÚT LUI KHỎI KÈO ĐẤU</b>\n` +
+      `• Đội rút lui: <b>${payload.guestTeamName}</b> (${payload.captainPhone || "N/A"})\n` +
+      `• Sân bóng: <b>${payload.pitchName}</b> (${payload.timeSlot})\n` +
+      `• Mức trừ điểm áp dụng: <b>-${payload.penaltyPoints} Điểm Uy Tín</b>\n` +
+      `• Lý do: <i>${payload.reasonDetail || payload.reasonCategory}</i>\n` +
+      `• Trạng thái trận đấu: <b>${payload.isConvertedToSos ? "🚨 ĐÃ TỰ ĐỘNG KÍCH HOẠT KÈO SOS (< 2H)" : "⚽ ĐÃ TỰ ĐỘNG MỞ LẠI SLOT TÌM ĐỐI MỚI"}</b>\n` +
+      (payload.appealSubmitted ? `👉 <i>Đội có gửi kèm Đơn Kháng Cáo Bất Khả Kháng lên BQT!</i>` : "");
+
+    await sendTelegramAlert(alertText);
+
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.error("[guestWithdrawFromMatchAction Error]", err);
     return { success: false, error: err?.message || "Unknown error" };
   }
 }

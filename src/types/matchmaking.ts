@@ -101,6 +101,7 @@ export interface MatchFeedItem {
   isHandshakeVerified?: boolean; // Hai đội đã nhập mã bắt tay thật sự trên sân
   escrowDepositTeamId?: string; // Đội đã ký quỹ 200k nếu điểm uy tín < 70
   isCreatedByCurrentUser?: boolean; // Đánh dấu kèo của chính người dùng hiện tại
+  isChallengedByCurrentUser?: boolean; // Đánh dấu người dùng hiện tại là bên nhận kèo
   creatorId?: string;
   gmapsUrl?: string; // Link vị trí sân trên Google Maps (chủ kèo ghim hoặc tự sinh)
   isGmapsIntegrated?: boolean; // Cờ tích hợp Google Maps
@@ -215,6 +216,10 @@ export type AppealReasonCategory =
   | "OTHER_FORCE_MAJEURE"
   | "WEATHER"
   | "PITCH_ISSUE"
+  | "LACK_OF_PLAYERS"
+  | "INJURY_ACCIDENT"
+  | "BAD_WEATHER"
+  | "URGENT_WORK"
   | "OTHER";
 
 export interface MatchAppealItem {

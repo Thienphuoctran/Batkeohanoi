@@ -14,6 +14,7 @@ import {
   Trash2,
   Navigation,
   ExternalLink,
+  UserX,
 } from "lucide-react";
 import { MatchFeedItem } from "@/types/matchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
@@ -32,6 +33,7 @@ interface MatchFeedCardProps {
   isOwner?: boolean;
   onEditMatch?: (match: MatchFeedItem) => void;
   onDeleteMatch?: (matchId: string) => void;
+  onCancelGuestChallenge?: (match: MatchFeedItem) => void;
 }
 
 export function MatchFeedCard({
@@ -42,6 +44,7 @@ export function MatchFeedCard({
   isOwner,
   onEditMatch,
   onDeleteMatch,
+  onCancelGuestChallenge,
 }: MatchFeedCardProps) {
   const tierInfo = SKILL_TIERS_CONFIG[match.requiredTier];
   const isMatched = match.status === "MATCHED" || match.status === "PLAYING_VERIFIED";
@@ -327,6 +330,16 @@ export function MatchFeedCard({
                 <MessageSquare className="w-3.5 h-3.5" />
                 <span>Zalo ĐT</span>
               </a>
+            )}
+            {!isOwner && onCancelGuestChallenge && (
+              <button
+                onClick={() => onCancelGuestChallenge(match)}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 text-xs font-black transition active:scale-95 shadow-sm"
+                title="Rút lui / Hủy không nhận kèo này nữa (vì lý do đột xuất)"
+              >
+                <UserX className="w-3.5 h-3.5 text-rose-400" />
+                <span>Rút Lui</span>
+              </button>
             )}
             {isOwner && onDeleteMatch && (
               <button

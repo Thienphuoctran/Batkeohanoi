@@ -60,6 +60,26 @@ export const APPEAL_REASON_LABELS: Record<
     badgeColor: 'text-amber-400 bg-amber-500/15 border-amber-500/30',
     desc: 'Sân mất điện hoặc ban quản lý xếp trùng lịch',
   },
+  LACK_OF_PLAYERS: {
+    label: '👥 Thiếu người đột xuất / Không đủ quân',
+    badgeColor: 'text-rose-400 bg-rose-500/15 border-rose-500/30',
+    desc: 'Đội khách báo bận phút chót không gom đủ 7 người',
+  },
+  INJURY_ACCIDENT: {
+    label: '🚑 Chấn thương / Tai nạn đột xuất',
+    badgeColor: 'text-rose-400 bg-rose-500/15 border-rose-500/30',
+    desc: 'Cầu thủ hoặc thủ môn gặp chấn thương trước giờ bóng lăn',
+  },
+  BAD_WEATHER: {
+    label: '🌧️ Thời tiết xấu / Sân sấm sét ngập lụt',
+    badgeColor: 'text-sky-400 bg-sky-500/15 border-sky-500/30',
+    desc: 'Trời mưa bão to, sân ngập nước nguy hiểm',
+  },
+  URGENT_WORK: {
+    label: '💼 Việc gia đình khẩn cấp / Tăng ca',
+    badgeColor: 'text-purple-400 bg-purple-500/15 border-purple-500/30',
+    desc: 'Công việc phát sinh ngoài ý muốn',
+  },
   OTHER: {
     label: '📋 Lý do bất khả kháng khác',
     badgeColor: 'text-slate-300 bg-slate-500/15 border-slate-500/30',

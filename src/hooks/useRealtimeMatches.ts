@@ -144,7 +144,13 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
     },
     district,
     pitchName: row.pitch_custom_name || "Sân Thành Phát",
-    pitchAddress: `Khu vực ${district}, Hà Nội`,
+    pitchAddress:
+      (row as any).pitch_address ||
+      (row as any).pitchAddress ||
+      `Khu vực ${district}, Hà Nội`,
+    gmapsUrl: (row as any).gmaps_url || undefined,
+    isGmapsIntegrated:
+      (row as any).is_gmaps_integrated ?? Boolean((row as any).gmaps_url),
     matchDate: matchDateLabel,
     matchDateIso,
     startTime: startTime || "19:00",
@@ -215,7 +221,16 @@ export function useRealtimeMatchFeed(
             const map = new Map<string, MatchFeedItem>();
             mapped.forEach((m) => map.set(m.id, m));
             prev.forEach((m) => {
-              if (!map.has(m.id) && m.status !== "CANCELLED" && m.status !== "EXPIRED") map.set(m.id, m);
+              // 🛡️ CHỐNG TỰ SINH 2 KÈO: Bỏ qua kèo tạm nếu CSDL đã tải về kèo thật cùng sân & giờ
+              const isDuplicateOfDb = mapped.some(
+                (dbM) =>
+                  dbM.pitchName === m.pitchName &&
+                  dbM.startTime === m.startTime &&
+                  dbM.hostTeam.name === m.hostTeam.name
+              );
+              if (!map.has(m.id) && !isDuplicateOfDb && m.status !== "CANCELLED" && m.status !== "EXPIRED") {
+                map.set(m.id, m);
+              }
             });
             return Array.from(map.values());
           });
@@ -251,6 +266,29 @@ export function useRealtimeMatchFeed(
             if (mapped.status === "CANCELLED" || mapped.status === "EXPIRED") return;
             setMatches((prev) => {
               if (prev.some((item) => item.id === mapped.id)) return prev;
+
+              // 🛡️ CHỐNG TỰ SINH 2 KÈO (Deduplicate Optimistic vs DB UUID):
+              // Thay thế kèo tạm thời do client tạo bằng bản ghi chuẩn từ CSDL với UUID chính xác
+              const tempMatchIdx = prev.findIndex(
+                (item) =>
+                  (item.id.startsWith("match-new-") || item.id.startsWith("m-") || item.isCreatedByCurrentUser) &&
+                  item.pitchName === mapped.pitchName &&
+                  item.startTime === mapped.startTime &&
+                  item.hostTeam.name === mapped.hostTeam.name
+              );
+
+              if (tempMatchIdx !== -1) {
+                const updated = [...prev];
+                updated[tempMatchIdx] = {
+                  ...mapped,
+                  isCreatedByCurrentUser: prev[tempMatchIdx].isCreatedByCurrentUser,
+                  pitchAddress: prev[tempMatchIdx].pitchAddress || mapped.pitchAddress,
+                  gmapsUrl: prev[tempMatchIdx].gmapsUrl || mapped.gmapsUrl,
+                  isGmapsIntegrated: prev[tempMatchIdx].isGmapsIntegrated ?? mapped.isGmapsIntegrated,
+                };
+                return updated;
+              }
+
               return [mapped, ...prev];
             });
             playNotificationChime();
@@ -351,6 +389,37 @@ export function useRealtimeMatchFeed(
         if (!matchId) return;
         setMatches((prev) => prev.filter((m) => m.id !== matchId));
       })
+      .on("broadcast", { event: "guest_withdrawn" }, ({ payload }) => {
+        const { matchId, wasConvertedToSos, previousGuestName } = payload as {
+          matchId: string;
+          wasConvertedToSos: boolean;
+          previousGuestName: string;
+        };
+        if (!matchId) return;
+        setMatches((prev) =>
+          prev.map((m) =>
+            m.id === matchId
+              ? {
+                  ...m,
+                  status: wasConvertedToSos ? "SOS" : "OPEN",
+                  isSOS: wasConvertedToSos,
+                  guestTeam: null,
+                  isChallengedByCurrentUser: false,
+                }
+              : m
+          )
+        );
+        playNotificationChime();
+        onNewRealtimeEvent?.(
+          wasConvertedToSos
+            ? "🚨 [Realtime] Kèo Vừa Mở Lại Thành SOS Khẩn Cấp!"
+            : "⚽ [Realtime] Slot Trận Đấu Vừa Được Mở Lại!",
+          `Đội ${previousGuestName || "khách"} vừa xin rút lui do sự cố. Kèo đấu đã mở lại để nhận đối mới!`,
+          wasConvertedToSos ? "SOS < 2h" : "Slot Mới",
+          undefined,
+          undefined
+        );
+      })
       .subscribe((status) => {
         setIsRealtimeConnected(status === "SUBSCRIBED");
       });
@@ -405,6 +474,23 @@ export function useRealtimeMatchFeed(
     }
   }, []);
 
+  const broadcastGuestWithdrawal = useCallback(
+    async (
+      matchId: string,
+      wasConvertedToSos: boolean,
+      previousGuestName: string
+    ) => {
+      if (channelRef.current) {
+        await channelRef.current.send({
+          type: "broadcast",
+          event: "guest_withdrawn",
+          payload: { matchId, wasConvertedToSos, previousGuestName },
+        });
+      }
+    },
+    []
+  );
+
   return {
     matches,
     setMatches,
@@ -412,5 +498,6 @@ export function useRealtimeMatchFeed(
     broadcastNewMatch,
     broadcastMatchLock,
     broadcastMatchDelete,
+    broadcastGuestWithdrawal,
   };
 }

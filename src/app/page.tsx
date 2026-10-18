@@ -28,6 +28,7 @@ import { MatchChallengeModal } from "@/components/matchmaking/MatchChallengeModa
 import { CreateMatchModal } from "@/components/matchmaking/CreateMatchModal";
 import { EditMatchModal } from "@/components/matchmaking/EditMatchModal";
 import { CancelMatchAppealModal } from "@/components/matchmaking/CancelMatchAppealModal";
+import { CancelGuestChallengeModal } from "@/components/matchmaking/CancelGuestChallengeModal";
 import { CustomerSupportModal } from "@/components/support/CustomerSupportModal";
 import { AppGuideModal } from "@/components/guide/AppGuideModal";
 import { LiveMatchBar } from "@/components/matchmaking/LiveMatchBar";
@@ -65,6 +66,7 @@ import {
   createMatchInDatabaseAction,
   requestWithdrawEscrowAction,
   deleteOrCancelMatchAction,
+  guestWithdrawFromMatchAction,
 } from "@/actions/auth";
 import {
   addStoredEscrowRecord,
@@ -112,6 +114,7 @@ export default function HanoiMatchmakingPlatform() {
     useState<MatchFeedItem | null>(null);
   const [editingMatch, setEditingMatch] = useState<MatchFeedItem | null>(null);
   const [cancellingMatch, setCancellingMatch] = useState<MatchFeedItem | null>(null);
+  const [cancellingGuestMatch, setCancellingGuestMatch] = useState<MatchFeedItem | null>(null);
   const [latestBroadcast, setLatestBroadcast] = useState<EmergencyBroadcastItem | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isBotDrawerOpen, setIsBotDrawerOpen] = useState(false);
@@ -229,6 +232,7 @@ export default function HanoiMatchmakingPlatform() {
     broadcastNewMatch,
     broadcastMatchLock,
     broadcastMatchDelete,
+    broadcastGuestWithdrawal,
   } = useRealtimeMatchFeed(MOCK_MATCH_FEEDS, pushBotLog);
 
   // TẦNG 2: Realtime Client Engine - Quét định kỳ mỗi 10 giây để tự động ẩn các kèo quá 15 phút sau bóng lăn
@@ -503,6 +507,7 @@ export default function HanoiMatchmakingPlatform() {
               ...m,
               status: "MATCHED",
               isSOS: false,
+              isChallengedByCurrentUser: true,
               guestTeam: {
                 ...MOCK_TEAMS[0],
                 name: challengerTeamName,
@@ -568,7 +573,7 @@ export default function HanoiMatchmakingPlatform() {
 
     // Nếu Đội trưởng đã đăng ký đội chính chủ trên Supabase, lưu kèo thẳng vào bảng public.matches
     if (team?.id) {
-      await createMatchInDatabaseAction({
+      const dbRes = await createMatchInDatabaseAction({
         hostTeamId: team.id,
         pitchCustomName: newMatch.pitchName,
         district: newMatch.district,
@@ -581,7 +586,25 @@ export default function HanoiMatchmakingPlatform() {
         notes: newMatch.notes,
         gmapsUrl: newMatch.gmapsUrl,
         isGmapsIntegrated: newMatch.isGmapsIntegrated,
+        pitchAddress: newMatch.pitchAddress,
       });
+
+      // 🛡️ CHỐNG TỰ SINH 2 KÈO: Cập nhật ngay ID chính thức từ Supabase cho kèo vừa tạo
+      if (dbRes?.success && dbRes.match?.id) {
+        setMatches((prev) =>
+          prev.map((m) =>
+            m.id === newMatch.id
+              ? {
+                  ...m,
+                  id: dbRes.match.id,
+                  pitchAddress: newMatch.pitchAddress,
+                  gmapsUrl: newMatch.gmapsUrl,
+                  isGmapsIntegrated: newMatch.isGmapsIntegrated,
+                }
+              : m
+          )
+        );
+      }
     }
 
     pushBotLog(
@@ -602,6 +625,93 @@ export default function HanoiMatchmakingPlatform() {
       });
     } catch (err) {
       console.log("Local match synchronized");
+    }
+  };
+
+  // Xử lý khi Đội Khách (Bên nhận) xin rút lui / hủy nhận kèo
+  const handleConfirmGuestWithdraw = async (
+    matchId: string,
+    options: {
+      reasonCategory: any;
+      reasonDetail: string;
+      penaltyPoints: number;
+      isConvertedToSos: boolean;
+      submittedAppeal?: any;
+    }
+  ) => {
+    const target = matches.find((m) => m.id === matchId);
+    if (!target) return;
+
+    const prevGuestName =
+      target.guestTeam?.name || team?.team_name || "Đội bạn";
+
+    // 1. Cập nhật Optimistic UI: Gỡ bỏ guestTeam, chuyển status sang SOS (nếu < 2h) hoặc OPEN
+    setMatches((prev) =>
+      prev.map((m) =>
+        m.id === matchId
+          ? {
+              ...m,
+              status: options.isConvertedToSos ? "SOS" : "OPEN",
+              isSOS: options.isConvertedToSos,
+              guestTeam: null,
+              isChallengedByCurrentUser: false,
+            }
+          : m
+      )
+    );
+    setCancellingGuestMatch(null);
+
+    // 2. Trừ điểm uy tín nếu có phạt
+    if (options.penaltyPoints > 0) {
+      setMyTrustScore((prev) => Math.max(0, prev - options.penaltyPoints));
+    }
+
+    // 3. Phát sóng Realtime qua Supabase WebSocket tới toàn sàn
+    await broadcastGuestWithdrawal(
+      matchId,
+      options.isConvertedToSos,
+      prevGuestName
+    );
+
+    // 4. Đồng bộ CSDL Supabase & Gửi cảnh báo Telegram BQT
+    await guestWithdrawFromMatchAction({
+      matchId,
+      guestTeamName: prevGuestName,
+      captainPhone: profile?.phone || team?.captain_phone || "0988666888",
+      reasonCategory: options.reasonCategory,
+      reasonDetail: options.reasonDetail,
+      penaltyPoints: options.penaltyPoints,
+      pitchName: target.pitchName,
+      timeSlot: `${target.startTime} - ${target.endTime}`,
+      isConvertedToSos: options.isConvertedToSos,
+      appealSubmitted: Boolean(options.submittedAppeal),
+    });
+
+    // 5. Ghi nhận nhật ký Bot Log
+    if (options.submittedAppeal) {
+      pushBotLog(
+        `🛡️ Đã Rút Lui Kèm Kháng Cáo (#${options.submittedAppeal.id})`,
+        `Đội bạn đã rút lui khỏi trận tại ${target.pitchName}. Kèo đã mở lại thành ${
+          options.isConvertedToSos ? "🚨 KÈO CỨU HỘ SOS (< 2H)" : "kèo thường"
+        } để chủ sân tìm đối mới. Đơn kháng cáo đã chuyển tới BQT!`,
+        "Chờ Duyệt Kháng Cáo"
+      );
+    } else if (options.penaltyPoints > 0) {
+      pushBotLog(
+        `⚠️ Đã Rút Lui Khỏi Kèo (-${options.penaltyPoints}đ Uy Tín)`,
+        `Đội bạn đã hủy nhận kèo tại ${target.pitchName}. Bị trừ -${
+          options.penaltyPoints
+        } điểm Uy Tín theo quy định. Kèo đã tự động chuyển sang ${
+          options.isConvertedToSos ? "🚨 KÈO CỨU HỘ SOS (< 2H)" : "kèo thường"
+        } để chủ sân tìm đối!`,
+        `-${options.penaltyPoints}đ Uy Tín`
+      );
+    } else {
+      pushBotLog(
+        "✅ Đã Rút Lui Hợp Lệ (Miễn Phạt)",
+        `Đội bạn đã rút lui thành công khỏi trận tại ${target.pitchName} trước 4 tiếng. Kèo đã mở lại cho chủ sân đón đối mới.`,
+        "Đã Rút Lui"
+      );
     }
   };
 
@@ -1018,6 +1128,7 @@ export default function HanoiMatchmakingPlatform() {
                         onOpenHandshake={(m) => setActiveHandshakeMatch(m)}
                         onEditMatch={(m) => setEditingMatch(m)}
                         onDeleteMatch={handleDeleteMatch}
+                        onCancelGuestChallenge={(m) => setCancellingGuestMatch(m)}
                       />
                     );
                   })}
@@ -1230,6 +1341,17 @@ export default function HanoiMatchmakingPlatform() {
         open={!!cancellingMatch}
         onClose={() => setCancellingMatch(null)}
         onConfirmCancelMatch={handleConfirmCancelMatch}
+      />
+
+      {/* Modal Đội Khách Xin Rút Lui / Hủy Nhận Kèo Đột Xuất & Kháng Cáo BQT */}
+      <CancelGuestChallengeModal
+        match={cancellingGuestMatch}
+        open={!!cancellingGuestMatch}
+        onClose={() => setCancellingGuestMatch(null)}
+        guestTeamName={team?.team_name || "Đội bạn"}
+        guestCaptainPhone={profile?.phone || team?.captain_phone || ""}
+        myTrustScore={effectiveTrustScore}
+        onConfirmWithdraw={handleConfirmGuestWithdraw}
       />
 
       {/* Modal Đăng Nhập / Đăng Ký Đội Trưởng */}
