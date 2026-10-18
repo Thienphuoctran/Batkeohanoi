@@ -36,13 +36,11 @@ export const TeamOnboardingModal: React.FC<TeamOnboardingModalProps> = ({
   const [teamName, setTeamName] = useState("");
   const [avgAge, setAvgAge] = useState(30);
   const [homeDistrict, setHomeDistrict] = useState("CauGiay");
-  const [jerseyColor, setJerseyColor] = useState("Đỏ truyền thống");
+  const [jerseyColor, setJerseyColor] = useState("");
 
   const [skillTier, setSkillTier] = useState<1 | 2 | 3>(2);
-  const [bankAccountNo, setBankAccountNo] = useState("07440948327598");
-  const [bankAccountName, setBankAccountName] = useState(
-    "TRAN QUOC THIEN PHUOC"
-  );
+  const [bankAccountNo, setBankAccountNo] = useState("");
+  const [bankAccountName, setBankAccountName] = useState("");
   const [bankCode, setBankCode] = useState("MB");
   const [fairplayPledge, setFairplayPledge] = useState(false);
 
