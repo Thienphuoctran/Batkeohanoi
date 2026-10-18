@@ -9,18 +9,18 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "BắtKèo7.vn — Ghép Trận Sân 7 Cầu Giấy & Nam Từ Liêm",
+  title: "GiaoHuu.vn — Sân Ghép Trận Sân 7 & Chống Bùng Kèo Hà Nội",
   description:
-    "Nền tảng ghép đối bóng đá sân 7 văn minh, chống bùng cọc tại Cầu Giấy & Nam Từ Liêm",
+    "Nền tảng ghép đối bóng đá sân 7 văn minh, bảo chứng cọc 200k, chống bùng kèo tại Hà Nội",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "BắtKèo7",
+    title: "GiaoHuu.vn",
   },
   icons: {
-    icon: "/icons/icon.svg",
-    apple: "/icons/icon.svg",
+    icon: "/api/logo",
+    apple: "/api/logo",
   },
 };
 

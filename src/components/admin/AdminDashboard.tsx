@@ -379,7 +379,7 @@ export function AdminDashboard() {
       bankAccountName: record.bankAccountName || record.accountName || '',
       transferCode: record.transferCode || record.id,
       refundedAt: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-      note: 'BQT BắtKèo7 đã hoàn tất chuyển khoản 200.000đ hoàn cọc về STK của bạn qua Napas247.',
+      note: 'BQT GiaoHuu.vn đã hoàn tất chuyển khoản 200.000đ hoàn cọc về STK của bạn qua Napas247.',
     });
 
     showToast(`💸 Bước 2 hoàn tất: Đã xác nhận hoàn cọc 200.000đ về ${record.bankShortName || 'ngân hàng'} cho ${record.teamName}!`);
@@ -449,7 +449,7 @@ export function AdminDashboard() {
         <div className="text-center space-y-3">
           <div className="w-12 h-12 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin mx-auto" />
           <p className="text-sm font-semibold text-slate-300">
-            Đang xác thực quyền Quản trị viên BắtKèo7...
+            Đang xác thực quyền Quản trị viên GiaoHuu.vn...
           </p>
           <p className="text-xs text-slate-500 font-mono">Chỉ cấp quyền cho {AUTHORIZED_ADMIN_EMAIL}</p>
         </div>
@@ -470,7 +470,7 @@ export function AdminDashboard() {
               KHU VỰC QUẢN TRỊ TỐI MẬT
             </CardTitle>
             <CardDescription className="text-xs text-slate-400">
-              BắtKèo7 Founder & Core Admin Access Only
+              GiaoHuu.vn Founder &amp; Core Admin Access Only
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-4">
@@ -530,7 +530,7 @@ export function AdminDashboard() {
                   className="text-xs text-slate-400 hover:text-white inline-flex items-center gap-1.5 transition"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  Quay về Trang Chủ BắtKèo7
+                  Quay về Trang Chủ GiaoHuu.vn
                 </Link>
               </div>
             </div>
@@ -561,7 +561,7 @@ export function AdminDashboard() {
               <Lock className="w-7 h-7" />
             </div>
             <CardTitle className="text-xl font-black text-white tracking-tight">
-              BẮTKÈO7 ADMIN HUB
+              GIAOHUU.VN ADMIN HUB
             </CardTitle>
             <CardDescription className="text-xs text-slate-400">
               Xác thực Mã PIN bảo vệ Trung Tâm Điều Phối
@@ -623,7 +623,7 @@ export function AdminDashboard() {
                   className="text-xs text-slate-400 hover:text-white inline-flex items-center gap-1.5"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  Quay về Trang Chủ BắtKèo7
+                  Quay về Trang Chủ GiaoHuu.vn
                 </Link>
               </div>
             </form>
@@ -649,7 +649,7 @@ export function AdminDashboard() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-base sm:text-lg font-black tracking-tight text-white">
-                  BẮTKÈO<span className="text-emerald-400">7</span> COMMAND CENTER
+                  GIAOHUU<span className="text-emerald-400">.VN</span> COMMAND CENTER
                 </span>
                 <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-[10px] font-bold">
                   LIVE ADMIN HUB

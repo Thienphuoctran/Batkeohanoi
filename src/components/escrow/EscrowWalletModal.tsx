@@ -118,7 +118,7 @@ export function EscrowWalletModal({
     accountNumber: "07440948327598",
     accountName: "TRAN QUOC THIEN PHUOC",
     amount: depositAmount,
-    description: `BK7 NAP ${captainPhone.slice(-6)} ${teamName.slice(0, 6)}`,
+    description: `GH NAP ${captainPhone.slice(-6)} ${teamName.slice(0, 6)}`,
   });
 
   // Tự động sinh mã VietQR theo STK rút tiền của chủ ví
@@ -252,7 +252,7 @@ export function EscrowWalletModal({
                 <span>🛡️ LƯU Ý QUAN TRỌNG: TIỀN CỌC SÂN CỐ ĐỊNH CHỈ LÀ 200.000Đ</span>
               </div>
               <p className="text-[11px] text-slate-200 leading-relaxed">
-                Hệ thống BắtKèo7 áp dụng mức cọc bảo chứng duy nhất <strong>200.000đ/trận</strong> (không thu thêm bất kỳ chi phí nào). Số tiền này dùng để cam kết chống bùng kèo và sẽ được <strong>hoàn trả 100% về tài khoản ngân hàng của bạn</strong> ngay sau khi hoàn tất trận đấu!
+                Hệ thống GiaoHuu.vn áp dụng mức cọc bảo chứng duy nhất <strong>200.000đ/trận</strong> (không thu thêm bất kỳ chi phí nào). Số tiền này dùng để cam kết chống bùng kèo và sẽ được <strong>hoàn trả 100% về tài khoản ngân hàng của bạn</strong> ngay sau khi hoàn tất trận đấu!
               </p>
             </div>
           </div>
@@ -313,7 +313,7 @@ export function EscrowWalletModal({
               </div>
 
               <p className="text-[11px] text-emerald-200/90 leading-relaxed italic">
-                💬 {refundReceipt.note || "BQT BắtKèo7 đã hoàn tất chuyển khoản 200.000đ trả về số tài khoản của bạn qua Napas247. Vui lòng kiểm tra biến động số dư trên App Ngân Hàng của bạn!"}
+                💬 {refundReceipt.note || "BQT GiaoHuu.vn đã hoàn tất chuyển khoản 200.000đ trả về số tài khoản của bạn qua Napas247. Vui lòng kiểm tra biến động số dư trên App Ngân Hàng của bạn!"}
               </p>
 
               <div className="flex gap-2 pt-1">

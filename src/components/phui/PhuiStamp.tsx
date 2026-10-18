@@ -90,7 +90,7 @@ export function PhuiStamp({
     },
     "sos-khan-cap": {
       label: "CỨU HỘ GẤP",
-      sub: "GIẢM 125K TIỀN SÂN",
+      sub: "THƯỞNG +8Đ UY TÍN",
       color: "text-rose-500",
       borderColor: "border-rose-500/90",
       bg: "bg-rose-950/30",

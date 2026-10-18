@@ -329,14 +329,14 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       `⚽ THẺ CĂN CƯỚC BÓNG ĐÁ SỐ: ${teamName}\n` +
       `• Đội trưởng: ${captainName} (${captainPhone || "Chưa có SĐT"})\n` +
       `• Trình độ: Tier ${skillTier} - ${tierInfo.name} (Tuổi TB: ${avgAge}t)\n` +
-      `• Điểm tín nhiệm: ${team.trust_score}/100 ★ (Bảo chứng BắtKèo7)\n` +
+      `• Điểm tín nhiệm: ${team.trust_score}/100 ★ (Bảo chứng GiaoHuu.vn)\n` +
       `• Địa bàn: ${homeDistrict || "Chưa cập nhật"} ${
         homePitch ? `• Sân nhà: ${homePitch}` : ""
       }\n` +
       (fixedSchedule ? `• Lịch đá: ${fixedSchedule}\n` : "") +
       (jerseyColor ? `• Màu áo: ${jerseyColor}\n` : "") +
       (slogan ? `• Triết lý: “${slogan}”\n` : "") +
-      `👉 Giao lưu bắt kèo tại: https://batkeohanoi-wh64.vercel.app`;
+      `👉 Giao lưu bắt kèo tại: https://giaohuu.vn`;
 
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -646,7 +646,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   Đội Chính Chủ Đã Xác Thực
                 </span>
                 <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
-                  ★ Bảo Chứng BắtKèo7
+                  ★ Bảo Chứng GiaoHuu.vn
                 </span>
               </div>
 

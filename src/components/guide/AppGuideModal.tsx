@@ -58,7 +58,7 @@ export function AppGuideModal({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-extrabold text-white">
-                  Cẩm Nang Hướng Dẫn BắtKèo7.vn
+                  Cẩm Nang Hướng Dẫn GiaoHuu.vn
                 </h2>
                 <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px] font-bold">
                   Bản Chuẩn v2.0

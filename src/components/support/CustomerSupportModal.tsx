@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { askBatKeoAiAssistantAction, ChatMessageItem } from "@/actions/aiAssistant";
 import { getZaloDeepLink } from "@/lib/zalo";
 
-const BQT_ZALO_PHONE = "0393407855"; // Hotline Zalo BQT BắtKèo7 (0393.407.855)
+const BQT_ZALO_PHONE = "0393407855"; // Hotline Zalo BQT GiaoHuu.vn (0393.407.855)
 
 interface MessageUIItem {
   id: string;
@@ -69,7 +69,7 @@ export function CustomerSupportModal({
     {
       id: "msg-welcome",
       role: "assistant",
-      text: "Xin chào anh em Đội trưởng & Cầu thủ phủi Hà Nội! ⚽\nTôi là **BắtKèo7 AI Agent**, túc trực 24/7 để giải đáp mọi thắc mắc về quy chế cọc 200k, bùng kèo, tìm sân và cứu hộ giờ vàng. Bạn cần hỗ trợ gì cứ nhắn tôi nhé!",
+      text: "Xin chào anh em Đội trưởng & Cầu thủ phủi Hà Nội! ⚽\nTôi là **GiaoHuu AI Agent**, túc trực 24/7 để giải đáp mọi thắc mắc về quy chế cọc 200k, bùng kèo, tìm sân và cứu hộ giờ vàng. Bạn cần hỗ trợ gì cứ nhắn tôi nhé!",
       time: "Vừa xong",
       actions: [
         { label: "💬 Chat Zalo Trực Tiếp BQT", actionType: "OPEN_ZALO" },
@@ -175,7 +175,7 @@ export function CustomerSupportModal({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-black text-white tracking-tight">
-                  BắtKèo7 AI Agent
+                  GiaoHuu AI Agent
                 </h3>
                 <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[9px] font-extrabold px-1.5 py-0">
                   ONLINE 24/7

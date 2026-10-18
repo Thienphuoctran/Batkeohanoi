@@ -44,7 +44,7 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
   };
 
   const tierInfo = SKILL_TIERS_CONFIG[match.requiredTier];
-  const discountedShare = Math.max(150000, match.shareCostVnd - 125000);
+  const shareCost = match.shareCostVnd;
 
   return (
     <LaserGlowCard glowColor="red" speed={3.5} className="w-full relative overflow-hidden">
@@ -102,27 +102,24 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
             </span>
           </div>
 
-          {/* Subsidy Box */}
+          {/* Rescue Benefit Box */}
           <div className="rounded-xl bg-rose-500/15 border border-rose-500/30 px-3 py-2 flex items-center gap-2 text-xs text-rose-200 font-semibold">
             <Gift className="w-4 h-4 text-rose-400 shrink-0" />
             <span>
-              Ưu đãi cứu hộ: Chủ sân giảm ngay 125.000đ tiền sân hỗ trợ anh em bắt kèo!
+              Quyền lợi cứu hộ: Thưởng ngay +8 điểm uy tín tín nhiệm &amp; hỗ trợ cộng đồng phủi!
             </span>
           </div>
         </div>
 
-        {/* Right: Discounted Cost & Action */}
+        {/* Right: Cost & Action */}
         <div className="md:col-span-4 flex sm:flex-row md:flex-col items-center sm:justify-between md:items-end justify-between gap-2.5 pt-2 md:pt-0 border-t md:border-t-0 border-rose-500/20">
           <div className="text-left md:text-right">
             <div className="text-[10px] text-slate-400">
-              Tiền sân ưu đãi cứu hộ:
+              Tiền sân chia sẻ (50/50):
             </div>
             <div className="flex items-baseline gap-2 md:justify-end">
-              <span className="text-xs text-slate-500 line-through tabular-nums">
-                {match.shareCostVnd.toLocaleString("vi-VN")}đ
-              </span>
               <span className="text-lg font-black text-emerald-400 tabular-nums">
-                Chỉ {discountedShare.toLocaleString("vi-VN")}đ
+                {shareCost.toLocaleString("vi-VN")}đ
               </span>
             </div>
           </div>

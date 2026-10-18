@@ -145,7 +145,7 @@ export function HeaderBar({
           <div className="animate-marquee inline-flex items-center gap-8">
             <span>⚡ FC Vinaconex vừa mở kèo Sân Thành Phát (19:00 hôm nay)</span>
             <span>🛡️ Quy chế v2.0: Hủy sát giờ &lt;1h lần 2 gắn nhãn đỏ &amp; cọc 100%</span>
-            <span>🔥 Kèo Cứu Hộ SOS Sân ĐH Thương Mại giảm ngay 150k tiền sân hỗ trợ anh em</span>
+            <span>🔥 Kèo Cứu Hộ SOS Sân ĐH Thương Mại đang tìm đối gấp, thưởng +8đ uy tín</span>
             <span>🌤️ Thời tiết Toàn Hà Nội tối nay: 25-26°C, mặt cỏ khô ráo đá cực đã</span>
             <span>⚡ FC Vinaconex vừa mở kèo Sân Thành Phát (19:00 hôm nay)</span>
             <span>🛡️ Quy chế v2.0: Hủy sát giờ &lt;1h lần 2 gắn nhãn đỏ &amp; cọc 100%</span>
@@ -157,21 +157,30 @@ export function HeaderBar({
       <div className="px-4 pt-3 pb-2.5 space-y-2.5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/25 text-slate-950 font-black text-base">
-              7v7
+            {/* Logo Thương Hiệu GiaoHuu.vn (Ảnh 2) */}
+            <div className="relative group shrink-0">
+              <img
+                src="/api/logo"
+                alt="GiaoHuu.vn - Sân Ghép Trận Sân 7"
+                className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-[0_2px_12px_rgba(16,185,129,0.35)] transition-transform duration-300 group-hover:scale-105"
+                onError={(e) => {
+                  // Fallback nếu ảnh chưa tải xong
+                  e.currentTarget.style.display = "none";
+                }}
+              />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h1 className="font-extrabold text-base tracking-tight text-white flex items-center">
-                  <ShinyText text="BắtKèo7" speed={3.5} className="text-white" />
+                <h1 className="font-extrabold text-base sm:text-lg tracking-tight text-white flex items-center">
+                  <ShinyText text="GiaoHuu" speed={3.5} className="text-white" />
                   <span className="text-emerald-400 font-black">.vn</span>
                 </h1>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                   Hà Nội v2.0
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                Toàn Hà Nội • Ghép Đối Sân 7 &amp; Chống Bùng Kèo
+              <p className="text-[11px] text-slate-300 font-medium">
+                Sân Ghép Trận Sân 7 &amp; Chống Bùng Kèo
               </p>
             </div>
           </div>
@@ -191,7 +200,7 @@ export function HeaderBar({
 
             <button
               onClick={onOpenBotDrawer}
-              title="Telegram Bot Webhook Logs (@BatkeoHanoi_bot)"
+              title="Telegram Bot Webhook Logs (@GiaohuuHanoi_bot)"
               className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-slate-200 border border-emerald-500/25 transition"
             >
               <Bell className="w-4 h-4 text-sky-400" />
@@ -205,7 +214,7 @@ export function HeaderBar({
             {onOpenGuide && (
               <button
                 onClick={onOpenGuide}
-                title="Cẩm Nang Hướng Dẫn Sử Dụng BắtKèo7"
+                title="Cẩm Nang Hướng Dẫn Sử Dụng GiaoHuu.vn"
                 className="inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-slate-200 border border-emerald-500/25 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm"
               >
                 <BookOpen className="w-3.5 h-3.5 text-sky-400" />
@@ -216,7 +225,7 @@ export function HeaderBar({
             {onOpenSupport && (
               <button
                 onClick={onOpenSupport}
-                title="Tư Vấn Khách Hàng & AI Trợ Lý BắtKèo7"
+                title="Tư Vấn Khách Hàng & AI Trợ Lý GiaoHuu.vn"
                 className="relative inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/35 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shadow-emerald-500/10"
               >
                 <Bot className="w-4 h-4 text-emerald-400" />

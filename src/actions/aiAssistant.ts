@@ -4,10 +4,10 @@ import { HANOI_PITCHES } from "@/constants/hanoiPitches";
 import { getZaloDeepLink } from "@/lib/zalo";
 
 const SYSTEM_INSTRUCTION = `
-Bạn là Trợ Lý AI Chuyên Sâu của nền tảng BắtKèo7 Hà Nội (BắtKèo7.vn) - Nền tảng ghép đối sân 7 và chống bùng kèo bóng đá phủi số 1 Hà Nội.
+Bạn là Trợ Lý AI Chuyên Sâu của nền tảng GiaoHuu.vn (giaohuu.vn) - Nền tảng ghép đối sân 7 và chống bùng kèo bóng đá phủi số 1 Hà Nội.
 Bạn nói chuyện với phong cách anh em bóng đá phủi: chân thành, nhiệt huyết, am hiểu luật bóng đá sân 7, chiến thuật và nghiệp vụ nền tảng.
 
-Các quy chế nghiệp vụ cốt lõi của BắtKèo7 Hà Nội:
+Các quy chế nghiệp vụ cốt lõi của GiaoHuu.vn Hà Nội:
 1. Ký quỹ & Cọc 200.000đ cố định:
    - Đội bóng có điểm Uy Tín 100/100đ được miễn cọc tiền mặt.
    - Khi điểm Uy Tín dưới 70đ hoặc khi nhận kèo SOS giờ vàng: hệ thống tự động khóa bảo chứng 200.000đ trong ví.
@@ -139,7 +139,7 @@ function getSmartOfflineResponse(query: string): AiAssistantResponse {
   ) {
     return {
       success: true,
-      reply: `👥 **Chợ Cầu BắtKèo7 - Cứu Tinh Khi Thiếu Quân:**\n\n• Nơi quy tụ hàng trăm cầu thủ phong trào tự do (Free Agents) sẵn sàng xỏ giày đá thay.\n• Bạn có thể lọc danh sách theo **Vị Trí** (Hậu vệ cánh, Thòng, Tiền vệ, Tiền đạo) và **Quận/Huyện**.\n• Bấm xem thông tin, phong cách thi đấu và mở Zalo chốt giờ hẹn với cầu thủ trong 30 giây!`,
+      reply: `👥 **Chợ Cầu GiaoHuu.vn - Cứu Tinh Khi Thiếu Quân:**\n\n• Nơi quy tụ hàng trăm cầu thủ phong trào tự do (Free Agents) sẵn sàng xỏ giày đá thay.\n• Bạn có thể lọc danh sách theo **Vị Trí** (Hậu vệ cánh, Thòng, Tiền vệ, Tiền đạo) và **Quận/Huyện**.\n• Bấm xem thông tin, phong cách thi đấu và mở Zalo chốt giờ hẹn với cầu thủ trong 30 giây!`,
       suggestedActions: [
         { label: "👥 Vào Chợ Cầu Tuyển Quân", actionType: "OPEN_SUB_MARKET" },
       ],
@@ -347,7 +347,7 @@ function getSmartOfflineResponse(query: string): AiAssistantResponse {
   ) {
     return {
       success: true,
-      reply: `⭐ **Hệ Thống Điểm Uy Tín BắtKèo7 (0 - 100 Điểm):**\n\n• **100đ:** Điểm mặc định cho đội bóng chuẩn chỉ. Được **MIỄN CỌC TIỀN MẶT** khi bắt đối!\n• **Dưới 70đ:** Bị cảnh báo, bắt buộc ký quỹ 200.000đ mỗi khi tạo hoặc nhận kèo.\n• **Hoàn thành trận đấu:** +2đ Uy Tín sau mỗi trận đá văn minh.\n• **Bùng kèo vô cớ:** Trừ nặng **-30đ đến -40đ** và tịch thu cọc chuyển cho đội bị bùng!`,
+      reply: `⭐ **Hệ Thống Điểm Uy Tín GiaoHuu.vn (0 - 100 Điểm):**\n\n• **100đ:** Điểm mặc định cho đội bóng chuẩn chỉ. Được **MIỄN CỌC TIỀN MẶT** khi bắt đối!\n• **Dưới 70đ:** Bị cảnh báo, bắt buộc ký quỹ 200.000đ mỗi khi tạo hoặc nhận kèo.\n• **Hoàn thành trận đấu:** +2đ Uy Tín sau mỗi trận đá văn minh.\n• **Bùng kèo vô cớ:** Trừ nặng **-30đ đến -40đ** và tịch thu cọc chuyển cho đội bị bùng!`,
     };
   }
 
@@ -458,7 +458,7 @@ function getSmartOfflineResponse(query: string): AiAssistantResponse {
   ) {
     return {
       success: true,
-      reply: `⚽ **BắtKèo7 AI xin chào anh em đồng banh!**\n\nRất hân hạnh được hỗ trợ đội bạn! Tôi sẵn sàng giải đáp ngay mọi vấn đề về:\n• 🛡️ Ký quỹ cọc 200k & cách rút tiền trước 22h00\n• ⚠️ Đền bù 200k khi đối thủ bùng kèo\n• 🧤 Thuê thủ môn (GK) & Chợ Cầu tuyển quân\n• 📋 Sơ đồ chiến thuật 3-2-1, 2-3-1 sân 7\n• 👟 Cách chọn giày đinh TF & sơ cứu lật sơ mi\n\nBạn hãy gõ câu hỏi hoặc bấm các gợi ý nhé!`,
+      reply: `⚽ **GiaoHuu.vn AI xin chào anh em đồng banh!**\n\nRất hân hạnh được hỗ trợ đội bạn! Tôi sẵn sàng giải đáp ngay mọi vấn đề về:\n• 🛡️ Ký quỹ cọc 200k & cách rút tiền trước 22h00\n• ⚠️ Đền bù 200k khi đối thủ bùng kèo\n• 🧤 Thuê thủ môn (GK) & Chợ Cầu tuyển quân\n• 📋 Sơ đồ chiến thuật 3-2-1, 2-3-1 sân 7\n• 👟 Cách chọn giày đinh TF & sơ cứu lật sơ mi\n\nBạn hãy gõ câu hỏi hoặc bấm các gợi ý nhé!`,
       suggestedActions: [
         { label: "🛡️ Cọc 200k rút thế nào?", actionType: "OPEN_WALLET" },
         { label: "⚠️ Bị bùng kèo ai đền tiền?", actionType: "OPEN_SOS" },
@@ -470,7 +470,7 @@ function getSmartOfflineResponse(query: string): AiAssistantResponse {
   // 27. Fallback thông minh linh hoạt cho mọi câu hỏi khác
   return {
     success: true,
-    reply: `⚽ **Trợ Lý BắtKèo7 đã nhận câu hỏi của bạn!**\n\nCâu hỏi của bạn: *" ${query} "*\n\nHiện tại hệ thống hỗ trợ giải đáp tức thì các chủ đề cốt lõi:\n• 🛡️ **Ký quỹ 200k & Rút tiền trước 22h** qua VietQR Napas247.\n• ⚠️ **Bảo hiểm bùng kèo:** Đội bị bùng nhận đủ 200k tiền sân.\n• 🌧️ **Kháng cáo 1-chạm:** Mưa bão ngập sân giữ 100đ Uy Tín.\n• 🧤 **Chợ Cầu & Thuê Thủ Môn (GK)** theo từng quận.\n• 📋 **Luật sân 7, chiến thuật 3-2-1 & chọn giày đinh TF**.\n\nNếu cần hỗ trợ riêng hoặc xử lý ca đặc biệt, bạn bấm nút chat Zalo bên dưới để gặp trực tiếp BQT nhé!`,
+    reply: `⚽ **Trợ Lý GiaoHuu.vn đã nhận câu hỏi của bạn!**\n\nCâu hỏi của bạn: *" ${query} "*\n\nHiện tại hệ thống hỗ trợ giải đáp tức thì các chủ đề cốt lõi:\n• 🛡️ **Ký quỹ 200k & Rút tiền trước 22h** qua VietQR Napas247.\n• ⚠️ **Bảo hiểm bùng kèo:** Đội bị bùng nhận đủ 200k tiền sân.\n• 🌧️ **Kháng cáo 1-chạm:** Mưa bão ngập sân giữ 100đ Uy Tín.\n• 🧤 **Chợ Cầu & Thuê Thủ Môn (GK)** theo từng quận.\n• 📋 **Luật sân 7, chiến thuật 3-2-1 & chọn giày đinh TF**.\n\nNếu cần hỗ trợ riêng hoặc xử lý ca đặc biệt, bạn bấm nút chat Zalo bên dưới để gặp trực tiếp BQT nhé!`,
     suggestedActions: [
       { label: "💬 Chat Trực Tiếp Zalo BQT (0393.407.855)", actionType: "OPEN_ZALO" },
       { label: "💼 Mở Ví Ký Quỹ & Cọc", actionType: "OPEN_WALLET" },

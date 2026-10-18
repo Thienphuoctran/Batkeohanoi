@@ -980,7 +980,7 @@ export default function HanoiMatchmakingPlatform() {
                     <span>TRẠM CỨU HỘ KÈO PHÚT CHÓT (&lt; 1 TIẾNG)</span>
                   </h2>
                   <p className="text-xs text-slate-300 mt-0.5">
-                    Cứu kèo giúp sân không bị bỏ trống • Giảm ngay 125.000đ tiền sân &amp; Thưởng +8 điểm tín nhiệm
+                    Cứu kèo giúp sân không bị bỏ trống • Thưởng +8 điểm tín nhiệm &amp; Bảo chứng an toàn 100%
                   </p>
                 </div>
                 <span className="px-2.5 py-1 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-black">
@@ -1074,14 +1074,27 @@ export default function HanoiMatchmakingPlatform() {
         </main>
 
         {/* Footer kín đáo & liên kết Quản trị ẩn */}
-        <footer className="mt-12 pb-6 border-t border-slate-900/90 pt-6 text-center text-xs text-slate-500 space-y-2">
-          <p className="font-medium text-slate-400">
-            © 2026 BắtKèo7 Hà Nội • Nền tảng Ghép Đối & Chống Bùng Kèo Sân Cỏ Phủi
+        <footer className="mt-12 pb-8 border-t border-emerald-950/60 pt-6 text-center text-xs text-slate-400 space-y-3">
+          <div className="flex items-center justify-center gap-2">
+            <img
+              src="/api/logo"
+              alt="GiaoHuu.vn Logo"
+              className="w-7 h-7 object-contain opacity-90"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+            <span className="font-extrabold text-white text-sm tracking-tight">
+              GiaoHuu<span className="text-emerald-400">.vn</span>
+            </span>
+          </div>
+          <p className="font-medium text-slate-300">
+            © 2026 GiaoHuu.vn Hà Nội • Nền tảng Ghép Trận Sân 7 &amp; Chống Bùng Kèo
           </p>
-          <div className="flex items-center justify-center gap-3 text-[11px] text-slate-600">
+          <div className="flex items-center justify-center gap-3 text-[11px] text-slate-400 flex-wrap">
             <button
               onClick={() => setIsGuideOpen(true)}
-              className="text-slate-500 hover:text-emerald-400 transition-colors inline-flex items-center gap-1"
+              className="text-slate-400 hover:text-emerald-400 transition-colors inline-flex items-center gap-1"
             >
               <BookOpen className="w-2.5 h-2.5 text-sky-400" />
               <span>Hướng dẫn sử dụng</span>
@@ -1093,7 +1106,7 @@ export default function HanoiMatchmakingPlatform() {
             <span>•</span>
             <Link
               href="/admin"
-              className="text-slate-600 hover:text-slate-400 transition-colors inline-flex items-center gap-1 opacity-50 hover:opacity-100"
+              className="text-slate-500 hover:text-slate-300 transition-colors inline-flex items-center gap-1 opacity-70 hover:opacity-100"
               title="Quản trị hệ thống (Khóa PIN)"
             >
               <Lock className="w-2.5 h-2.5" />
@@ -1215,7 +1228,7 @@ export default function HanoiMatchmakingPlatform() {
                 </div>
                 <div>
                   <h3 className="text-sm font-black text-white">
-                    Trung Tâm Thông Báo BắtKèo7
+                    Trung Tâm Thông Báo GiaoHuu.vn
                   </h3>
                   <p className="text-[11px] text-emerald-400">
                     ● Chuông Web Trực Tiếp &amp; Mở Zalo 1-Chạm
@@ -1308,7 +1321,7 @@ export default function HanoiMatchmakingPlatform() {
           type="button"
           onClick={() => setIsSupportOpen(true)}
           className="group relative flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-slate-950 font-black text-xs sm:text-sm shadow-2xl shadow-emerald-500/40 hover:shadow-emerald-500/60 hover:scale-105 active:scale-95 transition-all duration-200 border-2 border-emerald-300/60 cursor-pointer"
-          title="Tư vấn khách hàng & Trợ lý AI BắtKèo7"
+          title="Tư vấn khách hàng & Trợ lý AI GiaoHuu.vn"
         >
           <div className="relative">
             <Bot className="w-5 h-5 fill-current" />
@@ -1332,7 +1345,7 @@ export default function HanoiMatchmakingPlatform() {
         onSelectTab={(tab) => setActiveTab(tab as ActiveTab)}
       />
 
-      {/* Modal Cẩm Nang Hướng Dẫn Sử Dụng & Quy Chế BắtKèo7 */}
+      {/* Modal Cẩm Nang Hướng Dẫn Sử Dụng & Quy Chế GiaoHuu.vn */}
       <AppGuideModal
         isOpen={isGuideOpen}
         onClose={() => setIsGuideOpen(false)}
