@@ -41,6 +41,7 @@ import {
   normalizeVietnamPhone,
   playNotificationChime,
 } from "@/lib/zalo";
+import { isMatchExpired } from "@/lib/matchTime";
 import { useRealtimeMatchFeed } from "@/hooks/useRealtimeMatches";
 import { useAuthTeam } from "@/hooks/useAuthTeam";
 import {
@@ -229,10 +230,24 @@ export default function HanoiMatchmakingPlatform() {
     broadcastMatchDelete,
   } = useRealtimeMatchFeed(MOCK_MATCH_FEEDS, pushBotLog);
 
-  // Lọc danh sách kèo (loại bỏ hoàn toàn các kèo đã hủy)
+  // TẦNG 2: Realtime Client Engine - Quét định kỳ mỗi 10 giây để tự động ẩn các kèo quá 15 phút sau bóng lăn
+  const [nowTick, setNowTick] = useState(Date.now());
+  const [isSimulatingCleanup, setIsSimulatingCleanup] = useState(false);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setNowTick(Date.now());
+    }, 10000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Lọc danh sách kèo: Loại bỏ kèo đã hủy, đã hết hạn hoặc quá 15 phút sau bóng lăn
   const filteredMatches = useMemo(() => {
     return matches.filter((m) => {
-      if (m.status === "CANCELLED") return false;
+      if (m.status === "CANCELLED" || m.status === "EXPIRED") return false;
+      // TẦNG 2: Tự động loại bỏ kèo mở quá 15 phút sau bóng lăn chưa có đối
+      if (isMatchExpired(m, 15, nowTick)) return false;
+
       const passDistrict =
         selectedDistrict === "ALL" ||
         m.district.toLowerCase().includes(selectedDistrict.toLowerCase()) ||
@@ -257,7 +272,55 @@ export default function HanoiMatchmakingPlatform() {
     selectedTier,
     selectedTimeSlot,
     searchQuery,
+    nowTick,
   ]);
+
+  // Nút Test Mô Phỏng 1-Chạm Xóa Kèo Quá 15 Phút (Bản Kế Hoạch Mục V)
+  const handleSimulateExpiredMatchCleanup = () => {
+    const testMatchId = `test-expired-${Date.now()}`;
+    const mockKickoff = new Date(Date.now() - 14 * 60 * 1000 - 55 * 1000); // 14p 55s trước
+    const testMatch: MatchFeedItem = {
+      id: testMatchId,
+      hostTeam: {
+        ...MOCK_TEAMS[0],
+        name: team?.team_name || "FC Test Mô Phỏng 15P",
+        captainName: profile?.full_name || "Đội Trưởng",
+      },
+      district: "Cầu Giấy",
+      pitchName: "Sân Thử Nghiệm Tự Động Xóa Kèo",
+      pitchAddress: "Cụm sân cỏ Cầu Giấy, Hà Nội",
+      matchDate: "Hôm nay",
+      startTime: `${mockKickoff.getHours().toString().padStart(2, "0")}:${mockKickoff.getMinutes().toString().padStart(2, "0")}`,
+      endTime: "22:00",
+      totalCostVnd: 800000,
+      shareCostVnd: 400000,
+      requiredTier: 2,
+      status: "OPEN",
+      isSOS: false,
+      notes: "⚡ KÈO TEST: Đang đếm ngược tới mốc 15 phút. Đúng 5 giây nữa thẻ này sẽ tự động biến mất khỏi trang chủ!",
+      createdAt: "Vừa xong",
+      expiresAt: new Date(Date.now() + 5000).toISOString(),
+      isCreatedByCurrentUser: true,
+    };
+
+    setMatches((prev) => [testMatch, ...prev]);
+    setIsSimulatingCleanup(true);
+    pushBotLog(
+      "🧪 Đang Test Mô Phỏng Xóa Kèo (15 Phút)",
+      `Đã mở bài đăng thử nghiệm ca ${testMatch.startTime}. Đúng 5 giây nữa (khi chạm mốc 15 phút sau bóng lăn), thẻ này sẽ tự động dọn dẹp khỏi bảng tin!`,
+      "Test Engine"
+    );
+
+    setTimeout(() => {
+      setNowTick(Date.now());
+      setIsSimulatingCleanup(false);
+      pushBotLog(
+        "🧹 [Auto-Cleanup] Đã Tự Động Xóa Kèo Quá Hạn!",
+        `Kèo #${testMatchId} đã vượt quá 15 phút sau bóng lăn chưa có đối. Hệ thống tự động làm mờ và dọn dẹp khỏi bảng tin!`,
+        "Đã Dọn Dẹp"
+      );
+    }, 5200);
+  };
 
   const sosMatches = filteredMatches.filter(
     (m) => m.isSOS && m.status !== "MATCHED"
@@ -759,6 +822,8 @@ export default function HanoiMatchmakingPlatform() {
                   matches.filter((m) => m.status !== "MATCHED").length
                 }
                 selectedDistrict={selectedDistrict}
+                onSimulateExpiredCleanup={handleSimulateExpiredMatchCleanup}
+                isSimulatingCleanup={isSimulatingCleanup}
               />
 
               {/* Thanh Tìm Kiếm + Chọn Ca Giờ + Quận + 3 Tier (Deep Emerald Glass) */}

@@ -22,6 +22,7 @@ import { maskPhoneNumber, getZaloDeepLink } from "@/lib/zalo";
 import { SpotlightCard } from "@/components/reactbits/SpotlightCard";
 import { ClickSpark } from "@/components/reactbits/ClickSpark";
 import { PhuiStamp } from "@/components/phui";
+import { formatExpiryTime } from "@/lib/matchTime";
 
 interface MatchFeedCardProps {
   match: MatchFeedItem;
@@ -209,6 +210,18 @@ export function MatchFeedCard({
               </strong>
             </span>
           </div>
+
+          {/* Hạn tự động dọn dẹp bài đăng nếu chưa có đối (kickoff + 15p) */}
+          {!isMatched && (
+            <div className="flex items-center justify-between text-[10.5px] text-slate-400 pt-1.5 border-t border-emerald-500/10">
+              <span className="flex items-center gap-1 text-emerald-400/90 font-medium">
+                <span>🧹 Tự đóng sau 15p bóng lăn</span>
+              </span>
+              <span className="font-mono text-slate-400 text-[10px]">
+                (Đóng lúc: <strong className="text-amber-300 font-bold">{formatExpiryTime(match.startTime, 15)}</strong>)
+              </span>
+            </div>
+          )}
         </div>
 
         {match.notes && (

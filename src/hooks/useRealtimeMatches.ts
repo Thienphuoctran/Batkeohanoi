@@ -14,11 +14,12 @@ export interface MatchItem {
   pitch_custom_name: string;
   district: string;
   kickoff_time: string;
+  expires_at?: string | null;
   time_slot_label: string;
   total_fee: number;
   split_fee: number;
   is_sos: boolean;
-  status: "open" | "matched" | "completed" | "cancelled";
+  status: "open" | "matched" | "completed" | "cancelled" | "expired";
   notes: string | null;
   teams?: {
     team_name: string;
@@ -128,6 +129,8 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
     status:
       row.status === "matched"
         ? "MATCHED"
+        : row.status === "expired"
+        ? "EXPIRED"
         : row.is_sos
         ? "SOS"
         : row.status === "completed"
@@ -138,6 +141,7 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
     isSOS: Boolean(row.is_sos),
     sosCountdownSeconds: row.is_sos ? 3600 : undefined,
     notes: row.notes || undefined,
+    expiresAt: row.expires_at || undefined,
     createdAt: "Real-time",
   };
 }
@@ -170,18 +174,19 @@ export function useRealtimeMatchFeed(
             "*, teams:host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
           )
           .neq("status", "cancelled")
+          .neq("status", "expired")
           .order("created_at", { ascending: false })
           .limit(50);
 
         if (!error && dbData && dbData.length > 0) {
           const mapped = dbData
-            .filter((d: any) => d.status !== "cancelled")
+            .filter((d: any) => d.status !== "cancelled" && d.status !== "expired")
             .map((d) => mapDbMatchToFeedItem(d as MatchItem));
           setMatches((prev) => {
             const map = new Map<string, MatchFeedItem>();
             mapped.forEach((m) => map.set(m.id, m));
             prev.forEach((m) => {
-              if (!map.has(m.id) && m.status !== "CANCELLED") map.set(m.id, m);
+              if (!map.has(m.id) && m.status !== "CANCELLED" && m.status !== "EXPIRED") map.set(m.id, m);
             });
             return Array.from(map.values());
           });
@@ -214,7 +219,7 @@ export function useRealtimeMatchFeed(
             const mapped = mapDbMatchToFeedItem(
               (newRow || payload.new) as MatchItem
             );
-            if (mapped.status === "CANCELLED") return;
+            if (mapped.status === "CANCELLED" || mapped.status === "EXPIRED") return;
             setMatches((prev) => {
               if (prev.some((item) => item.id === mapped.id)) return prev;
               return [mapped, ...prev];
@@ -231,7 +236,7 @@ export function useRealtimeMatchFeed(
             );
           } else if (payload.eventType === "UPDATE") {
             const updated = payload.new as MatchItem;
-            if (updated.status === "cancelled") {
+            if (updated.status === "cancelled" || updated.status === "expired") {
               setMatches((prev) => prev.filter((m) => m.id !== updated.id));
               return;
             }

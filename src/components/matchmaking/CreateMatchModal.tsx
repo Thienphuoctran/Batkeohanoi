@@ -25,6 +25,7 @@ import {
   maskPhoneNumber,
   getZaloDeepLink,
 } from "@/lib/zalo";
+import { formatExpiryTime, getMatchExpiresDate } from "@/lib/matchTime";
 
 import {
   AuthenticatedTeamProfile,
@@ -259,6 +260,7 @@ export function CreateMatchModal({
         : undefined,
       notes,
       createdAt: "Vừa xong",
+      expiresAt: getMatchExpiresDate({ matchDate: "Hôm nay", startTime: startTime || "19:00" }, 15).toISOString(),
       handshakePin: Math.floor(1000 + Math.random() * 9000).toString(),
       isHandshakeVerified: false,
       escrowDepositTeamId: currentTrustScore < 70 ? (verifiedTeam?.id || "team-escrow") : undefined,
@@ -670,6 +672,19 @@ export function CreateMatchModal({
                     {slot}
                   </button>
                 ))}
+              </div>
+
+              {/* Cam kết tự động đóng bài sau 15p bóng lăn & bảo toàn Uy Tín */}
+              <div className="mt-2.5 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px]">
+                <span className="text-slate-300 flex items-center gap-1.5">
+                  <span>🧹</span>
+                  <span>
+                    Tự động đóng nếu chưa có đối: <strong className="text-amber-300 font-bold">{formatExpiryTime(timeSlot, 15)}</strong> (15p sau giờ đá)
+                  </span>
+                </span>
+                <span className="text-emerald-400 font-bold text-[10px] sm:text-right">
+                  Bảo toàn 100% điểm Uy Tín &amp; Cọc
+                </span>
               </div>
             </div>
           </div>

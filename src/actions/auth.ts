@@ -413,11 +413,15 @@ export async function createMatchInDatabaseAction(payload: {
     matchCreationRateLimitMap.set(payload.hostTeamId, recent);
 
     const adminClient = getAdminClient();
+    const kickoffDate = new Date(Date.now() + 2 * 3600 * 1000);
+    const expiresDate = new Date(kickoffDate.getTime() + 15 * 60 * 1000);
+
     const insertObj: Record<string, any> = {
       host_team_id: payload.hostTeamId,
       pitch_custom_name: payload.pitchCustomName,
       district: payload.district || "Hà Nội",
-      kickoff_time: new Date(Date.now() + 2 * 3600 * 1000).toISOString(),
+      kickoff_time: kickoffDate.toISOString(),
+      expires_at: expiresDate.toISOString(),
       time_slot_label: payload.timeSlotLabel,
       total_fee: payload.totalFee,
       split_fee: payload.splitFee,
@@ -437,10 +441,15 @@ export async function createMatchInDatabaseAction(payload: {
       .select("*, teams:host_team_id(team_name, trust_score)")
       .single();
 
-    // Nếu bảng matches trên Supabase chưa tạo cột gmaps_url, fallback insert không có cột gmaps
-    if (error && error.message?.includes("gmaps")) {
-      delete insertObj.gmaps_url;
-      delete insertObj.is_gmaps_integrated;
+    // Fallback nếu CSDL chưa thêm cột gmaps hoặc expires_at
+    if (error && (error.message?.includes("gmaps") || error.message?.includes("expires"))) {
+      if (error.message.includes("gmaps")) {
+        delete insertObj.gmaps_url;
+        delete insertObj.is_gmaps_integrated;
+      }
+      if (error.message.includes("expires")) {
+        delete insertObj.expires_at;
+      }
       const retry = await adminClient
         .from("matches")
         .insert(insertObj)
@@ -737,6 +746,46 @@ export async function deleteAllMatchesByHostTeamAction(hostTeamId: string) {
     return { success: true };
   } catch (err: any) {
     console.error("[deleteAllMatchesByHostTeamAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+
+// 11. Tự động quét và dọn dẹp các kèo quá 15 phút sau bóng lăn (Tầng 3 Server Action)
+export async function cleanupExpiredMatchesServerAction() {
+  try {
+    const adminClient = getAdminClient();
+    
+    // Thử gọi RPC fn_auto_cleanup_expired_matches
+    const { data: rpcData, error: rpcError } = await adminClient.rpc("fn_auto_cleanup_expired_matches");
+    if (!rpcError && rpcData) {
+      revalidatePath("/");
+      return rpcData;
+    }
+
+    // Fallback: Quét trực tiếp bằng query
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    const { data: updated, error: updateErr } = await adminClient
+      .from("matches")
+      .update({
+        status: "expired",
+        notes: "[Tự động đóng bài đăng do quá giờ bóng lăn 15 phút chưa có đối]",
+      })
+      .eq("status", "open")
+      .lte("kickoff_time", fifteenMinutesAgo)
+      .select("id");
+
+    if (updateErr) {
+      return { success: false, error: updateErr.message };
+    }
+
+    revalidatePath("/");
+    return {
+      success: true,
+      cleaned_count: updated?.length || 0,
+      timestamp: new Date().toISOString(),
+    };
+  } catch (err: any) {
+    console.error("[cleanupExpiredMatchesServerAction Error]", err);
     return { success: false, error: err?.message || "Unknown error" };
   }
 }

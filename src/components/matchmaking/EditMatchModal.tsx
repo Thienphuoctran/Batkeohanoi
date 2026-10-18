@@ -22,6 +22,7 @@ import {
 import { POPULAR_HANOI_DISTRICTS, GOLDEN_TIME_SLOTS } from "./CreateMatchModal";
 import { HANOI_PITCHES, SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { Button } from "@/components/ui/button";
+import { getMatchExpiresDate } from "@/lib/matchTime";
 
 interface EditMatchModalProps {
   isOpen: boolean;
@@ -134,6 +135,7 @@ export function EditMatchModal({
       splitRatioLabel,
       isSOS,
       notes,
+      expiresAt: getMatchExpiresDate({ matchDate: match.matchDate, startTime }, 15).toISOString(),
       gmapsUrl: effectiveGmapsUrl,
       isGmapsIntegrated: isGmapsIntegrated,
     };

@@ -21,6 +21,8 @@ interface LiveMatchBarProps {
   sosCount: number;
   openMatchCount: number;
   selectedDistrict: "ALL" | District;
+  onSimulateExpiredCleanup?: () => void;
+  isSimulatingCleanup?: boolean;
 }
 
 export function LiveMatchBar({
@@ -29,6 +31,8 @@ export function LiveMatchBar({
   sosCount,
   openMatchCount,
   selectedDistrict,
+  onSimulateExpiredCleanup,
+  isSimulatingCleanup = false,
 }: LiveMatchBarProps) {
   return (
     <div className="rounded-2xl border border-emerald-500/25 bg-[#061e13]/90 backdrop-blur-xl p-3 sm:p-3.5 shadow-xl flex flex-col md:flex-row items-center justify-between gap-3">
@@ -94,10 +98,28 @@ export function LiveMatchBar({
         {/* Nút Đánh giá kèo (Vàng dạ quang) */}
         <button
           onClick={() => onSwitchTab("trust-profile")}
-          className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 animate-amber-glow transition active:scale-95"
+          className="h-9 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 animate-amber-glow transition active:scale-95"
         >
           Đánh giá kèo
         </button>
+
+        {/* Nút Test Mô Phỏng 1-Chạm Xóa Kèo Quá 15 Phút (Bản Kế Hoạch Mục V) */}
+        {onSimulateExpiredCleanup && (
+          <button
+            type="button"
+            onClick={onSimulateExpiredCleanup}
+            disabled={isSimulatingCleanup}
+            className={`h-9 px-2.5 rounded-xl border text-[11px] font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95 ${
+              isSimulatingCleanup
+                ? "bg-amber-500/20 text-amber-300 border-amber-400 animate-pulse"
+                : "bg-[#020d07]/90 text-slate-300 border-emerald-500/30 hover:border-emerald-400 hover:text-white"
+            }`}
+            title="Mô phỏng 1-chạm: Tạo bài đăng ca đá và đồng hồ đếm ngược 5s để tự động dọn dẹp khỏi bảng tin"
+          >
+            <span>🧹</span>
+            <span className="hidden lg:inline">{isSimulatingCleanup ? "Đang đếm 5s..." : "Test Xóa Kèo 15p"}</span>
+          </button>
+        )}
 
         {/* Nút Tạo Kèo (Cam Lửa Concept 2) */}
         <ClickSpark sparkColor={["#f97316", "#fbbf24", "#38bdf8", "#ffffff"]} sparkCount={10}>

@@ -58,7 +58,8 @@ export type MatchStatus =
   | "PLAYING_VERIFIED"
   | "FINISHED"
   | "CANCELLED"
-  | "DISPUTED";
+  | "DISPUTED"
+  | "EXPIRED";
 
 export interface EscrowWallet {
   balance: number; // Số dư ví ký quỹ (VNĐ)
@@ -93,6 +94,7 @@ export interface MatchFeedItem {
   notes?: string;
   matchedAt?: string;
   createdAt: string;
+  expiresAt?: string; // Thời điểm tự động đóng bài (kickoff + 15 phút)
   handshakePin?: string; // Mã Bắt Tay 4 Số ngẫu nhiên (chống vu khống bùng kèo 100%)
   isHandshakeVerified?: boolean; // Hai đội đã nhập mã bắt tay thật sự trên sân
   escrowDepositTeamId?: string; // Đội đã ký quỹ 200k nếu điểm uy tín < 70
