@@ -161,7 +161,7 @@ export function useRealtimeMatchFeed(
   const channelRef = useRef<RealtimeChannel | null>(null);
 
   useEffect(() => {
-    // 0. Tải các trận đấu thực tế đã lưu trong CSDL Supabase
+    // 0. Tải các trận đấu thực tế đã lưu trong CSDL Supabase (loại trừ kèo đã hủy)
     const fetchExistingMatches = async () => {
       try {
         const { data: dbData, error } = await supabase
@@ -169,15 +169,18 @@ export function useRealtimeMatchFeed(
           .select(
             "*, teams:host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
           )
+          .neq("status", "cancelled")
           .order("created_at", { ascending: false });
 
         if (!error && dbData && dbData.length > 0) {
-          const mapped = dbData.map((d) => mapDbMatchToFeedItem(d as MatchItem));
+          const mapped = dbData
+            .filter((d: any) => d.status !== "cancelled")
+            .map((d) => mapDbMatchToFeedItem(d as MatchItem));
           setMatches((prev) => {
             const map = new Map<string, MatchFeedItem>();
             mapped.forEach((m) => map.set(m.id, m));
             prev.forEach((m) => {
-              if (!map.has(m.id)) map.set(m.id, m);
+              if (!map.has(m.id) && m.status !== "CANCELLED") map.set(m.id, m);
             });
             return Array.from(map.values());
           });
@@ -210,6 +213,7 @@ export function useRealtimeMatchFeed(
             const mapped = mapDbMatchToFeedItem(
               (newRow || payload.new) as MatchItem
             );
+            if (mapped.status === "CANCELLED") return;
             setMatches((prev) => {
               if (prev.some((item) => item.id === mapped.id)) return prev;
               return [mapped, ...prev];
@@ -226,6 +230,10 @@ export function useRealtimeMatchFeed(
             );
           } else if (payload.eventType === "UPDATE") {
             const updated = payload.new as MatchItem;
+            if (updated.status === "cancelled") {
+              setMatches((prev) => prev.filter((m) => m.id !== updated.id));
+              return;
+            }
             setMatches((prev) =>
               prev.map((m) =>
                 m.id === updated.id
@@ -303,6 +311,11 @@ export function useRealtimeMatchFeed(
           challengerTeamName
         );
       })
+      .on("broadcast", { event: "match_deleted" }, ({ payload }) => {
+        const { matchId } = payload as { matchId: string };
+        if (!matchId) return;
+        setMatches((prev) => prev.filter((m) => m.id !== matchId));
+      })
       .subscribe((status) => {
         setIsRealtimeConnected(status === "SUBSCRIBED");
       });
@@ -347,11 +360,22 @@ export function useRealtimeMatchFeed(
     []
   );
 
+  const broadcastMatchDelete = useCallback(async (matchId: string) => {
+    if (channelRef.current) {
+      await channelRef.current.send({
+        type: "broadcast",
+        event: "match_deleted",
+        payload: { matchId },
+      });
+    }
+  }, []);
+
   return {
     matches,
     setMatches,
     isRealtimeConnected,
     broadcastNewMatch,
     broadcastMatchLock,
+    broadcastMatchDelete,
   };
 }

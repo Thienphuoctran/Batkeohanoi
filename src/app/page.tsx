@@ -47,6 +47,7 @@ import {
   signOutAction,
   createMatchInDatabaseAction,
   requestWithdrawEscrowAction,
+  deleteOrCancelMatchAction,
 } from "@/actions/auth";
 import {
   addStoredEscrowRecord,
@@ -208,11 +209,13 @@ export default function HanoiMatchmakingPlatform() {
     setMatches,
     broadcastNewMatch,
     broadcastMatchLock,
+    broadcastMatchDelete,
   } = useRealtimeMatchFeed(MOCK_MATCH_FEEDS, pushBotLog);
 
-  // Lọc danh sách kèo
+  // Lọc danh sách kèo (loại bỏ hoàn toàn các kèo đã hủy)
   const filteredMatches = useMemo(() => {
     return matches.filter((m) => {
+      if (m.status === "CANCELLED") return false;
       const passDistrict =
         selectedDistrict === "ALL" ||
         m.district.toLowerCase().includes(selectedDistrict.toLowerCase()) ||
@@ -540,7 +543,7 @@ export default function HanoiMatchmakingPlatform() {
     setCancellingMatch(target);
   };
 
-  const handleConfirmCancelMatch = (
+  const handleConfirmCancelMatch = async (
     matchId: string,
     options: {
       incurredPenalty: boolean;
@@ -549,8 +552,32 @@ export default function HanoiMatchmakingPlatform() {
     }
   ) => {
     const target = matches.find((m) => m.id === matchId);
+
+    // 1. Gỡ ngay khỏi danh sách hiển thị (Optimistic UI)
     setMatches((prev) => prev.filter((m) => m.id !== matchId));
     setCancellingMatch(null);
+
+    // 2. Phát sóng WebSocket Realtime cho toàn bộ các thiết bị khác đang mở bảng tin
+    await broadcastMatchDelete(matchId);
+
+    // 3. Xóa hoặc cập nhật status = 'cancelled' vĩnh viễn trong CSDL Supabase
+    await deleteOrCancelMatchAction(matchId);
+
+    // 4. Đồng bộ xóa sạch khỏi localStorage
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("batkeo7_matches_v1");
+        if (saved) {
+          const list = JSON.parse(saved);
+          if (Array.isArray(list)) {
+            localStorage.setItem(
+              "batkeo7_matches_v1",
+              JSON.stringify(list.filter((m: any) => m.id !== matchId))
+            );
+          }
+        }
+      } catch {}
+    }
 
     if (options.incurredPenalty && options.penaltyPoints > 0) {
       setMyTrustScore((prev) => Math.max(0, prev - options.penaltyPoints));
@@ -651,6 +678,7 @@ export default function HanoiMatchmakingPlatform() {
           onOpenTeamOnboarding={() => setIsTeamOnboardingOpen(true)}
           escrowWallet={escrowWallet}
           onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
+          onOpenSupport={() => setIsSupportOpen(true)}
         />
 
         {/* Banner Phát Sóng Khẩn Cấp Từ BQT (/admin - Đề xuất 5) */}
@@ -1181,26 +1209,12 @@ export default function HanoiMatchmakingPlatform() {
         </div>
       )}
 
-      {/* Footer kín đáo */}
-      <footer className="mt-14 py-8 border-t border-slate-900 text-center text-xs text-slate-600">
-        <p className="flex items-center justify-center gap-2">
-          <span>© 2026 BắtKèo7 • Sàn Bắt Đối Phủi Hà Nội</span>
-          <span>•</span>
-          <Link
-            href="/admin"
-            className="hover:text-slate-400 transition inline-flex items-center gap-1 text-slate-600 hover:underline"
-          >
-            <Lock className="w-3 h-3" />
-            <span>Quản trị</span>
-          </Link>
-        </p>
-      </footer>
-
       {/* Nút Nổi Tư Vấn Khách Hàng (AI Agent & Zalo BQT) */}
-      <div className="fixed bottom-5 right-4 sm:right-6 z-40">
+      <div className="fixed bottom-6 right-5 sm:right-7 z-50">
         <button
+          type="button"
           onClick={() => setIsSupportOpen(true)}
-          className="group relative flex items-center gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all duration-200 border border-emerald-300/40"
+          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-slate-950 font-black text-xs sm:text-sm shadow-2xl shadow-emerald-500/40 hover:shadow-emerald-500/60 hover:scale-105 active:scale-95 transition-all duration-200 border-2 border-emerald-300/60 cursor-pointer"
           title="Tư vấn khách hàng & Trợ lý AI BắtKèo7"
         >
           <div className="relative">
@@ -1208,8 +1222,8 @@ export default function HanoiMatchmakingPlatform() {
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500" />
           </div>
-          <div className="flex flex-col items-start leading-tight">
-            <span className="tracking-tight">Tư Vấn Khách Hàng</span>
+          <div className="flex flex-col items-start leading-tight text-left">
+            <span className="tracking-tight text-slate-950 font-black">Tư Vấn Khách Hàng</span>
             <span className="text-[10px] text-slate-900/80 font-bold hidden sm:inline">
               AI Trợ Lý &amp; Zalo BQT
             </span>

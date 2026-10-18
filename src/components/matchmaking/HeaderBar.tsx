@@ -16,6 +16,7 @@ import {
   Wallet,
   MapPin,
   Scale,
+  Bot,
 } from "lucide-react";
 import { EscrowWallet } from "@/types/matchmaking";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ interface HeaderBarProps {
   onOpenTeamOnboarding?: () => void;
   escrowWallet?: EscrowWallet;
   onOpenEscrowModal?: () => void;
+  onOpenSupport?: () => void;
 }
 
 const PITCH_WEATHER_DATA: Record<
@@ -101,6 +103,7 @@ export function HeaderBar({
   onOpenTeamOnboarding,
   escrowWallet,
   onOpenEscrowModal,
+  onOpenSupport,
 }: HeaderBarProps) {
   const [selectedPitch, setSelectedPitch] = useState(
     "Trung Kính Hạ (Cầu Giấy)"
@@ -193,6 +196,18 @@ export function HeaderBar({
                 </span>
               )}
             </button>
+
+            {onOpenSupport && (
+              <button
+                onClick={onOpenSupport}
+                title="Tư Vấn Khách Hàng & AI Trợ Lý BắtKèo7"
+                className="relative inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shadow-emerald-500/10"
+              >
+                <Bot className="w-4 h-4 text-emerald-400" />
+                <span className="hidden sm:inline">Tư Vấn</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              </button>
+            )}
 
             {!isAuthenticated ? (
               <button

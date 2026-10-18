@@ -668,3 +668,49 @@ export async function sendEmergencyBroadcastAction(payload: {
     return { success: false, error: err?.message || "Unknown error" };
   }
 }
+
+// 9. Xóa hoặc Hủy Kèo Đấu Trực Tiếp Trong Database Supabase (Chống Tái Xuất Hiện Khi F5)
+export async function deleteOrCancelMatchAction(matchId: string) {
+  try {
+    const adminClient = getAdminClient();
+
+    // 1. Thử xóa hoàn toàn khỏi bảng matches
+    const { error: delError } = await adminClient
+      .from("matches")
+      .delete()
+      .eq("id", matchId);
+
+    // 2. Nếu có lỗi ràng buộc khóa ngoại, cập nhật status = 'cancelled'
+    if (delError) {
+      console.warn("[deleteMatch] delete error, fallback update to cancelled:", delError.message);
+      await adminClient
+        .from("matches")
+        .update({ status: "cancelled" })
+        .eq("id", matchId);
+    }
+
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.error("[deleteOrCancelMatchAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+
+// 10. Xóa tất cả các kèo test của một đội bóng
+export async function deleteAllMatchesByHostTeamAction(hostTeamId: string) {
+  try {
+    const adminClient = getAdminClient();
+    await adminClient
+      .from("matches")
+      .delete()
+      .eq("host_team_id", hostTeamId);
+
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.error("[deleteAllMatchesByHostTeamAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+
