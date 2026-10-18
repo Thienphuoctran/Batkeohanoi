@@ -226,6 +226,7 @@ export function useRealtimeMatchFeed(
       (m) => !m.id?.startsWith("seed-") && !m.id?.startsWith("mock-")
     );
   });
+  const [isLoadingMatches, setIsLoadingMatches] = useState(true);
   const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
 
@@ -333,6 +334,8 @@ export function useRealtimeMatchFeed(
         }
       } catch (err) {
         console.error("fetchExistingMatches error:", err);
+      } finally {
+        setIsLoadingMatches(false);
       }
     };
 
@@ -723,6 +726,7 @@ export function useRealtimeMatchFeed(
   return {
     matches,
     setMatches,
+    isLoadingMatches,
     isRealtimeConnected,
     broadcastNewMatch,
     broadcastMatchLock,

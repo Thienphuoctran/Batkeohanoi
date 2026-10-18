@@ -5,13 +5,23 @@
  */
 
 /**
- * Lấy chuỗi YYYY-MM-DD theo múi giờ địa phương (Việt Nam)
+ * Lấy chuỗi YYYY-MM-DD theo chuẩn múi giờ Việt Nam (GMT+7, Asia/Ho_Chi_Minh)
+ * Đảm bảo 100% không lệch ngày khi chạy trên Vercel Serverless (UTC) lúc rạng sáng (00h-07h)
  */
 export function toLocalIsoDate(date: Date = new Date()): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(date);
+  } catch {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
 }
 
 export function getTodayIsoDate(): string {
@@ -19,8 +29,8 @@ export function getTodayIsoDate(): string {
 }
 
 export function getOffsetIsoDate(offsetDays: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() + offsetDays);
+  const [vnY, vnM, vnD] = toLocalIsoDate(new Date()).split("-").map(Number);
+  const d = new Date(vnY, vnM - 1, vnD + offsetDays);
   return toLocalIsoDate(d);
 }
 
@@ -36,10 +46,10 @@ export function getQuickDateOptions(count = 5): {
 }[] {
   const days = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
   const result = [];
+  const [vnY, vnM, vnD] = toLocalIsoDate(new Date()).split("-").map(Number);
 
   for (let i = 0; i < count; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
+    const d = new Date(vnY, vnM - 1, vnD + i);
     const iso = toLocalIsoDate(d);
     const dd = String(d.getDate()).padStart(2, "0");
     const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -104,11 +114,11 @@ export function parseMatchDateParts(matchDateStr?: string): {
   month: number; // 0-indexed (0 = Jan, 9 = Oct)
   day: number;
 } {
-  const now = new Date();
+  const [vnY, vnM, vnD] = toLocalIsoDate(new Date()).split("-").map(Number);
   const defaultRes = {
-    year: now.getFullYear(),
-    month: now.getMonth(),
-    day: now.getDate(),
+    year: vnY,
+    month: vnM - 1,
+    day: vnD,
   };
 
   if (!matchDateStr) return defaultRes;
@@ -129,7 +139,7 @@ export function parseMatchDateParts(matchDateStr?: string): {
   if (slashMatch) {
     const d = parseInt(slashMatch[1], 10);
     const m = parseInt(slashMatch[2], 10) - 1;
-    let y = slashMatch[3] ? parseInt(slashMatch[3], 10) : now.getFullYear();
+    let y = slashMatch[3] ? parseInt(slashMatch[3], 10) : defaultRes.year;
     if (y < 100) y += 2000;
     return { year: y, month: m, day: d };
   }
@@ -137,13 +147,11 @@ export function parseMatchDateParts(matchDateStr?: string): {
   // 3. Kiểm tra từ khóa tương đối nếu không kèm số ngày
   const lower = raw.toLowerCase();
   if (lower.includes("ngày kia")) {
-    const d = new Date(now);
-    d.setDate(d.getDate() + 2);
+    const d = new Date(defaultRes.year, defaultRes.month, defaultRes.day + 2);
     return { year: d.getFullYear(), month: d.getMonth(), day: d.getDate() };
   }
   if (lower.includes("mai")) {
-    const d = new Date(now);
-    d.setDate(d.getDate() + 1);
+    const d = new Date(defaultRes.year, defaultRes.month, defaultRes.day + 1);
     return { year: d.getFullYear(), month: d.getMonth(), day: d.getDate() };
   }
 

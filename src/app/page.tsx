@@ -284,6 +284,7 @@ export default function HanoiMatchmakingPlatform() {
   const {
     matches,
     setMatches,
+    isLoadingMatches,
     broadcastNewMatch,
     broadcastMatchLock,
     broadcastMatchDelete,
@@ -686,6 +687,10 @@ export default function HanoiMatchmakingPlatform() {
         ...newMatch,
         id: officialId,
       });
+    } else {
+      console.warn("⚠️ createMatchInDatabaseAction warning:", dbRes?.error);
+      // Fallback: Nếu CSDL gặp lỗi tạm thời, vẫn broadcast newMatch để máy B nhận được ngay
+      await broadcastNewMatch(newMatch);
     }
 
     pushBotLog(
@@ -1309,7 +1314,21 @@ export default function HanoiMatchmakingPlatform() {
               )}
 
               {/* Danh sách Kèo Thường / Khối Ghép Trận Phủi */}
-              {filteredMatches.length === 0 ? (
+              {isLoadingMatches ? (
+                <div className="relative rounded-3xl border border-emerald-500/30 bg-[#061e13]/90 backdrop-blur-xl p-8 sm:p-12 text-center space-y-4 shadow-2xl overflow-hidden">
+                  <div className="py-2">
+                    <RollingFootballPitch statusText="Đang kết nối Realtime & đồng bộ dữ liệu sân phủi..." />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold text-emerald-400 animate-pulse">
+                      Đang tải danh sách kèo đấu trực tuyến từ máy chủ...
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      Tự động cập nhật tức thì mọi thay đổi mà không cần tải lại trang
+                    </p>
+                  </div>
+                </div>
+              ) : filteredMatches.length === 0 ? (
                 <div className="relative rounded-3xl border border-emerald-500/25 bg-[#061e13]/90 backdrop-blur-xl p-8 sm:p-10 text-center space-y-4 shadow-2xl overflow-hidden">
                   {/* Watermark Stamps Phủi */}
                   <div className="absolute top-4 right-4 hidden sm:block">
