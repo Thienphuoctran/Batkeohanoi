@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Flame,
   MapPin,
   Clock,
   ShieldCheck,
-  Gift,
   Handshake,
+  Edit3,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { MatchFeedItem } from "@/types/matchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
@@ -19,30 +21,18 @@ import { PhuiStamp } from "@/components/phui";
 interface SosAlertCardProps {
   match: MatchFeedItem;
   onSelectMatch: (match: MatchFeedItem) => void;
+  isOwner?: boolean;
+  onEditMatch?: (match: MatchFeedItem) => void;
+  onDeleteMatch?: (matchId: string) => void;
 }
 
-export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
-  const [secondsLeft, setSecondsLeft] = useState(
-    match.sosCountdownSeconds || 3240
-  );
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatCountdown = (sec: number) => {
-    const hrs = Math.floor(sec / 3600);
-    const mins = Math.floor((sec % 3600) / 60);
-    const remSec = sec % 60;
-    return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(
-      2,
-      "0"
-    )}:${String(remSec).padStart(2, "0")}`;
-  };
-
+export function SosAlertCard({
+  match,
+  onSelectMatch,
+  isOwner = false,
+  onEditMatch,
+  onDeleteMatch,
+}: SosAlertCardProps) {
   const tierInfo = SKILL_TIERS_CONFIG[match.requiredTier];
   const shareCost = match.shareCostVnd;
 
@@ -50,25 +40,27 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
     <LaserGlowCard glowColor="red" speed={3.5} className="w-full relative overflow-hidden">
       {/* Top Urgent Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-rose-500/25">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500 text-white text-[11px] font-black tracking-wide uppercase shadow-sm">
             <Flame className="w-3.5 h-3.5 fill-current animate-bounce" />
             SOS CẦN ĐỐI GẤP
           </span>
-          <PhuiStamp variant="sos-khan-cap" size="sm" angle={-6} className="hidden sm:inline-flex" />
+          <PhuiStamp variant="sos-khan-cap" size="sm" angle={-5} className="hidden sm:inline-flex" />
           <span className="text-xs font-semibold text-rose-200/90">
-            {match.cancellationReason || "Đối thủ hủy sát giờ (< 1 tiếng)"}
+            {match.cancellationReason || "Cần tìm đối thay thế khẩn cấp trước giờ bóng lăn"}
           </span>
         </div>
 
-        {/* Live Countdown Badge */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950/90 border border-rose-500/40 text-xs">
-          <Clock className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
-          <span className="text-slate-400 text-[11px]">Bóng lăn sau:</span>
-          <span className="font-mono font-black text-rose-400 tabular-nums text-xs">
-            {formatCountdown(secondsLeft)}
+        {/* Trạng thái Kèo của bạn hoặc Nhãn Khẩn Cấp (Đã gỡ bỏ đồng hồ đếm ngược theo yêu cầu) */}
+        {isOwner ? (
+          <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider">
+            ★ KÈO SOS CỦA BẠN
           </span>
-        </div>
+        ) : (
+          <span className="px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[10px] font-bold tracking-wider">
+            ⚡ KHẨN CẤP
+          </span>
+        )}
       </div>
 
       {/* Main Content */}
@@ -97,48 +89,82 @@ export function SosAlertCard({ match, onSelectMatch }: SosAlertCardProps) {
               <MapPin className="w-3.5 h-3.5 text-rose-400" />
               {match.pitchName}
             </span>
-            <span className="text-amber-300 font-extrabold tabular-nums">
-              ⏰ {match.startTime} - {match.endTime} ({match.matchDate})
+            <span className="text-amber-300 font-extrabold tabular-nums flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {match.startTime} - {match.endTime} ({match.matchDate})
             </span>
           </div>
 
-          {/* Rescue Benefit Box */}
-          <div className="rounded-xl bg-rose-500/15 border border-rose-500/30 px-3 py-2 flex items-center gap-2 text-xs text-rose-200 font-semibold">
-            <Gift className="w-4 h-4 text-rose-400 shrink-0" />
+          {/* Rescue Policy Box - Sòng phẳng 100%, bảo chứng an toàn */}
+          <div className="rounded-xl bg-rose-500/15 border border-rose-500/30 px-3 py-2 flex items-center gap-2 text-xs text-rose-200 font-medium">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>
-              Quyền lợi cứu hộ: Thưởng ngay +8 điểm uy tín tín nhiệm &amp; hỗ trợ cộng đồng phủi!
+              Quy chuẩn cứu hộ: Ghép đối khẩn cấp • Thưởng +8 điểm uy tín tín nhiệm • Bảo chứng cọc 200k an toàn 100%!
             </span>
           </div>
         </div>
 
-        {/* Right: Cost & Action */}
+        {/* Right: Cost & Actions */}
         <div className="md:col-span-4 flex sm:flex-row md:flex-col items-center sm:justify-between md:items-end justify-between gap-2.5 pt-2 md:pt-0 border-t md:border-t-0 border-rose-500/20">
           <div className="text-left md:text-right">
-            <div className="text-[10px] text-slate-400">
-              Tiền sân chia sẻ (50/50):
+            <div className="text-[10px] text-slate-400 font-medium">
+              Tiền sân chia đôi (50/50):
             </div>
             <div className="flex items-baseline gap-2 md:justify-end">
               <span className="text-lg font-black text-emerald-400 tabular-nums">
                 {shareCost.toLocaleString("vi-VN")}đ
               </span>
             </div>
+            <div className="text-[10px] text-slate-500">
+              Tổng sân: {match.totalCostVnd.toLocaleString("vi-VN")}đ
+            </div>
           </div>
 
-          <ClickSpark
-            sparkColor={["#ef4444", "#f97316", "#fbbf24", "#ffffff"]}
-            sparkCount={10}
-            className="w-full sm:w-auto md:w-full"
-          >
-            <Button
-              onClick={() => onSelectMatch(match)}
-              className="w-full h-10 px-5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 hover:brightness-110 text-white font-black text-xs tracking-wide shadow-lg shadow-red-600/30 flex items-center justify-center gap-1.5 active:scale-95 transition"
+          {/* NÚT THAO TÁC: NẾU LÀ CHỦ BÀI ĐĂNG SOS -> CHO PHÉP SỬA & HỦY/XÓA; NẾU LÀ ĐỘI KHÁC -> NÚT GIẢI CỨU */}
+          {isOwner ? (
+            <div className="flex items-center gap-2 w-full sm:w-auto md:w-full justify-end">
+              {onEditMatch && (
+                <button
+                  type="button"
+                  onClick={() => onEditMatch(match)}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-amber-500/40 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 text-xs font-black transition shadow-sm active:scale-95"
+                  title="Chỉnh sửa thông tin bài đăng SOS của bạn"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Sửa SOS</span>
+                </button>
+              )}
+              {onDeleteMatch && (
+                <button
+                  type="button"
+                  onClick={() => onDeleteMatch(match.id)}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-rose-500/40 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-black transition shadow-sm active:scale-95"
+                  title="Hủy hoặc xóa bài đăng SOS này khỏi bảng tin"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Hủy / Xóa</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <ClickSpark
+              sparkColor={["#ef4444", "#f97316", "#fbbf24", "#ffffff"]}
+              sparkCount={10}
+              className="w-full sm:w-auto md:w-full"
             >
-              <span>Giải Cứu Kèo Ngay</span>
-              <span>📣</span>
-            </Button>
-          </ClickSpark>
+              <Button
+                onClick={() => onSelectMatch(match)}
+                className="w-full h-10 px-5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 hover:brightness-110 text-white font-black text-xs tracking-wide shadow-lg shadow-red-600/30 flex items-center justify-center gap-1.5 active:scale-95 transition"
+              >
+                <span>Giải Cứu Kèo Ngay</span>
+                <span>📣</span>
+              </Button>
+            </ClickSpark>
+          )}
         </div>
       </div>
     </LaserGlowCard>
   );
 }
+
+export default SosAlertCard;

@@ -866,13 +866,21 @@ export default function HanoiMatchmakingPlatform() {
               {/* Kèo SOS nổi bật trên đầu Bảng Kèo */}
               {sosMatches.length > 0 && (
                 <section className="space-y-3">
-                  {sosMatches.map((sos) => (
-                    <SosAlertCard
-                      key={sos.id}
-                      match={sos}
-                      onSelectMatch={(m) => setActiveChallengeMatch(m)}
-                    />
-                  ))}
+                  {sosMatches.map((sos) => {
+                    const isOwner =
+                      Boolean(sos.isCreatedByCurrentUser) ||
+                      (Boolean(team?.team_name) && sos.hostTeam.name === team?.team_name);
+                    return (
+                      <SosAlertCard
+                        key={sos.id}
+                        match={sos}
+                        isOwner={isOwner}
+                        onSelectMatch={(m) => setActiveChallengeMatch(m)}
+                        onEditMatch={(m) => setEditingMatch(m)}
+                        onDeleteMatch={handleDeleteMatch}
+                      />
+                    );
+                  })}
                 </section>
               )}
 
@@ -965,13 +973,21 @@ export default function HanoiMatchmakingPlatform() {
 
               {sosMatches.length > 0 ? (
                 <div className="space-y-3.5">
-                  {sosMatches.map((sos) => (
-                    <SosAlertCard
-                      key={sos.id}
-                      match={sos}
-                      onSelectMatch={(m) => setActiveChallengeMatch(m)}
-                    />
-                  ))}
+                  {sosMatches.map((sos) => {
+                    const isOwner =
+                      Boolean(sos.isCreatedByCurrentUser) ||
+                      (Boolean(team?.team_name) && sos.hostTeam.name === team?.team_name);
+                    return (
+                      <SosAlertCard
+                        key={sos.id}
+                        match={sos}
+                        isOwner={isOwner}
+                        onSelectMatch={(m) => setActiveChallengeMatch(m)}
+                        onEditMatch={(m) => setEditingMatch(m)}
+                        onDeleteMatch={handleDeleteMatch}
+                      />
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="surface-card rounded-2xl border border-white/[0.08] p-8 text-center text-xs text-slate-400">
