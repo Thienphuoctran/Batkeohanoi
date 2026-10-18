@@ -170,7 +170,8 @@ export function useRealtimeMatchFeed(
             "*, teams:host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
           )
           .neq("status", "cancelled")
-          .order("created_at", { ascending: false });
+          .order("created_at", { ascending: false })
+          .limit(50);
 
         if (!error && dbData && dbData.length > 0) {
           const mapped = dbData
