@@ -205,27 +205,38 @@ export function useRealtimeMatchFeed(
   const [matches, setMatches] = useState<MatchFeedItem[]>(() => {
     if (typeof window !== "undefined") {
       try {
+        localStorage.removeItem("batkeo7_matches_v1");
         const saved = localStorage.getItem(MATCHES_STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed;
+            // Lọc sạch toàn bộ các kèo mẫu / kèo ảo (seed-*, mock-*)
+            return parsed.filter(
+              (m: any) =>
+                !m.id?.startsWith("seed-") &&
+                !m.id?.startsWith("mock-")
+            );
           }
         }
       } catch (e) {
         console.warn("Failed to read matches from localStorage", e);
       }
     }
-    return initialFeed;
+    return (initialFeed || []).filter(
+      (m) => !m.id?.startsWith("seed-") && !m.id?.startsWith("mock-")
+    );
   });
   const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
 
   // Tự động sao lưu dữ liệu sang localStorage sau mỗi biến động (chống mất dữ liệu khi F5)
   useEffect(() => {
-    if (typeof window !== "undefined" && matches && matches.length > 0) {
+    if (typeof window !== "undefined") {
       try {
-        localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(matches));
+        const cleanMatches = (matches || []).filter(
+          (m) => !m.id?.startsWith("seed-") && !m.id?.startsWith("mock-")
+        );
+        localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(cleanMatches));
       } catch (e) {
         console.warn("Failed to save matches to localStorage", e);
       }
@@ -261,8 +272,15 @@ export function useRealtimeMatchFeed(
             .map((d) => mapDbMatchToFeedItem(d as MatchItem));
           setMatches((prev) => {
             const map = new Map<string, MatchFeedItem>();
-            mapped.forEach((m) => map.set(m.id, m));
+            mapped.forEach((m) => {
+              if (!m.id?.startsWith("seed-") && !m.id?.startsWith("mock-")) {
+                map.set(m.id, m);
+              }
+            });
             prev.forEach((m) => {
+              // Bỏ qua kèo ảo / kèo mẫu seed
+              if (m.id?.startsWith("seed-") || m.id?.startsWith("mock-")) return;
+
               // 🛡️ CHỐNG TỰ SINH 2 KÈO: Bỏ qua kèo tạm nếu CSDL đã tải về kèo thật cùng sân & giờ
               const isDuplicateOfDb = mapped.some(
                 (dbM) =>
@@ -281,6 +299,23 @@ export function useRealtimeMatchFeed(
               } catch {}
             }
             return merged;
+          });
+        } else {
+          // Nếu CSDL rỗng hoặc chưa có trận nào, dọn dẹp sạch toàn bộ kèo seed/mock khỏi state
+          setMatches((prev) => {
+            const cleanPrev = prev.filter(
+              (m) =>
+                !m.id?.startsWith("seed-") &&
+                !m.id?.startsWith("mock-") &&
+                m.status !== "CANCELLED" &&
+                m.status !== "EXPIRED"
+            );
+            if (typeof window !== "undefined") {
+              try {
+                localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(cleanPrev));
+              } catch {}
+            }
+            return cleanPrev;
           });
         }
       } catch (err) {

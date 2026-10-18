@@ -161,12 +161,19 @@ export function AdminDashboard() {
     setEscrowRecords(getStoredEscrowRecords());
     setBroadcasts(getStoredBroadcasts());
     try {
-      const savedMatches = localStorage.getItem('batkeo7_matches_v1');
+      const savedMatches =
+        localStorage.getItem('batkeo7_matches_v2') ||
+        localStorage.getItem('batkeo7_matches_v1');
       if (savedMatches) {
         const parsed = JSON.parse(savedMatches);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setMatches(parsed);
+        if (Array.isArray(parsed)) {
+          const clean = parsed.filter(
+            (m: any) => !m.id?.startsWith('seed-') && !m.id?.startsWith('mock-')
+          );
+          setMatches(clean);
         }
+      } else {
+        setMatches([]);
       }
     } catch {
       // ignore
