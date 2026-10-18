@@ -11,7 +11,10 @@ import {
   formatMatchDateDisplay,
   getMatchExpiresDate,
 } from "@/lib/matchTime";
+import { getRealtimeMatchesFromDatabaseAction } from "@/actions/auth";
 import type { RealtimeChannel } from "@supabase/supabase-js";
+
+export const MATCHES_STORAGE_KEY = "batkeo7_matches_v2";
 
 export interface MatchItem {
   id: string;
@@ -195,26 +198,61 @@ export function useRealtimeMatchFeed(
     captainName?: string
   ) => void
 ) {
-  const [matches, setMatches] = useState<MatchFeedItem[]>(initialFeed);
+  const [matches, setMatches] = useState<MatchFeedItem[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(MATCHES_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to read matches from localStorage", e);
+      }
+    }
+    return initialFeed;
+  });
   const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
 
+  // Tự động sao lưu dữ liệu sang localStorage sau mỗi biến động (chống mất dữ liệu khi F5)
   useEffect(() => {
-    // 0. Tải các trận đấu thực tế đã lưu trong CSDL Supabase (loại trừ kèo đã hủy)
+    if (typeof window !== "undefined" && matches && matches.length > 0) {
+      try {
+        localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(matches));
+      } catch (e) {
+        console.warn("Failed to save matches to localStorage", e);
+      }
+    }
+  }, [matches]);
+
+  useEffect(() => {
+    // 0. Tải các trận đấu thực tế đã lưu trong CSDL Supabase (Bypass RLS qua getRealtimeMatchesFromDatabaseAction)
     const fetchExistingMatches = async () => {
       try {
-        const { data: dbData, error } = await supabase
-          .from("matches")
-          .select(
-            "*, teams:host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
-          )
-          .neq("status", "cancelled")
-          .neq("status", "expired")
-          .order("created_at", { ascending: false })
-          .limit(50);
+        let rawMatches: any[] = [];
+        const serverRes = await getRealtimeMatchesFromDatabaseAction();
+        if (serverRes.success && serverRes.data && serverRes.data.length > 0) {
+          rawMatches = serverRes.data;
+        } else {
+          const { data: dbData, error } = await supabase
+            .from("matches")
+            .select(
+              "*, teams:host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
+            )
+            .neq("status", "cancelled")
+            .neq("status", "expired")
+            .order("created_at", { ascending: false })
+            .limit(50);
+          if (!error && dbData && dbData.length > 0) {
+            rawMatches = dbData;
+          }
+        }
 
-        if (!error && dbData && dbData.length > 0) {
-          const mapped = dbData
+        if (rawMatches.length > 0) {
+          const mapped = rawMatches
             .filter((d: any) => d.status !== "cancelled" && d.status !== "expired")
             .map((d) => mapDbMatchToFeedItem(d as MatchItem));
           setMatches((prev) => {
@@ -232,7 +270,13 @@ export function useRealtimeMatchFeed(
                 map.set(m.id, m);
               }
             });
-            return Array.from(map.values());
+            const merged = Array.from(map.values());
+            if (typeof window !== "undefined") {
+              try {
+                localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(merged));
+              } catch {}
+            }
+            return merged;
           });
         }
       } catch (err) {

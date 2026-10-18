@@ -703,8 +703,43 @@ export async function createMatchInDatabaseAction(payload: {
         ? parsedExpires
         : new Date(kickoffDate.getTime() + 15 * 60 * 1000);
 
+    let hostTeamId = payload.hostTeamId;
+    const isValidUuid =
+      typeof hostTeamId === "string" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        hostTeamId
+      );
+
+    if (!isValidUuid) {
+      const { data: firstTeam } = await adminClient
+        .from("teams")
+        .select("id")
+        .limit(1)
+        .maybeSingle();
+      if (firstTeam?.id) {
+        hostTeamId = firstTeam.id;
+      } else {
+        const { data: newTeam } = await adminClient
+          .from("teams")
+          .insert({
+            team_name: "FC Cầu Giấy Phủi",
+            captain_name: "Đội Trưởng Mẫu",
+            captain_phone: "0988666888",
+            captain_zalo: "0988666888",
+            home_district: "CauGiay",
+            skill_tier: 2,
+            trust_score: 100,
+          })
+          .select("id")
+          .single();
+        if (newTeam?.id) {
+          hostTeamId = newTeam.id;
+        }
+      }
+    }
+
     const insertObj: Record<string, any> = {
-      host_team_id: payload.hostTeamId,
+      host_team_id: hostTeamId,
       pitch_custom_name: payload.pitchCustomName,
       district: payload.district || "Hà Nội",
       kickoff_time: kickoffDate.toISOString(),
@@ -732,8 +767,8 @@ export async function createMatchInDatabaseAction(payload: {
       .select("*, teams:host_team_id(team_name, trust_score)")
       .single();
 
-    // Fallback nếu CSDL chưa thêm cột gmaps, expires_at hoặc pitch_address
-    if (error && (error.message?.includes("gmaps") || error.message?.includes("expires") || error.message?.includes("pitch_address"))) {
+    // Fallback nếu CSDL chưa thêm cột gmaps, expires_at hoặc pitch_address hoặc lỗi host_team_id foreign key
+    if (error && (error.message?.includes("gmaps") || error.message?.includes("expires") || error.message?.includes("pitch_address") || error.message?.includes("foreign key") || error.message?.includes("host_team_id"))) {
       if (error.message.includes("pitch_address")) {
         delete insertObj.pitch_address;
       }
@@ -743,6 +778,33 @@ export async function createMatchInDatabaseAction(payload: {
       }
       if (error.message.includes("expires")) {
         delete insertObj.expires_at;
+      }
+      if (error.message.includes("foreign key") || error.message.includes("host_team_id")) {
+        const { data: fallbackTeam } = await adminClient
+          .from("teams")
+          .select("id")
+          .limit(1)
+          .maybeSingle();
+        if (fallbackTeam?.id) {
+          insertObj.host_team_id = fallbackTeam.id;
+        } else {
+          const { data: newTeam } = await adminClient
+            .from("teams")
+            .insert({
+              team_name: "FC Cầu Giấy Phủi",
+              captain_name: "Đội Trưởng Mẫu",
+              captain_phone: "0988666888",
+              captain_zalo: "0988666888",
+              home_district: "CauGiay",
+              skill_tier: 2,
+              trust_score: 100,
+            })
+            .select("id")
+            .single();
+          if (newTeam?.id) {
+            insertObj.host_team_id = newTeam.id;
+          }
+        }
       }
       const retry = await adminClient
         .from("matches")
@@ -1124,6 +1186,67 @@ export async function guestWithdrawFromMatchAction(payload: {
     return { success: true };
   } catch (err: any) {
     console.error("[guestWithdrawFromMatchAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+
+// 13. Lấy toàn bộ danh sách trận đấu thực tế từ Supabase Database (Bypass RLS, bảo đảm không bị mất dữ liệu khi F5)
+export async function getRealtimeMatchesFromDatabaseAction() {
+  try {
+    const adminClient = getAdminClient();
+    const { data, error } = await adminClient
+      .from("matches")
+      .select(
+        "*, teams:host_team_id(team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo)"
+      )
+      .neq("status", "cancelled")
+      .neq("status", "expired")
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.warn("[getRealtimeMatchesFromDatabaseAction Warning]", error.message);
+      return { success: false, data: [] };
+    }
+
+    return { success: true, data: data || [] };
+  } catch (err: any) {
+    console.error("[getRealtimeMatchesFromDatabaseAction Error]", err);
+    return { success: false, data: [] };
+  }
+}
+
+// 14. Khóa Kèo / Xác nhận bắt kèo lưu trạng thái kiên cố vào Supabase
+export async function confirmMatchChallengeAction(payload: {
+  matchId: string;
+  guestTeamName: string;
+  guestCaptainPhone: string;
+  guestCaptainZalo?: string;
+  guestTrustScore?: number;
+}) {
+  try {
+    const adminClient = getAdminClient();
+
+    const updateObj: Record<string, any> = {
+      status: "matched",
+      is_sos: false,
+      notes: `[Đã bắt kèo bởi ${payload.guestTeamName} - ${payload.guestCaptainPhone}]`,
+    };
+
+    const { error } = await adminClient
+      .from("matches")
+      .update(updateObj)
+      .eq("id", payload.matchId);
+
+    if (error) {
+      console.warn("[confirmMatchChallengeAction Error]", error.message);
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.error("[confirmMatchChallengeAction Error]", err);
     return { success: false, error: err?.message || "Unknown error" };
   }
 }

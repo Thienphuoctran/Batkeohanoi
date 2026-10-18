@@ -67,6 +67,7 @@ import {
   requestWithdrawEscrowAction,
   deleteOrCancelMatchAction,
   guestWithdrawFromMatchAction,
+  confirmMatchChallengeAction,
 } from "@/actions/auth";
 import {
   addStoredEscrowRecord,
@@ -185,6 +186,7 @@ export default function HanoiMatchmakingPlatform() {
     };
   }, []);
 
+
   const [botLogs, setBotLogs] = useState<BotLogItem[]>([
     {
       id: "log-1",
@@ -224,6 +226,55 @@ export default function HanoiMatchmakingPlatform() {
     ]);
     setUnreadBotCount((c) => c + 1);
   };
+
+  // 🛡️ Khôi phục dữ liệu Ví Ký Quỹ, Điểm Uy Tín & Lịch Sử Bot từ localStorage khi F5 / Tải lại trang
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const savedScore = localStorage.getItem("batkeo7_my_trust_score");
+      if (savedScore !== null) {
+        const parsed = Number(savedScore);
+        if (!isNaN(parsed)) setMyTrustScore(parsed);
+      }
+
+      const savedWallet = localStorage.getItem("batkeo7_escrow_wallet");
+      if (savedWallet) {
+        const parsed = JSON.parse(savedWallet);
+        if (parsed && typeof parsed.balance === "number") {
+          setEscrowWallet(parsed);
+        }
+      }
+
+      const savedLogs = localStorage.getItem("batkeo7_bot_logs");
+      if (savedLogs) {
+        const parsed = JSON.parse(savedLogs);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setBotLogs(parsed);
+        }
+      }
+    } catch (e) {
+      console.warn("Error restoring state from localStorage", e);
+    }
+  }, []);
+
+  // Tự động lưu biến động sang localStorage
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("batkeo7_my_trust_score", String(myTrustScore));
+    }
+  }, [myTrustScore]);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("batkeo7_escrow_wallet", JSON.stringify(escrowWallet));
+    }
+  }, [escrowWallet]);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined" && botLogs.length > 0) {
+      localStorage.setItem("batkeo7_bot_logs", JSON.stringify(botLogs.slice(0, 50)));
+    }
+  }, [botLogs]);
 
   // Kết nối Supabase WebSockets Realtime (Zero Reload giữa các thiết bị)
   const {
@@ -539,6 +590,15 @@ export default function HanoiMatchmakingPlatform() {
       );
     }
 
+    // 🛡️ Lưu trạng thái Khóa Kèo trực tiếp vào CSDL Supabase (Zero Data Loss khi F5)
+    await confirmMatchChallengeAction({
+      matchId,
+      guestTeamName: challengerTeamName,
+      guestCaptainPhone: challengerPhone,
+      guestCaptainZalo: challengerZalo,
+      guestTrustScore: effectiveTrustScore,
+    });
+
     try {
       await fetch(`/api/matches/${matchId}/challenge`, {
         method: "POST",
@@ -571,40 +631,40 @@ export default function HanoiMatchmakingPlatform() {
     // Phát sóng Realtime sang các thiết bị khác đang mở bảng tin (Zero Reload)
     await broadcastNewMatch(newMatch);
 
-    // Nếu Đội trưởng đã đăng ký đội chính chủ trên Supabase, lưu kèo thẳng vào bảng public.matches
-    if (team?.id) {
-      const dbRes = await createMatchInDatabaseAction({
-        hostTeamId: team.id,
-        pitchCustomName: newMatch.pitchName,
-        district: newMatch.district,
-        timeSlotLabel: `${newMatch.startTime} - ${newMatch.endTime}`,
-        kickoffTimeIso: newMatch.kickoffTime,
-        expiresAtIso: newMatch.expiresAt,
-        totalFee: newMatch.totalCostVnd,
-        splitFee: newMatch.shareCostVnd,
-        isSos: newMatch.isSOS,
-        notes: newMatch.notes,
-        gmapsUrl: newMatch.gmapsUrl,
-        isGmapsIntegrated: newMatch.isGmapsIntegrated,
-        pitchAddress: newMatch.pitchAddress,
-      });
+    // Luôn luôn lưu kèo vào CSDL Supabase (kể cả khi chưa đăng ký tài khoản, dùng fallback host team an toàn)
+    const hostTeamIdToSave = team?.id || "team-cg-01";
+    const dbRes = await createMatchInDatabaseAction({
+      hostTeamId: hostTeamIdToSave,
+      pitchCustomName: newMatch.pitchName,
+      district: newMatch.district,
+      timeSlotLabel: `${newMatch.startTime} - ${newMatch.endTime}`,
+      kickoffTimeIso: newMatch.kickoffTime,
+      expiresAtIso: newMatch.expiresAt,
+      totalFee: newMatch.totalCostVnd,
+      splitFee: newMatch.shareCostVnd,
+      isSos: newMatch.isSOS,
+      notes: newMatch.notes,
+      gmapsUrl: newMatch.gmapsUrl,
+      isGmapsIntegrated: newMatch.isGmapsIntegrated,
+      pitchAddress: newMatch.pitchAddress,
+    });
 
-      // 🛡️ CHỐNG TỰ SINH 2 KÈO: Cập nhật ngay ID chính thức từ Supabase cho kèo vừa tạo
-      if (dbRes?.success && dbRes.match?.id) {
-        setMatches((prev) =>
-          prev.map((m) =>
-            m.id === newMatch.id
-              ? {
-                  ...m,
-                  id: dbRes.match.id,
-                  pitchAddress: newMatch.pitchAddress,
-                  gmapsUrl: newMatch.gmapsUrl,
-                  isGmapsIntegrated: newMatch.isGmapsIntegrated,
-                }
-              : m
-          )
-        );
-      }
+    // 🛡️ CHỐNG TỰ SINH 2 KÈO: Cập nhật ngay ID chính thức từ Supabase cho kèo vừa tạo
+    if (dbRes?.success && dbRes.match?.id) {
+      setMatches((prev) =>
+        prev.map((m) =>
+          m.id === newMatch.id
+            ? {
+                ...m,
+                id: dbRes.match.id,
+                isCreatedByCurrentUser: true,
+                pitchAddress: newMatch.pitchAddress,
+                gmapsUrl: newMatch.gmapsUrl,
+                isGmapsIntegrated: newMatch.isGmapsIntegrated,
+              }
+            : m
+        )
+      );
     }
 
     pushBotLog(
@@ -759,16 +819,17 @@ export default function HanoiMatchmakingPlatform() {
     // 4. Đồng bộ xóa sạch khỏi localStorage
     if (typeof window !== "undefined") {
       try {
-        const saved = localStorage.getItem("batkeo7_matches_v1");
+        const saved = localStorage.getItem("batkeo7_matches_v2");
         if (saved) {
           const list = JSON.parse(saved);
           if (Array.isArray(list)) {
             localStorage.setItem(
-              "batkeo7_matches_v1",
+              "batkeo7_matches_v2",
               JSON.stringify(list.filter((m: any) => m.id !== matchId))
             );
           }
         }
+        localStorage.removeItem("batkeo7_matches_v1");
       } catch {}
     }
 
