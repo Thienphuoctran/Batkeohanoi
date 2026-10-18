@@ -22,11 +22,11 @@ import { SosAlertCard } from "@/components/matchmaking/SosAlertCard";
 import { MatchFeedCard } from "@/components/matchmaking/MatchFeedCard";
 import { MatchChallengeModal } from "@/components/matchmaking/MatchChallengeModal";
 import { CreateMatchModal } from "@/components/matchmaking/CreateMatchModal";
+import { EditMatchModal } from "@/components/matchmaking/EditMatchModal";
 import { LiveMatchBar } from "@/components/matchmaking/LiveMatchBar";
 import { EscrowWalletModal } from "@/components/escrow/EscrowWalletModal";
 import { HandshakeModal } from "@/components/matchmaking/HandshakeModal";
 import { SubMarketAndRollCall } from "@/components/matchmaking/SubMarketAndRollCall";
-import { VietQrSplitter } from "@/components/matchmaking/VietQrSplitter";
 import { TeamTrustProfile } from "@/components/matchmaking/TeamTrustProfile";
 import {
   getZaloDeepLink,
@@ -77,6 +77,7 @@ export default function HanoiMatchmakingPlatform() {
   // Modal & Trung tâm Chuông thông báo In-App + Zalo 1-Click
   const [activeChallengeMatch, setActiveChallengeMatch] =
     useState<MatchFeedItem | null>(null);
+  const [editingMatch, setEditingMatch] = useState<MatchFeedItem | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isBotDrawerOpen, setIsBotDrawerOpen] = useState(false);
   const [unreadBotCount, setUnreadBotCount] = useState(1);
@@ -405,6 +406,31 @@ export default function HanoiMatchmakingPlatform() {
     }
   };
 
+  const handleSaveEditedMatch = (updatedMatch: MatchFeedItem) => {
+    setMatches((prev) =>
+      prev.map((m) => (m.id === updatedMatch.id ? updatedMatch : m))
+    );
+    setEditingMatch(null);
+    pushBotLog(
+      "✏️ Đã Cập Nhật Kèo Đấu",
+      `Thông tin kèo đấu tại ${updatedMatch.pitchName} (${updatedMatch.startTime} - ${updatedMatch.district}) đã được cập nhật thành công!`,
+      "Đã Cập Nhật"
+    );
+  };
+
+  const handleDeleteMatch = (matchId: string) => {
+    const target = matches.find((m) => m.id === matchId);
+    setMatches((prev) => prev.filter((m) => m.id !== matchId));
+    if (editingMatch?.id === matchId) {
+      setEditingMatch(null);
+    }
+    pushBotLog(
+      "🗑️ Đã Xóa Kèo Đấu",
+      `Kèo đấu tại ${target?.pitchName || "sân"} (${target?.startTime || ""}) đã được gỡ bỏ khỏi bảng tin.`,
+      "Đã Xóa Kèo"
+    );
+  };
+
   return (
     <div className="min-h-screen bg-stadium-multi text-slate-100 flex flex-col pb-16 relative overflow-x-hidden">
       {/* Dynamic Multi-Color Stadium Flares & Floating Sport Stickers */}
@@ -640,15 +666,24 @@ export default function HanoiMatchmakingPlatform() {
                     isWideLayout ? "md:grid-cols-2" : ""
                   } gap-3.5`}
                 >
-                  {regularMatches.map((match) => (
-                    <MatchFeedCard
-                      key={match.id}
-                      match={match}
-                      onSelectMatch={(m) => setActiveChallengeMatch(m)}
-                      onOpenBlindReview={() => setActiveTab("trust-profile")}
-                      onOpenHandshake={(m) => setActiveHandshakeMatch(m)}
-                    />
-                  ))}
+                  {regularMatches.map((match) => {
+                    const isOwner =
+                      Boolean(match.isCreatedByCurrentUser) ||
+                      (Boolean(team?.team_name) && match.hostTeam.name === team?.team_name) ||
+                      match.id === "feed-1";
+                    return (
+                      <MatchFeedCard
+                        key={match.id}
+                        match={match}
+                        isOwner={isOwner}
+                        onSelectMatch={(m) => setActiveChallengeMatch(m)}
+                        onOpenBlindReview={() => setActiveTab("trust-profile")}
+                        onOpenHandshake={(m) => setActiveHandshakeMatch(m)}
+                        onEditMatch={(m) => setEditingMatch(m)}
+                        onDeleteMatch={handleDeleteMatch}
+                      />
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -693,11 +728,6 @@ export default function HanoiMatchmakingPlatform() {
           {/* WORKSPACE 3: CHỢ CẦU LẺ */}
           {activeTab === "sub-market" && (
             <SubMarketAndRollCall viewMode="sub-market" />
-          )}
-
-          {/* WORKSPACE 4: MÁY TÍNH VIETQR */}
-          {activeTab === "vietqr" && (
-            <VietQrSplitter />
           )}
 
           {/* WORKSPACE 6: HỒ SƠ ĐỘI TÔI & THẺ CĂN CƯỚC BÓNG ĐÁ SỐ */}
@@ -787,6 +817,15 @@ export default function HanoiMatchmakingPlatform() {
         }}
         escrowWallet={escrowWallet}
         onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
+      />
+
+      {/* Modal Chỉnh Sửa Kèo Đấu (Chỉ dành cho Đội Trưởng Tạo Kèo) */}
+      <EditMatchModal
+        isOpen={!!editingMatch}
+        onClose={() => setEditingMatch(null)}
+        match={editingMatch}
+        onSaveMatch={handleSaveEditedMatch}
+        onDeleteMatch={handleDeleteMatch}
       />
 
       {/* Modal Đăng Nhập / Đăng Ký Đội Trưởng */}

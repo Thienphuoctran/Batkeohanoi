@@ -10,6 +10,8 @@ import {
   Handshake,
   Lock,
   MessageSquare,
+  Edit3,
+  Trash2,
 } from "lucide-react";
 import { MatchFeedItem } from "@/types/matchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
@@ -21,6 +23,9 @@ interface MatchFeedCardProps {
   onSelectMatch: (match: MatchFeedItem) => void;
   onOpenBlindReview?: (teamName: string) => void;
   onOpenHandshake?: (match: MatchFeedItem) => void;
+  isOwner?: boolean;
+  onEditMatch?: (match: MatchFeedItem) => void;
+  onDeleteMatch?: (matchId: string) => void;
 }
 
 export function MatchFeedCard({
@@ -28,6 +33,9 @@ export function MatchFeedCard({
   onSelectMatch,
   onOpenBlindReview,
   onOpenHandshake,
+  isOwner,
+  onEditMatch,
+  onDeleteMatch,
 }: MatchFeedCardProps) {
   const tierInfo = SKILL_TIERS_CONFIG[match.requiredTier];
   const isMatched = match.status === "MATCHED" || match.status === "PLAYING_VERIFIED";
@@ -76,10 +84,15 @@ export function MatchFeedCard({
               {host.shortName.slice(0, 3).toUpperCase()}
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <h3 className="font-bold text-sm text-white leading-tight">
                   {host.name}
                 </h3>
+                {isOwner && (
+                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    Kèo của bạn
+                  </span>
+                )}
                 <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-amber-400 tabular-nums">
                   <Star className="w-3 h-3 fill-amber-400" />
                   {avgStar}
@@ -165,13 +178,15 @@ export function MatchFeedCard({
       {/* Bottom Footer */}
       <div className="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-white/[0.06]">
         <div>
-          <span className="text-[10px] text-slate-400 block">
-            Tiền sân chia đôi (50/50)
-          </span>
           <div className="flex items-center gap-1.5">
-            <span className="text-sm font-black text-emerald-400 tabular-nums">
-              {match.shareCostVnd.toLocaleString("vi-VN")}đ
+            <span className="text-[11px] font-black text-emerald-300 px-2 py-0.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30">
+              Chia {match.splitRatioLabel || "50/50"}
             </span>
+            <span className="text-xs font-bold text-slate-300 tabular-nums">
+              Sân: {match.totalCostVnd.toLocaleString("vi-VN")}đ
+            </span>
+          </div>
+          <div className="mt-1 flex items-center gap-1.5">
             <span
               className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
                 host.credit.score < 70
@@ -190,6 +205,19 @@ export function MatchFeedCard({
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               <span>Đã Bắt Tay &amp; Hoàn Cọc</span>
             </span>
+            {isOwner && onDeleteMatch && (
+              <button
+                onClick={() => {
+                  if (window.confirm("Bạn có chắc chắn muốn xóa kèo đã hoàn thành này khỏi danh sách?")) {
+                    onDeleteMatch(match.id);
+                  }
+                }}
+                className="p-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 transition active:scale-95"
+                title="Xóa kèo"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+              </button>
+            )}
             {onOpenBlindReview && (
               <button
                 onClick={() => onOpenBlindReview(host.name)}
@@ -201,6 +229,16 @@ export function MatchFeedCard({
           </div>
         ) : isMatched ? (
           <div className="flex items-center gap-1.5">
+            {isOwner && onEditMatch && (
+              <button
+                onClick={() => onEditMatch(match)}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold transition shadow-sm active:scale-95"
+                title="Chỉnh sửa thông tin kèo"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                <span>Sửa</span>
+              </button>
+            )}
             {onOpenHandshake && (
               <button
                 onClick={() => onOpenHandshake(match)}
@@ -211,22 +249,64 @@ export function MatchFeedCard({
                 <span>Mã Bắt Tay</span>
               </button>
             )}
-            <a
-              href={hostZaloUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-[#d97706]/70 bg-[#78350f]/25 hover:bg-[#78350f]/45 text-[#f59e0b] text-xs font-black transition shadow-md shadow-amber-900/20 active:scale-95"
-              title="Nhắn Zalo trực tiếp cho Đội trưởng chủ sân"
-            >
-              <MessageSquare className="w-3.5 h-3.5" />
-              <span>Zalo ĐT</span>
-            </a>
+            {!isOwner && (
+              <a
+                href={hostZaloUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-[#d97706]/70 bg-[#78350f]/25 hover:bg-[#78350f]/45 text-[#f59e0b] text-xs font-black transition shadow-md shadow-amber-900/20 active:scale-95"
+                title="Nhắn Zalo trực tiếp cho Đội trưởng chủ sân"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>Zalo ĐT</span>
+              </a>
+            )}
+            {isOwner && onDeleteMatch && (
+              <button
+                onClick={() => {
+                  if (window.confirm("Kèo này đã có đối thủ nhận. Bạn có chắc chắn muốn hủy và xóa kèo?")) {
+                    onDeleteMatch(match.id);
+                  }
+                }}
+                className="p-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 transition active:scale-95"
+                title="Xóa kèo"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+              </button>
+            )}
             {onOpenBlindReview && (
               <button
                 onClick={() => onOpenBlindReview(host.name)}
                 className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-105 text-slate-950 text-xs font-black transition shadow-md shadow-amber-500/20 active:scale-95"
               >
                 ★ Đánh giá
+              </button>
+            )}
+          </div>
+        ) : isOwner ? (
+          <div className="flex items-center gap-2">
+            {onEditMatch && (
+              <button
+                onClick={() => onEditMatch(match)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-500/40 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 text-xs font-black transition shadow-sm active:scale-95"
+                title="Chỉnh sửa kèo đấu của bạn"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                <span>Sửa Kèo</span>
+              </button>
+            )}
+            {onDeleteMatch && (
+              <button
+                onClick={() => {
+                  if (window.confirm("Bạn có chắc chắn muốn xóa kèo này không? Kèo sẽ được gỡ khỏi bảng tin.")) {
+                    onDeleteMatch(match.id);
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 text-xs font-black transition shadow-sm active:scale-95"
+                title="Xóa kèo này khỏi bảng tin"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                <span>Xóa Kèo</span>
               </button>
             )}
           </div>

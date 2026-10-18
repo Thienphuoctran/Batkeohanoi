@@ -122,6 +122,8 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
     endTime: endTime || "20:30",
     totalCostVnd: Number(row.total_fee) || 800000,
     shareCostVnd: Number(row.split_fee) || 400000,
+    splitRatio: "50_50",
+    splitRatioLabel: "50/50",
     requiredTier: tier,
     status:
       row.status === "matched"

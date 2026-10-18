@@ -21,7 +21,6 @@ export type ActiveTab =
   | "feed"
   | "sos"
   | "sub-market"
-  | "vietqr"
   | "trust-profile";
 
 interface HeaderBarProps {
@@ -120,7 +119,6 @@ export function HeaderBar({
       isSos: true,
     },
     { id: "sub-market", label: "Chợ Cầu", icon: <Users className="w-3.5 h-3.5" /> },
-    { id: "vietqr", label: "VietQR", icon: <QrCode className="w-3.5 h-3.5" /> },
   ];
 
   return (
@@ -285,8 +283,8 @@ export function HeaderBar({
           </div>
         </div>
 
-        {/* 4. 5-Tab Navigation Bar + Trust Profile Pill */}
-        <div className="grid grid-cols-5 gap-1 bg-slate-900/95 p-1 rounded-xl border border-slate-800/90 text-[11px] font-semibold">
+        {/* 4. 4-Tab Navigation Bar + Trust Profile Pill */}
+        <div className="grid grid-cols-4 gap-1.5 bg-slate-900/95 p-1 rounded-xl border border-slate-800/90 text-[11px] font-semibold">
           {navTabs.map((tab) => {
             const active = activeTab === tab.id;
             return (

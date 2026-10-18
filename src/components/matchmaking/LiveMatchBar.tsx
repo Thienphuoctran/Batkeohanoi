@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Flame,
   CloudSun,
@@ -29,28 +29,9 @@ export function LiveMatchBar({
   openMatchCount,
   selectedDistrict,
 }: LiveMatchBarProps) {
-  const [countdownSeconds, setCountdownSeconds] = useState(3098); // ~00:51:38
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdownSeconds((prev) => (prev > 0 ? prev - 1 : 3600));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatCountdown = (sec: number) => {
-    const hrs = Math.floor(sec / 3600);
-    const mins = Math.floor((sec % 3600) / 60);
-    const remSec = sec % 60;
-    return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(
-      2,
-      "0"
-    )}:${String(remSec).padStart(2, "0")}`;
-  };
-
   return (
     <div className="surface-card rounded-2xl border border-white/[0.1] p-3 sm:p-3.5 shadow-xl flex flex-col md:flex-row items-center justify-between gap-3">
-      {/* KHỐI TRÁI: LIVE HN + ĐỒNG HỒ ĐẾM NGƯỢC + THỜI TIẾT */}
+      {/* KHỐI TRÁI: LIVE HN + THỜI TIẾT SÂN + MINI PITCH */}
       <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full md:w-auto">
         {/* LIVE HN Beacon */}
         <div className="rounded-xl px-2.5 py-1.5 border border-rose-500/40 bg-rose-950/40 flex items-center gap-2 shrink-0">
@@ -63,16 +44,6 @@ export function LiveMatchBar({
             <span className="w-0.5 bg-rose-500 rounded-full animate-wave-2" />
             <span className="w-0.5 bg-rose-500 rounded-full animate-wave-3" />
           </div>
-        </div>
-
-        {/* Đồng hồ đếm ngược Bóng lăn sau */}
-        <div className="rounded-xl bg-slate-950/90 border border-slate-800 px-3 py-1.5 flex items-center gap-2 shrink-0">
-          <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-            Bóng lăn sau:
-          </span>
-          <span className="text-xs sm:text-sm font-black text-amber-300 font-mono tracking-wider tabular-nums">
-            {formatCountdown(countdownSeconds)}
-          </span>
         </div>
 
         {/* Thời tiết Sân */}

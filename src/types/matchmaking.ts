@@ -68,6 +68,8 @@ export interface EscrowWallet {
   canWithdraw: boolean; // true nếu điểm uy tín đã phục hồi >= 70 và có số dư
 }
 
+export type SplitCostRatio = "50_50" | "60_40" | "70_30" | "CUSTOM";
+
 export interface MatchFeedItem {
   id: string;
   hostTeam: TeamProfile;
@@ -79,7 +81,10 @@ export interface MatchFeedItem {
   startTime: string; // HH:mm (VD: 19:00)
   endTime: string;   // HH:mm (VD: 20:30)
   totalCostVnd: number; // Tổng tiền sân (VD: 800.000đ)
-  shareCostVnd: number; // Tiền chia đôi mỗi đội (VD: 400.000đ)
+  shareCostVnd: number; // Tiền đội khách (đối thủ) chịu
+  hostCostVnd?: number; // Tiền đội chủ nhà chịu
+  splitRatio?: SplitCostRatio; // Tỷ lệ chia: 50_50, 60_40, 70_30, CUSTOM
+  splitRatioLabel?: string; // Nhãn hiển thị: "Chia 50/50", "Chủ 60% / Khách 40%", v.v.
   requiredTier: SkillTier;
   status: MatchStatus;
   isSOS: boolean; // Cờ kích hoạt kèo SOS (< 2 tiếng)
@@ -91,6 +96,8 @@ export interface MatchFeedItem {
   handshakePin?: string; // Mã Bắt Tay 4 Số ngẫu nhiên (chống vu khống bùng kèo 100%)
   isHandshakeVerified?: boolean; // Hai đội đã nhập mã bắt tay thật sự trên sân
   escrowDepositTeamId?: string; // Đội đã ký quỹ 200k nếu điểm uy tín < 70
+  isCreatedByCurrentUser?: boolean; // Đánh dấu kèo của chính người dùng hiện tại
+  creatorId?: string;
 }
 
 export interface BlindReview {

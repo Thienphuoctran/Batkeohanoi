@@ -11,7 +11,7 @@ import {
   ShieldCheck,
   Lock,
 } from "lucide-react";
-import { District, MatchFeedItem, SkillTier, EscrowWallet } from "@/types/matchmaking";
+import { District, MatchFeedItem, SkillTier, EscrowWallet, SplitCostRatio } from "@/types/matchmaking";
 import { HANOI_PITCHES, SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { MOCK_TEAMS } from "@/constants/mockMatchmaking";
 import { Button } from "@/components/ui/button";
@@ -100,10 +100,35 @@ export function CreateMatchModal({
   );
   const [timeSlot, setTimeSlot] = useState("19:00 - 20:30");
   const [totalCost, setTotalCost] = useState(850000);
+  const [splitRatio, setSplitRatio] = useState<SplitCostRatio>("50_50");
+  const [customRatioText, setCustomRatioText] = useState("");
   const [isSOS, setIsSOS] = useState(false);
   const [notes, setNotes] = useState(
     "Đội văn minh, đúng giờ, giao lưu vui vẻ sau giờ làm."
   );
+
+  const guestCost = React.useMemo(() => {
+    if (splitRatio === "50_50") return Math.round(totalCost * 0.5);
+    if (splitRatio === "60_40") return Math.round(totalCost * 0.4);
+    if (splitRatio === "70_30") return Math.round(totalCost * 0.3);
+    const matchRatio = customRatioText.match(/(\d+)\s*\/\s*(\d+)/);
+    if (matchRatio) {
+      const guestPercent = Number(matchRatio[2]);
+      if (!isNaN(guestPercent) && guestPercent >= 0 && guestPercent <= 100) {
+        return Math.round((totalCost * guestPercent) / 100);
+      }
+    }
+    return Math.round(totalCost * 0.5);
+  }, [splitRatio, totalCost, customRatioText]);
+
+  const hostCost = Math.max(0, totalCost - guestCost);
+
+  const splitRatioLabel = React.useMemo(() => {
+    if (splitRatio === "50_50") return "50/50";
+    if (splitRatio === "60_40") return "60/40";
+    if (splitRatio === "70_30") return "70/30";
+    return customRatioText.trim() || "50/50";
+  }, [splitRatio, customRatioText]);
 
   React.useEffect(() => {
     if (verifiedTeam) {
@@ -196,7 +221,11 @@ export function CreateMatchModal({
       startTime: startTime || "19:00",
       endTime: endTime || "20:30",
       totalCostVnd: totalCost,
-      shareCostVnd: Math.round(totalCost / 2),
+      shareCostVnd: guestCost,
+      hostCostVnd: hostCost,
+      splitRatio: splitRatio,
+      splitRatioLabel: splitRatioLabel,
+      isCreatedByCurrentUser: true,
       requiredTier: tier,
       status: isSOS ? "SOS" : "OPEN",
       isSOS,
@@ -583,41 +612,82 @@ export function CreateMatchModal({
             </div>
           </div>
 
-          {/* 5. Tiền sân & Chế độ SOS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-            <div>
-              <label className="block font-semibold text-slate-300 mb-1">
-                5. Tổng tiền sân (VNĐ)
+          {/* 5. Tiền sân & Mức chia tiền sân */}
+          <div className="space-y-3 rounded-2xl bg-slate-950/70 border border-white/[0.08] p-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+              <div>
+                <label className="block font-semibold text-slate-300 mb-1">
+                  5. Tổng tiền sân (VNĐ)
+                </label>
+                <input
+                  type="number"
+                  step={50000}
+                  value={totalCost}
+                  onChange={(e) => setTotalCost(Number(e.target.value))}
+                  className="w-full h-10 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-emerald-400 font-extrabold tabular-nums"
+                />
+              </div>
+
+              <label className="flex items-center gap-2.5 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/25 cursor-pointer sm:mt-6">
+                <input
+                  type="checkbox"
+                  checked={isSOS}
+                  onChange={(e) => setIsSOS(e.target.checked)}
+                  className="w-4 h-4 accent-rose-500 rounded"
+                />
+                <div>
+                  <div className="font-bold text-rose-300 flex items-center gap-1 text-xs">
+                    <Flame className="w-3.5 h-3.5" />
+                    Bật Kèo SOS Khẩn Cấp (&lt;2h)
+                  </div>
+                  <div className="text-[10px] text-slate-400">
+                    Ưu tiên nổi bật trên đầu bảng tin
+                  </div>
+                </div>
               </label>
-              <input
-                type="number"
-                step={50000}
-                value={totalCost}
-                onChange={(e) => setTotalCost(Number(e.target.value))}
-                className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-white/[0.1] text-emerald-400 font-extrabold tabular-nums"
-              />
-              <span className="text-[10px] text-slate-400 mt-1 block">
-                Mỗi đội chia 50/50: {(totalCost / 2).toLocaleString("vi-VN")}đ
-              </span>
             </div>
 
-            <label className="flex items-center gap-2.5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 cursor-pointer mt-2 sm:mt-4">
-              <input
-                type="checkbox"
-                checked={isSOS}
-                onChange={(e) => setIsSOS(e.target.checked)}
-                className="w-4 h-4 accent-rose-500"
-              />
-              <div>
-                <div className="font-bold text-rose-300 flex items-center gap-1">
-                  <Flame className="w-3.5 h-3.5" />
-                  Bật Kèo SOS Khẩn Cấp
-                </div>
-                <div className="text-[10px] text-slate-400">
-                  Dành cho trận sát giờ &lt;2h bị bùng
-                </div>
+            {/* Mức chia tiền sân */}
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-300 mb-1.5">
+                Mức chia tiền sân:
+              </label>
+              <div className="grid grid-cols-4 gap-2 text-xs">
+                {[
+                  { id: "50_50", label: "50/50" },
+                  { id: "60_40", label: "60/40" },
+                  { id: "70_30", label: "70/30" },
+                  { id: "CUSTOM", label: "Tự điền" },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setSplitRatio(item.id as SplitCostRatio);
+                    }}
+                    className={`py-2 px-1 rounded-xl border text-center transition-all ${
+                      splitRatio === item.id
+                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-400 font-black shadow-sm ring-1 ring-emerald-400"
+                        : "bg-slate-900 border-white/[0.08] text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    <div className="font-extrabold text-xs">{item.label}</div>
+                  </button>
+                ))}
               </div>
-            </label>
+
+              {splitRatio === "CUSTOM" && (
+                <div className="mt-2.5">
+                  <input
+                    type="text"
+                    value={customRatioText}
+                    onChange={(e) => setCustomRatioText(e.target.value)}
+                    placeholder="Nhập mức chia (VD: 80/20, 55/45, Tùy tâm...)"
+                    className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-emerald-500/40 text-white font-bold text-xs placeholder:text-slate-500 focus:outline-none focus:border-emerald-400"
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           {/* 6. Ghi chú */}
