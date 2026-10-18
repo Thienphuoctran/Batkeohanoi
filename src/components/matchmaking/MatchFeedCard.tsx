@@ -20,15 +20,18 @@ interface MatchFeedCardProps {
   match: MatchFeedItem;
   onSelectMatch: (match: MatchFeedItem) => void;
   onOpenBlindReview?: (teamName: string) => void;
+  onOpenHandshake?: (match: MatchFeedItem) => void;
 }
 
 export function MatchFeedCard({
   match,
   onSelectMatch,
   onOpenBlindReview,
+  onOpenHandshake,
 }: MatchFeedCardProps) {
   const tierInfo = SKILL_TIERS_CONFIG[match.requiredTier];
-  const isMatched = match.status === "MATCHED";
+  const isMatched = match.status === "MATCHED" || match.status === "PLAYING_VERIFIED";
+  const isPlayingVerified = match.status === "PLAYING_VERIFIED";
   const host = match.hostTeam;
   const avgStar = (
     (host.ratingPunctual + host.ratingFairplay + host.ratingFinancial) /
@@ -173,21 +176,46 @@ export function MatchFeedCard({
               className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
                 host.credit.score < 70
                   ? "bg-rose-500/15 text-rose-300 border border-rose-500/30"
-                  : "bg-slate-800 text-slate-300"
+                  : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
               }`}
             >
-              {host.credit.score < 70 ? "Cọc 200k BQT" : "Miễn cọc tiền mặt"}
+              {host.credit.score < 70 ? "Ký quỹ 200k" : "Miễn cọc 100%"}
             </span>
           </div>
         </div>
 
-        {isMatched ? (
+        {isPlayingVerified ? (
           <div className="flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Đã Bắt Tay &amp; Hoàn Cọc</span>
+            </span>
+            {onOpenBlindReview && (
+              <button
+                onClick={() => onOpenBlindReview(host.name)}
+                className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-105 text-slate-950 text-xs font-black transition shadow-sm active:scale-95"
+              >
+                ★ Đánh giá
+              </button>
+            )}
+          </div>
+        ) : isMatched ? (
+          <div className="flex items-center gap-1.5">
+            {onOpenHandshake && (
+              <button
+                onClick={() => onOpenHandshake(match)}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black transition shadow-md shadow-emerald-500/20 active:scale-95"
+                title="Nhập mã bắt tay 4 số tại sân để xác thực thi đấu & giải phóng cọc 200k"
+              >
+                <Handshake className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Mã Bắt Tay</span>
+              </button>
+            )}
             <a
               href={hostZaloUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#d97706]/70 bg-[#78350f]/25 hover:bg-[#78350f]/45 text-[#f59e0b] text-xs font-black transition shadow-md shadow-amber-900/20 active:scale-95"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-[#d97706]/70 bg-[#78350f]/25 hover:bg-[#78350f]/45 text-[#f59e0b] text-xs font-black transition shadow-md shadow-amber-900/20 active:scale-95"
               title="Nhắn Zalo trực tiếp cho Đội trưởng chủ sân"
             >
               <MessageSquare className="w-3.5 h-3.5" />
@@ -196,9 +224,9 @@ export function MatchFeedCard({
             {onOpenBlindReview && (
               <button
                 onClick={() => onOpenBlindReview(host.name)}
-                className="px-3 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-105 text-slate-950 text-xs font-black transition shadow-md shadow-amber-500/20 active:scale-95"
+                className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-105 text-slate-950 text-xs font-black transition shadow-md shadow-amber-500/20 active:scale-95"
               >
-                ★ Đánh giá kèo
+                ★ Đánh giá
               </button>
             )}
           </div>

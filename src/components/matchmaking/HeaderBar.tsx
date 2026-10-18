@@ -12,7 +12,9 @@ import {
   Maximize2,
   Minimize2,
   Trophy,
+  Wallet,
 } from "lucide-react";
+import { EscrowWallet } from "@/types/matchmaking";
 import { Button } from "@/components/ui/button";
 
 export type ActiveTab =
@@ -38,6 +40,8 @@ interface HeaderBarProps {
   currentTeamName?: string;
   onOpenAuthModal?: () => void;
   onOpenTeamOnboarding?: () => void;
+  escrowWallet?: EscrowWallet;
+  onOpenEscrowModal?: () => void;
 }
 
 const PITCH_WEATHER_DATA: Record<
@@ -92,6 +96,8 @@ export function HeaderBar({
   currentTeamName,
   onOpenAuthModal,
   onOpenTeamOnboarding,
+  escrowWallet,
+  onOpenEscrowModal,
 }: HeaderBarProps) {
   const [selectedPitch, setSelectedPitch] = useState(
     "Trung Kính Hạ (Cầu Giấy)"
@@ -210,6 +216,25 @@ export function HeaderBar({
                 <span className="truncate">{currentTeamName}</span>
               </button>
             )}
+
+            {/* Quick Pill Ví Ký Quỹ */}
+            <button
+              onClick={onOpenEscrowModal}
+              title="Ví Ký Quỹ Nội Bộ (Bảo chứng 200k & Hoàn tiền tự động)"
+              className="h-9 px-2.5 sm:px-3 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/35 font-extrabold text-xs inline-flex items-center gap-1.5 transition"
+            >
+              <Wallet className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+              <span className="hidden sm:inline">Ví:</span>
+              <span className="tabular-nums font-mono text-sky-200">
+                {(escrowWallet?.balance ?? 0).toLocaleString("vi-VN")}đ
+              </span>
+              {escrowWallet && escrowWallet.lockedAmount > 0 && (
+                <span
+                  title={`Đang tạm khóa ${escrowWallet.lockedAmount.toLocaleString("vi-VN")}đ`}
+                  className="w-2 h-2 rounded-full bg-amber-400 animate-ping"
+                />
+              )}
+            </button>
 
             <Button
               onClick={onOpenCreateModal}

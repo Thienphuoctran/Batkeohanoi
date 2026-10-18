@@ -12,19 +12,24 @@ import {
   RotateCcw,
   Activity,
 } from "lucide-react";
-import { SkillTier } from "@/types/matchmaking";
+import { SkillTier, EscrowWallet } from "@/types/matchmaking";
 import { Button } from "@/components/ui/button";
+import { Wallet } from "lucide-react";
 
 interface TeamTrustProfileProps {
   myTrustScore: number;
   setMyTrustScore: React.Dispatch<React.SetStateAction<number>>;
   onPushBotLog?: (title: string, msg: string, badge: string) => void;
+  escrowWallet?: EscrowWallet;
+  onOpenEscrowModal?: () => void;
 }
 
 export function TeamTrustProfile({
   myTrustScore,
   setMyTrustScore,
   onPushBotLog,
+  escrowWallet,
+  onOpenEscrowModal,
 }: TeamTrustProfileProps) {
   const [under1hViolations, setUnder1hViolations] = useState(0);
   const [cleanStreak, setCleanStreak] = useState(0);
@@ -377,6 +382,63 @@ export function TeamTrustProfile({
                 </Button>
               </div>
             )}
+          </div>
+
+          {/* Thẻ Ví Ký Quỹ & Điều Kiện Rút Tiền Phân Tầng */}
+          <div className="rounded-xl bg-slate-950/90 border border-slate-800 p-3.5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+                  <Wallet className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white">Ví Ký Quỹ Nội Bộ (Escrow Balance)</h4>
+                  <p className="text-[10px] text-slate-400">Số dư bảo chứng không cần Admin duyệt tay</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-black text-sky-400 tabular-nums">
+                  {(escrowWallet?.balance ?? 0).toLocaleString("vi-VN")}đ
+                </div>
+                <div className="text-[10px] text-slate-400">
+                  Khả dụng: {(escrowWallet?.availableBalance ?? 0).toLocaleString("vi-VN")}đ
+                </div>
+              </div>
+            </div>
+
+            {myTrustScore < 70 ? (
+              <div className="rounded-lg bg-rose-500/10 border border-rose-500/30 p-2.5 space-y-1.5">
+                <div className="text-[11px] font-bold text-rose-300 flex items-center justify-between">
+                  <span>⚠️ Uy tín &lt; 70đ ({myTrustScore}đ) — Bị giới hạn dịch vụ</span>
+                  <span className="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-bold">
+                    Khóa Rút Tiền
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-300 leading-relaxed">
+                  Để tạo/nhận kèo, bạn bắt buộc phải có ít nhất <strong>200.000đ</strong> trong ví. Quyền rút tiền về ngân hàng sẽ tự động mở khóa khi bạn thi đấu nghiêm túc và khôi phục điểm uy tín lên <strong>≥ 70 điểm</strong>.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-2.5 space-y-1.5">
+                <div className="text-[11px] font-bold text-emerald-300 flex items-center justify-between">
+                  <span>✅ Uy tín an toàn ({myTrustScore}đ ≥ 70đ)</span>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-bold">
+                    Được Phép Rút Tiền
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-300 leading-relaxed">
+                  Bạn được <strong>miễn cọc 100%</strong> khi tạo &amp; nhận kèo. Nếu có số dư trong ví, bạn có thể rút về tài khoản ngân hàng bất cứ lúc nào (Hệ thống xử lý tự động trong 30 giây).
+                </p>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={onOpenEscrowModal}
+              className="w-full h-8 rounded-lg bg-slate-900 hover:bg-slate-800 text-sky-300 border border-sky-500/30 font-bold text-xs flex items-center justify-center gap-1.5 transition"
+            >
+              <span>Mở Chi Tiết Ví Ký Quỹ &amp; Nạp / Rút Tiền (Napas247)</span>
+            </button>
           </div>
         </div>
       </div>

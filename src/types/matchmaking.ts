@@ -51,7 +51,22 @@ export interface TeamProfile {
   };
 }
 
-export type MatchStatus = "OPEN" | "MATCHED" | "SOS" | "FINISHED" | "CANCELLED";
+export type MatchStatus =
+  | "OPEN"
+  | "MATCHED"
+  | "SOS"
+  | "PLAYING_VERIFIED"
+  | "FINISHED"
+  | "CANCELLED"
+  | "DISPUTED";
+
+export interface EscrowWallet {
+  balance: number; // Số dư ví ký quỹ (VNĐ)
+  lockedAmount: number; // Số tiền đang tạm khóa cọc cho trận đang đấu (200.000đ)
+  availableBalance: number; // Số dư khả dụng
+  isRestricted: boolean; // true nếu điểm uy tín < 70 và ví chưa đủ 200k
+  canWithdraw: boolean; // true nếu điểm uy tín đã phục hồi >= 70 và có số dư
+}
 
 export interface MatchFeedItem {
   id: string;
@@ -73,6 +88,9 @@ export interface MatchFeedItem {
   notes?: string;
   matchedAt?: string;
   createdAt: string;
+  handshakePin?: string; // Mã Bắt Tay 4 Số ngẫu nhiên (chống vu khống bùng kèo 100%)
+  isHandshakeVerified?: boolean; // Hai đội đã nhập mã bắt tay thật sự trên sân
+  escrowDepositTeamId?: string; // Đội đã ký quỹ 200k nếu điểm uy tín < 70
 }
 
 export interface BlindReview {

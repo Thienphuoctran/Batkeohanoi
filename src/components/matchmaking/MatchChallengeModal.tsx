@@ -18,10 +18,9 @@ import {
   BellRing,
   ExternalLink,
 } from "lucide-react";
-import { MatchFeedItem } from "@/types/matchmaking";
+import { MatchFeedItem, EscrowWallet } from "@/types/matchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { Button } from "@/components/ui/button";
-import { getAdminEscrowQRUrl } from "@/lib/vietqr";
 import {
   normalizeVietnamPhone,
   isValidVietnamPhone,
@@ -44,6 +43,8 @@ interface MatchChallengeModalProps {
     challengerPhone: string,
     challengerZalo?: string
   ) => void;
+  escrowWallet?: EscrowWallet;
+  onOpenEscrowModal?: () => void;
 }
 
 export function MatchChallengeModal({
@@ -51,6 +52,8 @@ export function MatchChallengeModal({
   myTrustScore = 100,
   onClose,
   onConfirmMatch,
+  escrowWallet,
+  onOpenEscrowModal,
 }: MatchChallengeModalProps) {
   const [teamName, setTeamName] = useState("FC Anh Em Cầu Giấy");
   const [phone, setPhone] = useState("0988.666.888");
@@ -68,9 +71,8 @@ export function MatchChallengeModal({
   const tierInfo = SKILL_TIERS_CONFIG[match.requiredTier];
   const host = match.hostTeam;
   const isEscrowRequired = myTrustScore < 70;
-  const escrowQrUrl = isEscrowRequired
-    ? getAdminEscrowQRUrl(match.id, teamName)
-    : "";
+  const isWalletFunded = !!escrowWallet && escrowWallet.balance >= 200000;
+  const isChallengeBlocked = isEscrowRequired && !isWalletFunded;
 
   const effectiveGuestZalo = sameZaloAsPhone ? phone : customZalo;
   const isGuestPhoneValid = isValidVietnamPhone(phone);
@@ -122,7 +124,8 @@ export function MatchChallengeModal({
       !agreedRules ||
       !teamName.trim() ||
       !isGuestPhoneValid ||
-      !isGuestZaloValid
+      !isGuestZaloValid ||
+      isChallengeBlocked
     )
       return;
 
@@ -479,29 +482,89 @@ export function MatchChallengeModal({
                 )}
               </div>
 
-              {/* Yêu cầu cọc 200.000đ nếu điểm tín nhiệm < 70 */}
-              {isEscrowRequired && (
-                <div className="rounded-xl bg-amber-500/10 border border-amber-500/40 p-3.5 space-y-2.5">
-                  <div className="text-amber-300 font-bold text-xs flex items-center gap-1.5">
-                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>
-                      Điểm tín nhiệm &lt; 70 ({myTrustScore}đ): Bắt buộc ký quỹ
-                      200.000đ
-                    </span>
+              {/* Trạng thái Ký Quỹ & Điểm Tín Nhiệm Phân Tầng */}
+              {isEscrowRequired ? (
+                isWalletFunded ? (
+                  <div className="rounded-xl bg-blue-500/10 border border-blue-500/30 p-3.5 space-y-2">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-blue-300">
+                            Ví Ký Quỹ Đã Sẵn Sàng ({(escrowWallet?.balance ?? 0).toLocaleString("vi-VN")}đ)
+                          </span>
+                          <span className="text-[10px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded-full font-bold">
+                            Đã bảo chứng
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                          Hệ thống sẽ <strong>tạm khóa 200.000đ</strong> bảo chứng trong ví. Tiền cọc sẽ <strong>tự động hoàn trả 100%</strong> về số dư khả dụng ngay khi 2 đội nhập <strong>Mã Bắt Tay trên sân</strong>.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-1 border-t border-white/[0.05] text-[11px] text-slate-400">
+                      <span>Uy tín hiện tại: <strong className="text-amber-400">{myTrustScore}đ</strong></span>
+                      <button
+                        type="button"
+                        onClick={onOpenEscrowModal}
+                        className="text-sky-400 hover:text-sky-300 font-semibold underline text-[11px]"
+                      >
+                        Quản lý Ví Ký Quỹ
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-[11px] text-slate-300 leading-relaxed">
-                    Để bảo vệ chủ sân khỏi rủi ro bùng kèo sát giờ, vui lòng quét
-                    VietQR chuyển khoản cọc <strong>200.000 VNĐ</strong> vào TK
-                    Ban Quản Trị (MB Bank:{" "}
-                    <strong className="text-white">07440948327598</strong> - TRAN
-                    QUOC THIEN PHUOC). Hoàn trả 100% sau trận đấu.
-                  </p>
-                  <div className="bg-white p-2.5 rounded-xl w-44 mx-auto">
-                    <img
-                      src={escrowQrUrl}
-                      alt="VietQR Cọc 200k BQT"
-                      className="w-full h-auto rounded"
-                    />
+                ) : (
+                  <div className="rounded-xl bg-rose-500/10 border border-rose-500/30 p-3.5 space-y-2.5">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                        <AlertTriangle className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-rose-300">
+                            Cần nạp 200.000đ Ký Quỹ (Uy tín {myTrustScore}đ &lt; 70đ)
+                          </span>
+                          <span className="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded-full font-bold">
+                            Tạm khóa quyền
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                          Điểm tín nhiệm của đội bạn đang dưới 70 điểm. Vui lòng nạp đủ 200.000đ vào Ví Ký Quỹ Nội Bộ để mở khóa quyền nhận kèo này.
+                        </p>
+                        <p className="text-[11px] text-slate-400 mt-1">
+                          Số dư ví hiện có: <strong className="text-white">{(escrowWallet?.balance ?? 0).toLocaleString("vi-VN")}đ</strong> — Cần thêm: <strong className="text-rose-400 font-bold">{(200000 - (escrowWallet?.balance ?? 0)).toLocaleString("vi-VN")}đ</strong>
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={onOpenEscrowModal}
+                      className="w-full h-9 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-slate-950 font-extrabold text-xs gap-1.5 shadow-md"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Nạp 200.000đ Vào Ví Ký Quỹ (VietQR Napas247)</span>
+                    </Button>
+                  </div>
+                )
+              ) : (
+                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-emerald-300">
+                        Điểm tín nhiệm {myTrustScore}★ (Chuẩn Phủi Uy Tín)
+                      </span>
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded-full font-bold">
+                        Miễn cọc 100%
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
+                      Đội bạn đạt mốc uy tín an toàn (≥ 70 điểm). Bạn được <strong>miễn nạp ký quỹ 100%</strong>, nhận kèo ngay không cần giữ tiền trong ví!
+                    </p>
                   </div>
                 </div>
               )}
@@ -522,23 +585,36 @@ export function MatchChallengeModal({
                 </span>
               </label>
 
-              <Button
-                type="submit"
-                disabled={
-                  !agreedRules ||
-                  isLocking ||
-                  !isGuestPhoneValid ||
-                  !isGuestZaloValid
-                }
-                className="w-full min-h-[46px] rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs gap-2"
-              >
-                <Lock className="w-4 h-4" />
-                <span>
-                  {isLocking
-                    ? "Đang khóa kèo (Row-Level Locking)..."
-                    : "Xác Nhận Bắt Đối & Mở Khóa Zalo Chủ Sân"}
-                </span>
-              </Button>
+              {isChallengeBlocked ? (
+                <Button
+                  type="button"
+                  onClick={onOpenEscrowModal}
+                  className="w-full min-h-[46px] rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-slate-950 font-extrabold text-xs gap-2 shadow-lg"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Nạp 200.000đ Ký Quỹ Để Mở Khóa Bắt Kèo</span>
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  disabled={
+                    !agreedRules ||
+                    isLocking ||
+                    !isGuestPhoneValid ||
+                    !isGuestZaloValid
+                  }
+                  className="w-full min-h-[46px] rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs gap-2 shadow-lg"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>
+                    {isLocking
+                      ? "Đang khóa kèo (Row-Level Locking)..."
+                      : isEscrowRequired
+                      ? "Xác Nhận Bắt Đối & Giữ Cọc Từ Ví (200.000đ)"
+                      : "Xác Nhận Bắt Đối & Mở Khóa Zalo Chủ Sân (Miễn Cọc)"}
+                  </span>
+                </Button>
+              )}
             </form>
           )}
         </div>

@@ -17,13 +17,15 @@ import {
 } from "lucide-react";
 import { MOCK_MATCH_FEEDS, MOCK_TEAMS } from "@/constants/mockMatchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
-import { District, MatchFeedItem, SkillTier } from "@/types/matchmaking";
+import { District, MatchFeedItem, SkillTier, EscrowWallet } from "@/types/matchmaking";
 import { HeaderBar, ActiveTab } from "@/components/matchmaking/HeaderBar";
 import { SosAlertCard } from "@/components/matchmaking/SosAlertCard";
 import { MatchFeedCard } from "@/components/matchmaking/MatchFeedCard";
 import { MatchChallengeModal } from "@/components/matchmaking/MatchChallengeModal";
 import { CreateMatchModal } from "@/components/matchmaking/CreateMatchModal";
 import { LiveMatchBar } from "@/components/matchmaking/LiveMatchBar";
+import { EscrowWalletModal } from "@/components/escrow/EscrowWalletModal";
+import { HandshakeModal } from "@/components/matchmaking/HandshakeModal";
 import { SubMarketAndRollCall } from "@/components/matchmaking/SubMarketAndRollCall";
 import { VietQrSplitter } from "@/components/matchmaking/VietQrSplitter";
 import { TeamTrustProfile } from "@/components/matchmaking/TeamTrustProfile";
@@ -79,6 +81,33 @@ export default function HanoiMatchmakingPlatform() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isBotDrawerOpen, setIsBotDrawerOpen] = useState(false);
   const [unreadBotCount, setUnreadBotCount] = useState(1);
+
+  // Quản lý Ví Ký Quỹ Nội Bộ (In-App Escrow Balance) & Mã Bắt Tay Sân
+  const effectiveTrustScore = team?.trust_score ?? myTrustScore;
+  const [escrowWallet, setEscrowWallet] = useState<EscrowWallet>({
+    balance: 0,
+    lockedAmount: 0,
+    availableBalance: 0,
+    isRestricted: false,
+    canWithdraw: true,
+  });
+  const [isEscrowModalOpen, setIsEscrowModalOpen] = useState(false);
+  const [activeHandshakeMatch, setActiveHandshakeMatch] =
+    useState<MatchFeedItem | null>(null);
+
+  // Đồng bộ quyền tạo/nhận kèo & quyền rút tiền theo điểm tín nhiệm (<70: hạn chế; >=70: miễn cọc & được rút)
+  React.useEffect(() => {
+    setEscrowWallet((prev) => {
+      const isRestricted = effectiveTrustScore < 70 && prev.balance < 200000;
+      const canWithdraw = effectiveTrustScore >= 70;
+      return {
+        ...prev,
+        isRestricted,
+        canWithdraw,
+      };
+    });
+  }, [effectiveTrustScore]);
+
   const [botLogs, setBotLogs] = useState<BotLogItem[]>([
     {
       id: "log-1",
@@ -163,6 +192,93 @@ export default function HanoiMatchmakingPlatform() {
     (m) => !m.isSOS || m.status === "MATCHED"
   );
 
+  // Xử lý nạp tiền vào Ví Ký Quỹ Nội Bộ (VietQR Napas247)
+  const handleDepositEscrow = (amount: number) => {
+    setEscrowWallet((prev) => {
+      const newBal = prev.balance + amount;
+      const isRestricted = effectiveTrustScore < 70 && newBal < 200000;
+      return {
+        ...prev,
+        balance: newBal,
+        availableBalance: newBal - prev.lockedAmount,
+        isRestricted,
+        canWithdraw: effectiveTrustScore >= 70,
+      };
+    });
+    pushBotLog(
+      `💰 Nạp Ví Ký Quỹ Thành Công (+${amount.toLocaleString("vi-VN")}đ)`,
+      `Bạn đã nạp thành công ${amount.toLocaleString("vi-VN")}đ vào Ví Ký Quỹ Nội Bộ qua VietQR Napas247. Số dư đã sẵn sàng bảo chứng cho các trận đấu.`,
+      "Ví Ký Quỹ"
+    );
+  };
+
+  // Xử lý rút tiền ký quỹ về tài khoản ngân hàng (chỉ mở khi uy tín >= 70)
+  const handleWithdrawEscrow = (
+    amount: number,
+    bankInfo: { bankName: string; accountNumber: string; accountName: string }
+  ) => {
+    setEscrowWallet((prev) => {
+      const newBal = Math.max(0, prev.balance - amount);
+      return {
+        ...prev,
+        balance: newBal,
+        availableBalance: Math.max(0, newBal - prev.lockedAmount),
+      };
+    });
+    pushBotLog(
+      `🏦 Hoàn Tiền Ký Quỹ Thành Công (-${amount.toLocaleString("vi-VN")}đ)`,
+      `Hệ thống đã chuyển ${amount.toLocaleString("vi-VN")}đ về tài khoản ${bankInfo.bankName} - ${bankInfo.accountNumber} (${bankInfo.accountName}). Giao dịch xử lý tự động hoàn tất.`,
+      "Hoàn Cọc 24/7"
+    );
+  };
+
+  // Xử lý xác thực thành công Mã Bắt Tay 4 Số Trên Sân
+  const handleVerifyHandshakeSuccess = (matchId: string) => {
+    setMatches((prev) =>
+      prev.map((m) =>
+        m.id === matchId
+          ? { ...m, status: "PLAYING_VERIFIED", isHandshakeVerified: true }
+          : m
+      )
+    );
+    // Nhả 200k cọc bị tạm khóa về ví khả dụng
+    setEscrowWallet((prev) => {
+      const newLocked = Math.max(0, prev.lockedAmount - 200000);
+      return {
+        ...prev,
+        lockedAmount: newLocked,
+        availableBalance: prev.balance - newLocked,
+      };
+    });
+    // Thưởng +10 điểm uy tín thi đấu đẹp
+    setMyTrustScore((prev) => Math.min(100, prev + 10));
+    pushBotLog(
+      "🤝 Bắt Tay Thành Công — Trận Đấu Khởi Tranh!",
+      "Hai đội đã nhập đúng Mã Bắt Tay 4 số tại sân bóng. Xác thực thi đấu văn minh thành công, số tiền 200.000đ được hoàn trả 100% về số dư khả dụng và đội bạn được thưởng +10 điểm tín nhiệm!",
+      "Đã Bắt Tay"
+    );
+  };
+
+  // Xử lý khi bị đối thủ bùng kèo (xác thực GPS tại sân bóng) -> Bồi thường 200k vào ví
+  const handleReportNoShow = (matchId: string, reason: string) => {
+    setMatches((prev) =>
+      prev.map((m) =>
+        m.id === matchId ? { ...m, status: "DISPUTED" } : m
+      )
+    );
+    // Bồi thường 200k vào ví người bị bùng
+    setEscrowWallet((prev) => ({
+      ...prev,
+      balance: prev.balance + 200000,
+      availableBalance: prev.availableBalance + 200000,
+    }));
+    pushBotLog(
+      "🛡️ Bồi Thường 200.000đ Tiền Sân Thành Công",
+      `Hệ thống đã xác thực toạ độ GPS tại sân. Đối thủ bùng kèo bị trừ 30 điểm tín nhiệm. Toàn bộ 200.000đ tiền cọc bảo chứng đã được chuyển thẳng vào Ví Ký Quỹ của bạn để bù chi phí đặt sân!`,
+      "Đền Bù Bùng Kèo"
+    );
+  };
+
   // Xử lý xác nhận bắt đối (Khóa kèo Row-Level Lock qua API + Đồng bộ WebSocket)
   const handleConfirmChallenge = async (
     matchId: string,
@@ -171,6 +287,15 @@ export default function HanoiMatchmakingPlatform() {
     challengerZalo?: string
   ) => {
     const target = matches.find((m) => m.id === matchId);
+
+    // Nếu đội có điểm uy tín < 70, tạm khóa 200.000đ trong ví ký quỹ
+    if (effectiveTrustScore < 70) {
+      setEscrowWallet((prev) => ({
+        ...prev,
+        lockedAmount: prev.lockedAmount + 200000,
+        availableBalance: Math.max(0, prev.balance - (prev.lockedAmount + 200000)),
+      }));
+    }
 
     // Cập nhật trạng thái Optimistic UI
     setMatches((prev) =>
@@ -219,7 +344,7 @@ export default function HanoiMatchmakingPlatform() {
           guestTeamName: challengerTeamName,
           guestCaptainPhone: challengerPhone,
           guestCaptainZalo: challengerZalo || challengerPhone,
-          guestTrustScore: myTrustScore,
+          guestTrustScore: effectiveTrustScore,
         }),
       });
     } catch (err) {
@@ -228,6 +353,15 @@ export default function HanoiMatchmakingPlatform() {
   };
 
   const handleCreateNewMatch = async (newMatch: MatchFeedItem) => {
+    // Nếu đội có điểm uy tín < 70, tạm khóa 200.000đ trong ví ký quỹ
+    if (effectiveTrustScore < 70) {
+      setEscrowWallet((prev) => ({
+        ...prev,
+        lockedAmount: prev.lockedAmount + 200000,
+        availableBalance: Math.max(0, prev.balance - (prev.lockedAmount + 200000)),
+      }));
+    }
+
     setMatches((prev) => [newMatch, ...prev]);
     setActiveTab(newMatch.isSOS ? "sos" : "feed");
 
@@ -341,6 +475,8 @@ export default function HanoiMatchmakingPlatform() {
           currentTeamName={team?.team_name}
           onOpenAuthModal={() => setIsAuthModalOpen(true)}
           onOpenTeamOnboarding={() => setIsTeamOnboardingOpen(true)}
+          escrowWallet={escrowWallet}
+          onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
         />
 
         {/* Main Content Container */}
@@ -508,6 +644,7 @@ export default function HanoiMatchmakingPlatform() {
                       match={match}
                       onSelectMatch={(m) => setActiveChallengeMatch(m)}
                       onOpenBlindReview={() => setActiveTab("trust-profile")}
+                      onOpenHandshake={(m) => setActiveHandshakeMatch(m)}
                     />
                   ))}
                 </div>
@@ -614,6 +751,8 @@ export default function HanoiMatchmakingPlatform() {
                 myTrustScore={team?.trust_score ?? myTrustScore}
                 setMyTrustScore={setMyTrustScore}
                 onPushBotLog={pushBotLog}
+                escrowWallet={escrowWallet}
+                onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
               />
             </div>
           )}
@@ -626,6 +765,8 @@ export default function HanoiMatchmakingPlatform() {
         myTrustScore={team?.trust_score ?? myTrustScore}
         onClose={() => setActiveChallengeMatch(null)}
         onConfirmMatch={handleConfirmChallenge}
+        escrowWallet={escrowWallet}
+        onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
       />
 
       {/* Modal Đăng Kèo Mới */}
@@ -642,6 +783,8 @@ export default function HanoiMatchmakingPlatform() {
             setIsTeamOnboardingOpen(true);
           }
         }}
+        escrowWallet={escrowWallet}
+        onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
       />
 
       {/* Modal Đăng Nhập / Đăng Ký Đội Trưởng */}
@@ -671,6 +814,31 @@ export default function HanoiMatchmakingPlatform() {
             profile?.full_name
           );
         }}
+      />
+
+      {/* Modal Quản Lý Ví Ký Quỹ Nội Bộ (In-App Escrow Balance) */}
+      <EscrowWalletModal
+        isOpen={isEscrowModalOpen}
+        onClose={() => setIsEscrowModalOpen(false)}
+        wallet={escrowWallet}
+        trustScore={effectiveTrustScore}
+        onDepositSuccess={handleDepositEscrow}
+        onWithdrawSuccess={handleWithdrawEscrow}
+      />
+
+      {/* Modal Mã Bắt Tay 4 Số Trên Sân & Check-in GPS Chống Vu Khống */}
+      <HandshakeModal
+        isOpen={!!activeHandshakeMatch}
+        onClose={() => setActiveHandshakeMatch(null)}
+        match={activeHandshakeMatch}
+        currentTeamRole={
+          activeHandshakeMatch?.hostTeam.name ===
+          (team?.team_name || "FC Khởi Nghiệp Cầu Giấy")
+            ? "HOST"
+            : "GUEST"
+        }
+        onVerifySuccess={handleVerifyHandshakeSuccess}
+        onReportNoShow={handleReportNoShow}
       />
 
       {/* Trung Tâm Chuông Thông Báo In-App & Liên Kết Zalo 1-Click */}

@@ -9,8 +9,9 @@ import {
   AlertCircle,
   ExternalLink,
   ShieldCheck,
+  Lock,
 } from "lucide-react";
-import { District, MatchFeedItem, SkillTier } from "@/types/matchmaking";
+import { District, MatchFeedItem, SkillTier, EscrowWallet } from "@/types/matchmaking";
 import { HANOI_PITCHES, SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { MOCK_TEAMS } from "@/constants/mockMatchmaking";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,8 @@ interface CreateMatchModalProps {
   verifiedTeam?: AuthenticatedTeamProfile | null;
   verifiedProfile?: UserProfile | null;
   onRequireAuth?: () => void;
+  escrowWallet?: EscrowWallet;
+  onOpenEscrowModal?: () => void;
 }
 
 export function CreateMatchModal({
@@ -65,6 +68,8 @@ export function CreateMatchModal({
   verifiedTeam,
   verifiedProfile,
   onRequireAuth,
+  escrowWallet,
+  onOpenEscrowModal,
 }: CreateMatchModalProps) {
   const [hostTeamName, setHostTeamName] = useState(
     verifiedTeam?.team_name || MOCK_TEAMS[0].name
@@ -149,9 +154,13 @@ export function CreateMatchModal({
     setTotalCost(pitch.typicalPeakPriceVnd);
   };
 
+  const currentTrustScore = verifiedTeam?.trust_score ?? 100;
+  const isEscrowLocked =
+    currentTrustScore < 70 && (!escrowWallet || escrowWallet.balance < 200000);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isPhoneValid || !isZaloValid) return;
+    if (!isPhoneValid || !isZaloValid || isEscrowLocked) return;
 
     const timeParts = timeSlot.includes("-")
       ? timeSlot.split("-").map((t) => t.trim())
@@ -177,7 +186,7 @@ export function CreateMatchModal({
         captainZalo: normalizedZalo,
         credit: {
           ...MOCK_TEAMS[0].credit,
-          score: verifiedTeam?.trust_score ?? 100,
+          score: currentTrustScore,
         },
       },
       district,
@@ -197,6 +206,9 @@ export function CreateMatchModal({
         : undefined,
       notes,
       createdAt: "Vừa xong",
+      handshakePin: Math.floor(1000 + Math.random() * 9000).toString(),
+      isHandshakeVerified: false,
+      escrowDepositTeamId: currentTrustScore < 70 ? (verifiedTeam?.id || "team-escrow") : undefined,
     };
 
     onCreateMatch(newMatch);
@@ -227,6 +239,38 @@ export function CreateMatchModal({
           onSubmit={handleSubmit}
           className="p-5 overflow-y-auto space-y-4 text-xs"
         >
+          {/* Banner Cảnh Báo Khóa Ký Quỹ nếu uy tín < 70đ & ví < 200k */}
+          {isEscrowLocked && (
+            <div className="rounded-xl bg-rose-500/15 border border-rose-500/40 p-3.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-rose-300 flex items-center gap-1.5">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                  Điểm Tín Nhiệm: {currentTrustScore}/100★ (Dưới ngưỡng 70đ)
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500 text-slate-950">
+                  TẠM KHÓA TẠO KÈO
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-300 leading-relaxed">
+                Do điểm tín nhiệm dưới 70đ, đội bạn cần duy trì{" "}
+                <strong className="text-amber-300">200.000đ trong Ví Ký Quỹ</strong> để bảo chứng trước khi được đăng kèo mới lên bảng tin.
+              </p>
+              {onOpenEscrowModal && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenEscrowModal();
+                  }}
+                  className="w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-1.5"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Mở Ví Ký Quỹ &amp; Nạp 200.000đ Để Mở Khóa Ngay</span>
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Banner trạng thái Xác thực Đội trưởng chính chủ */}
           {verifiedTeam ? (
             <div className="rounded-xl bg-emerald-500/15 border border-emerald-500/40 p-3 flex items-center justify-between gap-2">
@@ -589,14 +633,28 @@ export function CreateMatchModal({
             />
           </div>
 
-          <Button
-            type="submit"
-            disabled={!isPhoneValid || !isZaloValid}
-            className="w-full min-h-[46px] rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs gap-2"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>Đăng Kèo Lên Bảng Tin Ngay</span>
-          </Button>
+          {isEscrowLocked ? (
+            <Button
+              type="button"
+              onClick={() => {
+                onClose();
+                onOpenEscrowModal?.();
+              }}
+              className="w-full min-h-[46px] rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs gap-2"
+            >
+              <Lock className="w-4 h-4" />
+              <span>Nạp 200k Ký Quỹ Mở Khóa Tạo Kèo ({currentTrustScore}★)</span>
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              disabled={!isPhoneValid || !isZaloValid}
+              className="w-full min-h-[46px] rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs gap-2"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>Đăng Kèo Lên Bảng Tin Ngay (Miễn Cọc)</span>
+            </Button>
+          )}
         </form>
       </div>
     </div>
