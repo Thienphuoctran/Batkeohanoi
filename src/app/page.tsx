@@ -38,7 +38,11 @@ import { useRealtimeMatchFeed } from "@/hooks/useRealtimeMatches";
 import { useAuthTeam } from "@/hooks/useAuthTeam";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { TeamOnboardingModal } from "@/components/team/TeamOnboardingModal";
-import { signOutAction, createMatchInDatabaseAction } from "@/actions/auth";
+import {
+  signOutAction,
+  createMatchInDatabaseAction,
+  requestWithdrawEscrowAction,
+} from "@/actions/auth";
 
 interface BotLogItem {
   id: string;
@@ -213,7 +217,7 @@ export default function HanoiMatchmakingPlatform() {
   };
 
   // Xử lý rút tiền ký quỹ về tài khoản ngân hàng (chỉ mở khi uy tín >= 70)
-  const handleWithdrawEscrow = (
+  const handleWithdrawEscrow = async (
     amount: number,
     bankInfo: BankWithdrawInfo
   ) => {
@@ -228,10 +232,21 @@ export default function HanoiMatchmakingPlatform() {
     const bankName = bankInfo.bankName || bankInfo.bank || "Ngân hàng";
     const accNumber = bankInfo.accountNumber || bankInfo.account || "";
     const accName = bankInfo.accountName || bankInfo.name || "";
+
+    // Gửi cảnh báo Telegram khẩn cấp đến Quản trị viên MB Bank
+    await requestWithdrawEscrowAction({
+      amount,
+      teamName: team?.team_name || "Đội bóng",
+      captainPhone: profile?.phone || team?.captain_phone || "0988666888",
+      bankName,
+      accountNumber: accNumber,
+      accountName: accName,
+    });
+
     pushBotLog(
-      `🏦 Hoàn Tiền Ký Quỹ Thành Công (-${amount.toLocaleString("vi-VN")}đ)`,
-      `Hệ thống đã chuyển ${amount.toLocaleString("vi-VN")}đ về tài khoản ${bankName} - ${accNumber} (${accName}). Giao dịch xử lý tự động hoàn tất.`,
-      "Hoàn Cọc 24/7"
+      `🏦 Đã Gửi Lệnh Hoàn Cọc (-${amount.toLocaleString("vi-VN")}đ)`,
+      `✅ Đã gửi lệnh rút ${amount.toLocaleString("vi-VN")}đ về tài khoản ${bankName} - ${accNumber} (${accName}) tới Ban Quản Trị! BQT sẽ chuyển khoản trả về STK của bạn trong 5-15 phút. Muộn nhất là 8h tối mỗi ngày ( thời gian hoạt động rút tiền từ ví là trước 22h nha )`,
+      "Chờ Hoàn Cọc"
     );
   };
 

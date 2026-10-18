@@ -482,3 +482,59 @@ export async function updateTeamProfileAction(payload: {
   }
 }
 
+// 8. Gửi yêu cầu rút tiền ký quỹ (Hoàn cọc) & Bắn thông báo Telegram khẩn cấp đến Admin
+export async function requestWithdrawEscrowAction(payload: {
+  amount: number;
+  teamName: string;
+  captainPhone: string;
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+}) {
+  try {
+    const vietQrLink = `https://img.vietqr.io/image/${encodeURIComponent(
+      payload.bankName
+    )}-${encodeURIComponent(payload.accountNumber)}-compact2.png?amount=${
+      payload.amount
+    }&addInfo=${encodeURIComponent(
+      `HOAN COC ${payload.teamName.slice(0, 15)}`
+    )}&accountName=${encodeURIComponent(payload.accountName)}`;
+
+    const alertText =
+      `🚨 <b>YÊU CẦU HOÀN TIỀN KÝ QUỸ (RÚT TIỀN CỌC)</b>\n` +
+      `• Đội bóng: <b>${payload.teamName}</b>\n` +
+      `• Đội trưởng / SĐT: <b>${payload.captainPhone}</b>\n` +
+      `• Số tiền cần hoàn: <b>${payload.amount.toLocaleString("vi-VN")} VNĐ</b>\n` +
+      `--------------------------------\n` +
+      `🏦 <b>THÔNG TIN TÀI KHOẢN NHẬN TIỀN:</b>\n` +
+      `• Ngân hàng: <b>${payload.bankName}</b>\n` +
+      `• Số tài khoản: <code>${payload.accountNumber}</code>\n` +
+      `• Chủ tài khoản: <b>${payload.accountName}</b>\n` +
+      `👉 <a href="${vietQrLink}">Bấm vào đây để mở mã VietQR bắn trả tiền nhanh</a>`;
+
+    await sendTelegramAlert(alertText);
+
+    // Lưu vào bảng withdraw_requests nếu database có bảng
+    try {
+      const adminClient = getAdminClient();
+      await adminClient.from("withdraw_requests").insert({
+        team_name: payload.teamName,
+        captain_phone: payload.captainPhone,
+        amount: payload.amount,
+        bank_name: payload.bankName,
+        account_number: payload.accountNumber,
+        account_name: payload.accountName,
+        status: "pending",
+      });
+    } catch (dbErr) {
+      // Fallback an toàn nếu bảng chưa tạo
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    console.error("[requestWithdrawEscrowAction Error]", err);
+    return { success: false, error: err?.message || "Unknown error" };
+  }
+}
+
+

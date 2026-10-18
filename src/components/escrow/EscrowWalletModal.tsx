@@ -88,7 +88,7 @@ export function EscrowWalletModal({
     setTimeout(() => {
       setWithdrawSuccessMsg(false);
       onClose();
-    }, 2000);
+    }, 5000);
   };
 
   return (
@@ -369,6 +369,10 @@ export function EscrowWalletModal({
                     </h4>
                   </div>
 
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 leading-relaxed">
+                    ⏱️ <strong>Thời gian hoạt động rút tiền từ ví:</strong> Trước 22h mỗi ngày. BQT sẽ chuyển khoản trả về STK của bạn trong 5-15 phút, muộn nhất là 8h tối mỗi ngày.
+                  </div>
+
                   <div>
                     <label className="block text-slate-300 font-semibold mb-1">
                       Ngân hàng thụ hưởng:
@@ -416,8 +420,8 @@ export function EscrowWalletModal({
                   </div>
 
                   {withdrawSuccessMsg && (
-                    <div className="rounded-lg bg-emerald-500/15 border border-emerald-500/40 p-2 text-emerald-300 font-bold text-center">
-                      ✅ Đã gửi lệnh rút {wallet.availableBalance.toLocaleString("vi-VN")}đ thành công! Tiền sẽ vào tài khoản trong 5-15 phút.
+                    <div className="rounded-lg bg-emerald-500/15 border border-emerald-500/40 p-2.5 text-emerald-300 font-bold text-center text-xs space-y-1">
+                      <div>✅ Đã gửi lệnh rút 200.000đ tới Ban Quản Trị! BQT sẽ chuyển khoản trả về STK của bạn trong 5-15 phút. Muộn nhất là 8h tối mỗi ngày ( thời gian hoạt động rút tiền từ ví là trước 22h nha )</div>
                     </div>
                   )}
 

@@ -190,7 +190,12 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
   const [newTrophyYear, setNewTrophyYear] = useState("2026");
   const [newTrophyNotes, setNewTrophyNotes] = useState("");
 
-  // TÍNH NĂNG 3: Link Mời & QR Code
+  // TÍNH NĂNG 3: Mã QR & Link Tham Gia Nhóm Zalo do Chủ Đội Tự Tải Lên
+  const [zaloQrImage, setZaloQrImage] = useState<string>("");
+  const [zaloGroupLink, setZaloGroupLink] = useState<string>("");
+  const [isEditingZaloInvite, setIsEditingZaloInvite] = useState(false);
+  const [tempZaloLink, setTempZaloLink] = useState("");
+  const [tempZaloQr, setTempZaloQr] = useState("");
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
   const [inviteMsgCopied, setInviteMsgCopied] = useState(false);
 
@@ -229,6 +234,14 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
         if (data.matchStats !== undefined) setMatchStats(data.matchStats);
         if (data.trophies !== undefined && Array.isArray(data.trophies)) {
           setTrophies(data.trophies);
+        }
+        if (data.zaloQrImage !== undefined) {
+          setZaloQrImage(data.zaloQrImage);
+          setTempZaloQr(data.zaloQrImage);
+        }
+        if (data.zaloGroupLink !== undefined) {
+          setZaloGroupLink(data.zaloGroupLink);
+          setTempZaloLink(data.zaloGroupLink);
         }
       }
     } catch (e) {
@@ -329,26 +342,63 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
     setTimeout(() => setCopied(false), 2500);
   };
 
-  // Link mời thành viên vào đội
-  const inviteUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}?joinTeam=${team.id}&teamName=${encodeURIComponent(
-          teamName
-        )}`
-      : `https://batkeohanoi-wh64.vercel.app?joinTeam=${team.id}`;
+  // Mở modal Mã QR & Link Zalo Đội
+  const handleOpenJoinLinkModal = () => {
+    setTempZaloLink(zaloGroupLink);
+    setTempZaloQr(zaloQrImage);
+    // Nếu chưa từng tải ảnh QR hoặc link Zalo, mở thẳng form cài đặt
+    if (!zaloQrImage && !zaloGroupLink) {
+      setIsEditingZaloInvite(true);
+    } else {
+      setIsEditingZaloInvite(false);
+    }
+    setIsJoinLinkModalOpen(true);
+  };
 
-  const handleCopyInviteLink = () => {
-    navigator.clipboard.writeText(inviteUrl);
+  // Xử lý upload ảnh mã QR nhóm Zalo từ máy
+  const handleUploadZaloQr = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Vui lòng chọn ảnh mã QR dung lượng dưới 2MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setTempZaloQr(result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Lưu cài đặt mã QR & Link Zalo do Chủ đội tự nhập
+  const handleSaveZaloInvite = (e: React.FormEvent) => {
+    e.preventDefault();
+    setZaloQrImage(tempZaloQr);
+    setZaloGroupLink(tempZaloLink.trim());
+    persistData({
+      zaloQrImage: tempZaloQr,
+      zaloGroupLink: tempZaloLink.trim(),
+    });
+    setIsEditingZaloInvite(false);
+  };
+
+  // Sao chép link Zalo của đội
+  const handleCopyZaloGroupLink = () => {
+    if (!zaloGroupLink) return;
+    navigator.clipboard.writeText(zaloGroupLink);
     setInviteLinkCopied(true);
     setTimeout(() => setInviteLinkCopied(false), 2500);
   };
 
+  // Sao chép tin nhắn Zalo gửi anh em
   const handleCopyZaloInviteMsg = () => {
+    const link = zaloGroupLink || "(Đội trưởng đang cập nhật link Zalo)";
     const msg =
-      `⚽ LỜI MỜI GIA NHẬP ĐỘI: ${teamName}\n` +
-      `Anh em ơi, đội mình đã chính thức xác thực Thẻ Căn Cước Bóng Đá Số tại BắtKèo7!\n` +
-      `👉 Bấm vào link dưới đây để đăng ký tên, số áo và vị trí vào danh sách đội nhé:\n` +
-      `${inviteUrl}`;
+      `⚽ LỜI MỜI VÀO NHÓM ZALO ĐỘI: ${teamName}\n` +
+      `Anh em ơi, đây là link tham gia Nhóm Zalo chính thức của đội ${teamName}:\n` +
+      `👉 Link Zalo: ${link}\n` +
+      `Anh em bấm vào link hoặc quét mã QR nhóm để nhận thông báo lịch đá và điểm danh nhé!`;
     navigator.clipboard.writeText(msg);
     setInviteMsgCopied(true);
     setTimeout(() => setInviteMsgCopied(false), 2500);
@@ -714,11 +764,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
             {/* TÍNH NĂNG 3: Nút Mời Vào Đội (Mã QR & Link Zalo) */}
             <button
-              onClick={() => setIsJoinLinkModalOpen(true)}
+              onClick={handleOpenJoinLinkModal}
               className="px-3 py-1.5 bg-gradient-to-r from-sky-500/20 to-blue-500/20 hover:from-sky-500/30 hover:to-blue-500/30 text-sky-300 border border-sky-400/40 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm active:scale-95"
             >
               <QrCode className="w-3.5 h-3.5 text-sky-400" />
-              <span>Mời Vào Đội (QR &amp; Link)</span>
+              <span>QR &amp; Link Zalo Đội</span>
             </button>
 
             {/* Nút Đăng Kèo Nhanh */}
@@ -1151,12 +1201,12 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
           <div className="flex items-center gap-2">
             <Button
-              onClick={() => setIsJoinLinkModalOpen(true)}
+              onClick={handleOpenJoinLinkModal}
               variant="outline"
               className="h-8 px-3 rounded-xl border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 font-bold text-xs gap-1"
             >
               <Link2 className="w-3.5 h-3.5" />
-              <span>Link Mời Anh Em</span>
+              <span>QR &amp; Link Zalo Đội</span>
             </Button>
             <Button
               onClick={() => setIsAddMemberModalOpen(true)}
@@ -1238,9 +1288,15 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                 <strong className="text-emerald-400 font-semibold">
                   + Thêm Cầu Thủ
                 </strong>{" "}
-                hoặc gửi{" "}
-                <strong className="text-sky-400 font-semibold">Link Mời</strong>{" "}
-                vào nhóm Zalo để anh em tự đăng ký số áo và vị trí!
+                hoặc bấm{" "}
+                <button
+                  type="button"
+                  onClick={handleOpenJoinLinkModal}
+                  className="text-sky-400 font-bold underline hover:text-sky-300"
+                >
+                  Cài Đặt QR &amp; Link Zalo
+                </button>{" "}
+                để chia sẻ mã QR vào nhóm cho anh em tham gia!
               </p>
             </div>
           )}
@@ -1980,17 +2036,17 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
         </div>
       )}
 
-      {/* TÍNH NĂNG 3: MODAL MÃ QR & LINK MỜI THÀNH VIÊN VÀO ĐỘI */}
+      {/* TÍNH NĂNG 3: MODAL MÃ QR & LINK NHÓM ZALO DO CHỦ ĐỘI TỰ TẢI LÊN */}
       {isJoinLinkModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-[#0f172a] border border-sky-500/40 shadow-2xl p-5 space-y-4 text-xs">
+          <div className="w-full max-w-md rounded-2xl bg-[#0f172a] border border-sky-500/40 shadow-2xl p-5 space-y-4 text-xs max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <div>
                 <span className="text-[10px] font-black uppercase text-sky-400">
                   Kết Nối Anh Em Đội Bóng
                 </span>
                 <h3 className="text-sm font-extrabold text-white mt-0.5">
-                  Mã QR &amp; Link Mời Cầu Thủ Vào Đội
+                  Mã QR &amp; Link Tham Gia Nhóm Zalo Đội
                 </h3>
               </div>
               <button
@@ -2001,88 +2057,237 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
               </button>
             </div>
 
-            {/* Khối Mã QR 2D */}
-            <div className="p-4 rounded-2xl bg-slate-950 border border-white/10 text-center space-y-2">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                  inviteUrl
-                )}&bgcolor=020617&color=10b981`}
-                alt="Mã QR Mời Đội"
-                className="w-36 h-36 rounded-xl border border-emerald-500/30 p-1 bg-slate-950 mx-auto shadow-lg"
-              />
-              <p className="text-[11px] font-bold text-white">
-                Mã QR Gia Nhập {teamName || "Đội Bóng"}
-              </p>
-              <p className="text-[10px] text-slate-400">
-                Mở camera điện thoại hoặc Zalo quét mã để tự đăng ký số áo &amp; vị trí
-              </p>
-            </div>
+            {/* CHẾ ĐỘ 1: FORM CÀI ĐẶT / TẢI LÊN MÃ QR & LINK ZALO */}
+            {isEditingZaloInvite || (!zaloQrImage && !zaloGroupLink) ? (
+              <form onSubmit={handleSaveZaloInvite} className="space-y-3.5">
+                <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 text-[11px] text-sky-200 leading-relaxed">
+                  📢 <strong>Chủ đội tự tải lên:</strong> Hãy tải ảnh mã QR nhóm Zalo thật của đội bạn và dán link mời Zalo vào bên dưới để anh em có thể quét mã hoặc bấm link tham gia đội nhé!
+                </div>
 
-            {/* Link mời trực tiếp */}
-            <div className="space-y-1">
-              <label className="block font-semibold text-slate-300">
-                Link tham gia trực tiếp:
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={inviteUrl}
-                  className="flex-1 h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-sky-300 font-mono text-[11px] truncate"
-                />
-                <Button
-                  type="button"
-                  onClick={handleCopyInviteLink}
-                  className="h-9 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs gap-1 shrink-0"
-                >
-                  {inviteLinkCopied ? (
+                {/* 1. Tải ảnh mã QR Nhóm Zalo */}
+                <div className="space-y-1.5">
+                  <label className="block font-bold text-slate-200">
+                    1. Tải lên ảnh mã QR Nhóm Zalo của đội:
+                  </label>
+                  {tempZaloQr ? (
+                    <div className="p-3 rounded-xl bg-slate-950 border border-white/10 flex flex-col items-center justify-center gap-2">
+                      <img
+                        src={tempZaloQr}
+                        alt="Ảnh QR Zalo Đội"
+                        className="w-40 h-40 rounded-xl p-1.5 bg-white border border-sky-400/40 shadow-md object-contain"
+                      />
+                      <div className="flex items-center gap-2">
+                        <label className="cursor-pointer px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 font-bold text-xs inline-flex items-center gap-1">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Đổi ảnh QR khác</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleUploadZaloQr}
+                            className="hidden"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setTempZaloQr("")}
+                          className="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold text-xs inline-flex items-center gap-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Gỡ</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="border-2 border-dashed border-sky-500/40 hover:border-sky-400 bg-slate-950/70 p-5 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition space-y-1.5">
+                      <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center">
+                        <Upload className="w-5 h-5" />
+                      </div>
+                      <span className="font-bold text-sky-300 text-xs">
+                        Bấm để chọn ảnh mã QR Zalo từ máy
+                      </span>
+                      <span className="text-[10px] text-slate-400 text-center">
+                        Hỗ trợ PNG, JPG, WebP tối đa 2MB
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleUploadZaloQr}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                  <p className="text-[10px] text-slate-400 italic">
+                    💡 <strong>Cách lấy mã QR Zalo:</strong> Vào app Zalo ➔ Vào Nhóm đội bóng ➔ Bấm Menu ☰ (góc trên phải) ➔ Chọn "Mã QR của nhóm" ➔ Bấm "Lưu ảnh" rồi tải lên đây.
+                  </p>
+                </div>
+
+                {/* 2. Dán Link Tham Gia Nhóm Zalo */}
+                <div className="space-y-1.5">
+                  <label className="block font-bold text-slate-200">
+                    2. Dán link mời tham gia Nhóm Zalo của đội:
+                  </label>
+                  <input
+                    type="url"
+                    value={tempZaloLink}
+                    onChange={(e) => setTempZaloLink(e.target.value)}
+                    placeholder="VD: https://zalo.me/g/abcdef123 (hoặc link Zalo Đội trưởng)"
+                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-sky-300 placeholder:text-slate-500 font-mono text-xs focus:outline-none focus:border-sky-400"
+                  />
+                  <p className="text-[10px] text-slate-400 italic">
+                    💡 <strong>Cách lấy link Zalo:</strong> Vào Nhóm chat Zalo ➔ Chọn "Link tham gia nhóm" ➔ "Sao chép link" rồi dán vào ô trên.
+                  </p>
+                </div>
+
+                {/* Nút bấm Lưu */}
+                <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+                  {(zaloQrImage || zaloGroupLink) && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setIsEditingZaloInvite(false)}
+                      className="h-9 text-xs text-slate-400"
+                    >
+                      Hủy
+                    </Button>
+                  )}
+                  <Button
+                    type="submit"
+                    className="h-9 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs gap-1.5 shadow-md shadow-emerald-500/20"
+                  >
+                    <Check className="w-4 h-4 stroke-[3]" />
+                    <span>Lưu Mã QR &amp; Link Zalo Đội</span>
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              /* CHẾ ĐỘ 2: HIỂN THỊ MÃ QR & LINK ZALO DO CHỦ ĐỘI TẢI LÊN */
+              <div className="space-y-4">
+                {/* Khối hiển thị ảnh QR thật */}
+                <div className="p-4 rounded-2xl bg-slate-950 border border-white/10 text-center space-y-2">
+                  {zaloQrImage ? (
                     <>
-                      <Check className="w-3.5 h-3.5" />
-                      <span>Đã chép!</span>
+                      <img
+                        src={zaloQrImage}
+                        alt="Mã QR Nhóm Zalo"
+                        className="w-44 h-44 rounded-2xl border-2 border-emerald-500/40 p-2 bg-white mx-auto shadow-2xl object-contain"
+                      />
+                      <p className="text-xs font-bold text-white">
+                        Mã QR Nhóm Zalo: {teamName || "Đội Bóng"}
+                      </p>
+                      <p className="text-[10px] text-slate-400">
+                        Mở camera Zalo trên điện thoại quét mã để vào thẳng nhóm chat của đội
+                      </p>
                     </>
                   ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Sao chép</span>
-                    </>
+                    <div className="py-6 space-y-2">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-dashed border-white/20 text-slate-500 mx-auto flex items-center justify-center">
+                        <QrCode className="w-6 h-6" />
+                      </div>
+                      <p className="text-xs font-bold text-slate-300">
+                        Chưa có ảnh mã QR Zalo
+                      </p>
+                      <p className="text-[10px] text-slate-500">
+                        Chủ đội hãy bấm nút "Cài Đặt / Đổi QR &amp; Link" bên dưới để tải ảnh lên.
+                      </p>
+                    </div>
                   )}
-                </Button>
-              </div>
-            </div>
+                </div>
 
-            {/* Soạn sẵn tin nhắn gửi nhóm Zalo */}
-            <div className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-2">
-              <span className="text-[10px] font-bold text-slate-300 flex items-center justify-between">
-                <span>💬 Tin nhắn mẫu gửi Nhóm Chat Zalo Đội:</span>
-                {inviteMsgCopied && (
-                  <span className="text-emerald-400 font-bold">
-                    ✓ Đã chép tin nhắn!
+                {/* Khối hiển thị Link Zalo */}
+                <div className="space-y-1">
+                  <label className="block font-semibold text-slate-300">
+                    Link tham gia Nhóm Zalo:
+                  </label>
+                  {zaloGroupLink ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        readOnly
+                        value={zaloGroupLink}
+                        className="flex-1 h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-sky-300 font-mono text-[11px] truncate"
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleCopyZaloGroupLink}
+                        className="h-9 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs gap-1 shrink-0"
+                      >
+                        {inviteLinkCopied ? (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Đã chép!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Sao chép</span>
+                          </>
+                        )}
+                      </Button>
+                      <a
+                        href={zaloGroupLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="h-9 px-2.5 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-bold text-xs flex items-center justify-center shrink-0"
+                        title="Mở Zalo tham gia nhóm ngay"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="p-2.5 rounded-xl bg-slate-950 border border-dashed border-white/10 text-slate-500 text-[11px] text-center">
+                      Chủ đội chưa dán link Zalo
+                    </div>
+                  )}
+                </div>
+
+                {/* Soạn sẵn tin nhắn gửi anh em */}
+                <div className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-2">
+                  <span className="text-[10px] font-bold text-slate-300 flex items-center justify-between">
+                    <span>💬 Tin nhắn mẫu gửi anh em đội bóng:</span>
+                    {inviteMsgCopied && (
+                      <span className="text-emerald-400 font-bold">
+                        ✓ Đã chép tin nhắn!
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-              <p className="text-[11px] text-slate-300 italic bg-slate-900/80 p-2 rounded-lg border border-white/5">
-                “⚽ Anh em ơi, đội mình {teamName} đã có Thẻ Căn Cước Bóng Đá Số tại BắtKèo7! Anh em bấm vào link này để đăng ký tên, số áo và vị trí vào đội nhé: {inviteUrl}”
-              </p>
-              <Button
-                type="button"
-                onClick={handleCopyZaloInviteMsg}
-                className="w-full h-8 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-extrabold text-xs gap-1.5 shadow-md shadow-blue-600/20"
-              >
-                <Share2 className="w-3.5 h-3.5" />
-                <span>Sao Chép Tin Nhắn Mẫu Gửi Nhóm Zalo</span>
-              </Button>
-            </div>
+                  <p className="text-[11px] text-slate-300 italic bg-slate-900/80 p-2 rounded-lg border border-white/5">
+                    “⚽ Anh em ơi, đây là link tham gia Nhóm Zalo chính thức của đội {teamName}: {zaloGroupLink || "(Chưa có link)"}. Anh em bấm vào link hoặc quét mã QR nhóm để nhận thông báo lịch đá và điểm danh nhé!”
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={handleCopyZaloInviteMsg}
+                    className="w-full h-8 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-extrabold text-xs gap-1.5 shadow-md shadow-blue-600/20"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                    <span>Sao Chép Tin Nhắn Mẫu Kèm Link Zalo</span>
+                  </Button>
+                </div>
 
-            <div className="flex justify-end pt-1">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setIsJoinLinkModalOpen(false)}
-                className="h-8 text-xs text-slate-400"
-              >
-                Đóng
-              </Button>
-            </div>
+                {/* Footer Controls */}
+                <div className="flex items-center justify-between pt-1 border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTempZaloLink(zaloGroupLink);
+                      setTempZaloQr(zaloQrImage);
+                      setIsEditingZaloInvite(true);
+                    }}
+                    className="text-xs font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Cài Đặt / Đổi QR &amp; Link Zalo</span>
+                  </button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsJoinLinkModalOpen(false)}
+                    className="h-8 text-xs text-slate-400"
+                  >
+                    Đóng
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
