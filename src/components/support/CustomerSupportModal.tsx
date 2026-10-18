@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { askBatKeoAiAssistantAction, ChatMessageItem } from "@/actions/aiAssistant";
 import { getZaloDeepLink } from "@/lib/zalo";
 
-const BQT_ZALO_PHONE = "0744094832"; // Hotline Zalo BQT BắtKèo7
+const BQT_ZALO_PHONE = "0393407855"; // Hotline Zalo BQT BắtKèo7 (0393.407.855)
 
 interface MessageUIItem {
   id: string;
@@ -43,6 +43,13 @@ const QUICK_PROMPTS = [
   "🌧️ Mưa to hủy kèo sao?",
   "🧤 Thuê thủ môn (GK) ở đâu?",
   "🏟️ Sân bóng nào ở Cầu Giấy?",
+  "⚽ Luật ném biên hay đá biên sân 7?",
+  "👟 Sân cỏ nhân tạo đi giày đinh gì?",
+  "🔥 Kèo SOS nhận được tặng gì?",
+  "📋 Sơ đồ chiến thuật 3-2-1 đá sao?",
+  "⭐ Làm sao tăng điểm Uy Tín lên 100đ?",
+  "🤝 Mã bắt tay 4 số dùng thế nào?",
+  "💬 Mở Zalo BQT hỗ trợ 24/7",
 ];
 
 interface CustomerSupportModalProps {
@@ -246,16 +253,33 @@ export function CustomerSupportModal({
 
                 {m.actions && m.actions.length > 0 && (
                   <div className="pt-2 border-t border-slate-800/80 flex flex-wrap gap-1.5">
-                    {m.actions.map((act, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handleExecuteAction(act.actionType)}
-                        className="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold flex items-center gap-1 transition"
-                      >
-                        <span>{act.label}</span>
-                        <ChevronRight className="w-3 h-3 text-emerald-400" />
-                      </button>
-                    ))}
+                    {m.actions.map((act, i) => {
+                      if (act.actionType === "OPEN_ZALO") {
+                        return (
+                          <a
+                            key={i}
+                            href={getZaloDeepLink(BQT_ZALO_PHONE)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-2.5 py-1 rounded-lg bg-[#0068FF] hover:bg-[#0057D9] text-white text-[11px] font-bold flex items-center gap-1.5 transition shadow-sm"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5 fill-current" />
+                            <span>{act.label}</span>
+                            <ExternalLink className="w-3 h-3 text-sky-200" />
+                          </a>
+                        );
+                      }
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => handleExecuteAction(act.actionType)}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold flex items-center gap-1 transition"
+                        >
+                          <span>{act.label}</span>
+                          <ChevronRight className="w-3 h-3 text-emerald-400" />
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
 
@@ -324,7 +348,7 @@ export function CustomerSupportModal({
                 rel="noopener noreferrer"
                 className="text-emerald-400 font-bold hover:underline"
               >
-                0744.094.832
+                0393.407.855
               </a>
             </span>
           </div>
