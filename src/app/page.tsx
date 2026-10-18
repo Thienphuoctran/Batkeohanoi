@@ -229,18 +229,22 @@ export default function HanoiMatchmakingPlatform() {
         availableBalance: Math.max(0, newBal - prev.lockedAmount),
       };
     });
-    const bankName = bankInfo.bankName || bankInfo.bank || "Ngân hàng";
+    const bankCode = bankInfo.bankCode || "MB";
+    const bankName = bankInfo.bankName || bankInfo.bank || "MBBank";
     const accNumber = bankInfo.accountNumber || bankInfo.account || "";
     const accName = bankInfo.accountName || bankInfo.name || "";
+    const customQrImage = bankInfo.customQrImage;
 
-    // Gửi cảnh báo Telegram khẩn cấp đến Quản trị viên MB Bank
+    // Gửi cảnh báo Telegram khẩn cấp đến Quản trị viên kèm ảnh mã QR
     await requestWithdrawEscrowAction({
       amount,
       teamName: team?.team_name || "Đội bóng",
       captainPhone: profile?.phone || team?.captain_phone || "0988666888",
+      bankCode,
       bankName,
       accountNumber: accNumber,
       accountName: accName,
+      customQrImage,
     });
 
     pushBotLog(
@@ -881,6 +885,8 @@ export default function HanoiMatchmakingPlatform() {
         onClose={() => setIsEscrowModalOpen(false)}
         wallet={escrowWallet}
         trustScore={effectiveTrustScore}
+        teamName={team?.team_name || "Đội bóng"}
+        captainPhone={profile?.phone || team?.captain_phone || "0988666888"}
         onDepositSuccess={handleDepositEscrow}
         onWithdrawSuccess={handleWithdrawEscrow}
       />

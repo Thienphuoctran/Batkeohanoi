@@ -4,7 +4,7 @@ import { getAdminClient } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { sendTelegramAlert } from "./telegram";
+import { sendTelegramAlert, sendTelegramPhoto } from "./telegram";
 import { normalizeVietnamPhone, isValidVietnamPhone } from "@/lib/zalo";
 
 function getAnonAuthClient() {
@@ -487,13 +487,16 @@ export async function requestWithdrawEscrowAction(payload: {
   amount: number;
   teamName: string;
   captainPhone: string;
+  bankCode?: string;
   bankName: string;
   accountNumber: string;
   accountName: string;
+  customQrImage?: string;
 }) {
   try {
+    const bankIdentifier = payload.bankCode || payload.bankName || "MB";
     const vietQrLink = `https://img.vietqr.io/image/${encodeURIComponent(
-      payload.bankName
+      bankIdentifier
     )}-${encodeURIComponent(payload.accountNumber)}-compact2.png?amount=${
       payload.amount
     }&addInfo=${encodeURIComponent(
@@ -510,9 +513,10 @@ export async function requestWithdrawEscrowAction(payload: {
       `• Ngân hàng: <b>${payload.bankName}</b>\n` +
       `• Số tài khoản: <code>${payload.accountNumber}</code>\n` +
       `• Chủ tài khoản: <b>${payload.accountName}</b>\n` +
-      `👉 <a href="${vietQrLink}">Bấm vào đây để mở mã VietQR bắn trả tiền nhanh</a>`;
+      `👉 <i>Admin mở app ngân hàng quét mã QR đính kèm để chuyển tiền hoàn cọc nhanh trong 5-15 phút.</i>`;
 
-    await sendTelegramAlert(alertText);
+    // Gửi ảnh trực tiếp vào Telegram qua sendTelegramPhoto
+    await sendTelegramPhoto(vietQrLink, alertText);
 
     // Lưu vào bảng withdraw_requests nếu database có bảng
     try {

@@ -187,9 +187,11 @@ export interface RollCallSession {
 }
 
 export interface BankWithdrawInfo {
+  bankCode?: string;
   bankName: string;
   accountNumber: string;
   accountName: string;
+  customQrImage?: string;
   bank?: string;
   account?: string;
   name?: string;
