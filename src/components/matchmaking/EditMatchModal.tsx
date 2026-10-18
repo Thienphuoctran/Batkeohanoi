@@ -10,6 +10,9 @@ import {
   Shield,
   Trash2,
   AlertTriangle,
+  Navigation,
+  Compass,
+  ExternalLink,
 } from "lucide-react";
 import {
   MatchFeedItem,
@@ -45,6 +48,8 @@ export function EditMatchModal({
   const [customRatioText, setCustomRatioText] = useState("");
   const [isSOS, setIsSOS] = useState(false);
   const [notes, setNotes] = useState("");
+  const [isGmapsIntegrated, setIsGmapsIntegrated] = useState(true);
+  const [customGmapsUrl, setCustomGmapsUrl] = useState("");
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   useEffect(() => {
@@ -63,9 +68,20 @@ export function EditMatchModal({
       }
       setIsSOS(match.isSOS);
       setNotes(match.notes || "");
+      setIsGmapsIntegrated(match.isGmapsIntegrated ?? true);
+      setCustomGmapsUrl(match.gmapsUrl ?? "");
       setShowConfirmDelete(false);
     }
   }, [match]);
+
+  const effectiveGmapsUrl = React.useMemo(() => {
+    if (!isGmapsIntegrated) return undefined;
+    if (customGmapsUrl.trim()) return customGmapsUrl.trim();
+    const query = encodeURIComponent(
+      `${pitchName.trim()} ${pitchAddress.trim()} ${district.trim()} Hà Nội`.trim()
+    );
+    return `https://www.google.com/maps/search/?api=1&query=${query}`;
+  }, [isGmapsIntegrated, customGmapsUrl, pitchName, pitchAddress, district]);
 
   if (!isOpen || !match) return null;
 
@@ -112,6 +128,8 @@ export function EditMatchModal({
       splitRatioLabel,
       isSOS,
       notes,
+      gmapsUrl: effectiveGmapsUrl,
+      isGmapsIntegrated: isGmapsIntegrated,
     };
 
     onSaveMatch(updatedMatch);
@@ -197,6 +215,58 @@ export function EditMatchModal({
                   ))}
                 </select>
               </div>
+            </div>
+
+            {/* TÍNH NĂNG CHỦ KÈO TÍCH HỢP VỊ TRÍ GOOGLE MAPS */}
+            <div className="rounded-xl bg-slate-900/90 border border-sky-500/35 p-3 space-y-2 mt-2">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isGmapsIntegrated}
+                    onChange={(e) => setIsGmapsIntegrated(e.target.checked)}
+                    className="w-4 h-4 accent-sky-500 rounded"
+                  />
+                  <span className="text-xs font-bold text-sky-300 flex items-center gap-1.5">
+                    <Compass className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Tích hợp ghim vị trí sân lên Google Maps</span>
+                  </span>
+                </label>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold border border-sky-500/30">
+                  Chỉ đường 1-chạm
+                </span>
+              </div>
+
+              {isGmapsIntegrated && (
+                <div className="space-y-2 pt-1 border-t border-white/[0.06]">
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={customGmapsUrl}
+                      onChange={(e) => setCustomGmapsUrl(e.target.value)}
+                      placeholder="Dán link Google Maps ghim sẵn (hoặc để trống để tự sinh link tìm kiếm)"
+                      className="flex-1 h-8 px-2.5 rounded-lg bg-slate-950 border border-white/[0.1] text-sky-300 placeholder:text-slate-500 font-mono text-[11px] focus:outline-none focus:border-sky-400"
+                    />
+                    {effectiveGmapsUrl && (
+                      <button
+                        type="button"
+                        onClick={() => window.open(effectiveGmapsUrl, "_blank")}
+                        className="h-8 px-2.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-400/40 text-[11px] font-bold flex items-center gap-1 shrink-0 transition"
+                        title="Mở thử Google Maps kiểm tra vị trí sân"
+                      >
+                        <Navigation className="w-3 h-3 text-sky-400" />
+                        <span>Test</span>
+                        <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-slate-400 leading-tight">
+                    💡 {customGmapsUrl.trim()
+                      ? "Đang dùng link Google Maps thủ công."
+                      : `Hệ thống tự động sinh link: “${pitchName} ${pitchAddress || district} Hà Nội”.`}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

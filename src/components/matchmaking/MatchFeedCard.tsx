@@ -12,6 +12,8 @@ import {
   MessageSquare,
   Edit3,
   Trash2,
+  Navigation,
+  ExternalLink,
 } from "lucide-react";
 import { MatchFeedItem } from "@/types/matchmaking";
 import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
@@ -146,6 +148,31 @@ export function MatchFeedCard({
             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 shrink-0">
               {match.district}
             </span>
+          </div>
+
+          {/* Địa chỉ & Nút Vị trí sân Google Maps (Chủ kèo ghim) */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-[11px] text-slate-400">
+            <span className="truncate">{match.pitchAddress || `Khu vực ${match.district}`}</span>
+
+            {(match.gmapsUrl || match.isGmapsIntegrated || match.pitchName) && (
+              <a
+                href={
+                  match.gmapsUrl ||
+                  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    `${match.pitchName} ${match.pitchAddress || match.district} Hà Nội`
+                  )}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/30 text-sky-300 font-bold text-[10px] transition shrink-0 self-start sm:self-auto shadow-sm"
+                title="Mở Google Maps dẫn đường đến sân bóng"
+              >
+                <Navigation className="w-2.5 h-2.5 text-sky-400" />
+                <span>📍 Vị trí sân Google Maps {match.isGmapsIntegrated ? "(Chủ kèo ghim)" : ""}</span>
+                <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+              </a>
+            )}
           </div>
 
           <div className="flex items-center justify-between text-xs pt-1.5 border-t border-slate-800/80">

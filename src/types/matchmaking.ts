@@ -98,6 +98,8 @@ export interface MatchFeedItem {
   escrowDepositTeamId?: string; // Đội đã ký quỹ 200k nếu điểm uy tín < 70
   isCreatedByCurrentUser?: boolean; // Đánh dấu kèo của chính người dùng hiện tại
   creatorId?: string;
+  gmapsUrl?: string; // Link vị trí sân trên Google Maps (chủ kèo ghim hoặc tự sinh)
+  isGmapsIntegrated?: boolean; // Cờ tích hợp Google Maps
 }
 
 export interface BlindReview {

@@ -386,25 +386,47 @@ export async function createMatchInDatabaseAction(payload: {
   splitFee: number;
   isSos: boolean;
   notes?: string;
+  gmapsUrl?: string;
+  isGmapsIntegrated?: boolean;
 }) {
   try {
     const adminClient = getAdminClient();
-    const { data, error } = await adminClient
+    const insertObj: Record<string, any> = {
+      host_team_id: payload.hostTeamId,
+      pitch_custom_name: payload.pitchCustomName,
+      district: payload.district || "Hà Nội",
+      kickoff_time: new Date(Date.now() + 2 * 3600 * 1000).toISOString(),
+      time_slot_label: payload.timeSlotLabel,
+      total_fee: payload.totalFee,
+      split_fee: payload.splitFee,
+      is_sos: payload.isSos,
+      notes: payload.notes || "Giao lưu văn minh, đúng giờ",
+      status: "open",
+    };
+
+    if (payload.gmapsUrl) {
+      insertObj.gmaps_url = payload.gmapsUrl;
+      insertObj.is_gmaps_integrated = payload.isGmapsIntegrated ?? true;
+    }
+
+    let { data, error } = await adminClient
       .from("matches")
-      .insert({
-        host_team_id: payload.hostTeamId,
-        pitch_custom_name: payload.pitchCustomName,
-        district: payload.district || "Hà Nội",
-        kickoff_time: new Date(Date.now() + 2 * 3600 * 1000).toISOString(),
-        time_slot_label: payload.timeSlotLabel,
-        total_fee: payload.totalFee,
-        split_fee: payload.splitFee,
-        is_sos: payload.isSos,
-        notes: payload.notes || "Giao lưu văn minh, đúng giờ",
-        status: "open",
-      })
+      .insert(insertObj)
       .select("*, teams:host_team_id(team_name, trust_score)")
       .single();
+
+    // Nếu bảng matches trên Supabase chưa tạo cột gmaps_url, fallback insert không có cột gmaps
+    if (error && error.message?.includes("gmaps")) {
+      delete insertObj.gmaps_url;
+      delete insertObj.is_gmaps_integrated;
+      const retry = await adminClient
+        .from("matches")
+        .insert(insertObj)
+        .select("*, teams:host_team_id(team_name, trust_score)")
+        .single();
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error) {
       console.error("[createMatchInDatabaseAction Error]", error);

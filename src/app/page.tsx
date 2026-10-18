@@ -28,6 +28,7 @@ import { EscrowWalletModal } from "@/components/escrow/EscrowWalletModal";
 import { HandshakeModal } from "@/components/matchmaking/HandshakeModal";
 import { SubMarketAndRollCall } from "@/components/matchmaking/SubMarketAndRollCall";
 import { PersonalTeamProfileHub } from "@/components/team/PersonalTeamProfileHub";
+import PitchMapSection from "@/components/pitch/PitchMapSection";
 import {
   getZaloDeepLink,
   normalizeVietnamPhone,
@@ -381,6 +382,8 @@ export default function HanoiMatchmakingPlatform() {
         splitFee: newMatch.shareCostVnd,
         isSos: newMatch.isSOS,
         notes: newMatch.notes,
+        gmapsUrl: newMatch.gmapsUrl,
+        isGmapsIntegrated: newMatch.isGmapsIntegrated,
       });
     }
 
@@ -726,6 +729,13 @@ export default function HanoiMatchmakingPlatform() {
           {/* WORKSPACE 3: CHỢ CẦU LẺ */}
           {activeTab === "sub-market" && (
             <SubMarketAndRollCall viewMode="sub-market" />
+          )}
+
+          {/* WORKSPACE 4: BẢN ĐỒ CỤM SÂN & TIỆN ÍCH KÈO ĐỆ TAM (0 ĐỒNG KINH PHÍ) */}
+          {activeTab === "pitch-map" && (
+            <div className="space-y-4">
+              <PitchMapSection />
+            </div>
           )}
 
           {/* WORKSPACE 6: HỒ SƠ ĐỘI TÔI & THẺ CĂN CƯỚC BÓNG ĐÁ SỐ CHÍNH CHỦ */}
