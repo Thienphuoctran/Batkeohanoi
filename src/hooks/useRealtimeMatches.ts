@@ -147,13 +147,40 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
     },
     district,
     pitchName: row.pitch_custom_name || "Sân Thành Phát",
-    pitchAddress:
-      (row as any).pitch_address ||
-      (row as any).pitchAddress ||
-      `Khu vực ${district}, Hà Nội`,
-    gmapsUrl: (row as any).gmaps_url || undefined,
-    isGmapsIntegrated:
-      (row as any).is_gmaps_integrated ?? Boolean((row as any).gmaps_url),
+    pitchAddress: (() => {
+      if (row.notes && row.notes.includes("meta:{")) {
+        try {
+          const idx = row.notes.indexOf("meta:{");
+          const meta = JSON.parse(row.notes.slice(idx + 5));
+          if (meta.address) return meta.address;
+        } catch {}
+      }
+      return (
+        (row as any).pitch_address ||
+        (row as any).pitchAddress ||
+        `Khu vực ${district}, Hà Nội`
+      );
+    })(),
+    gmapsUrl: (() => {
+      if (row.notes && row.notes.includes("meta:{")) {
+        try {
+          const idx = row.notes.indexOf("meta:{");
+          const meta = JSON.parse(row.notes.slice(idx + 5));
+          if (meta.gmapsUrl) return meta.gmapsUrl;
+        } catch {}
+      }
+      return (row as any).gmaps_url || undefined;
+    })(),
+    isGmapsIntegrated: (() => {
+      if (row.notes && row.notes.includes("meta:{")) {
+        try {
+          const idx = row.notes.indexOf("meta:{");
+          const meta = JSON.parse(row.notes.slice(idx + 5));
+          if (typeof meta.isGmapsIntegrated === "boolean") return meta.isGmapsIntegrated;
+        } catch {}
+      }
+      return (row as any).is_gmaps_integrated ?? Boolean((row as any).gmaps_url);
+    })(),
     matchDate: matchDateLabel,
     matchDateIso,
     startTime: startTime || "19:00",
@@ -181,7 +208,17 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
         : "OPEN",
     isSOS: Boolean(row.is_sos),
     sosCountdownSeconds: row.is_sos ? 3600 : undefined,
-    notes: row.notes || undefined,
+    notes: (() => {
+      if (row.notes && row.notes.includes("meta:{")) {
+        try {
+          const idx = row.notes.indexOf("meta:{");
+          const meta = JSON.parse(row.notes.slice(idx + 5));
+          if (meta.rawNotes) return meta.rawNotes;
+          return row.notes.slice(0, idx).replace(/\|\s*$/, "").trim() || undefined;
+        } catch {}
+      }
+      return row.notes || undefined;
+    })(),
     kickoffTime: row.kickoff_time || undefined,
     expiresAt: resolvedExpiresAt,
     createdAt: "Real-time",
@@ -248,11 +285,20 @@ export function useRealtimeMatchFeed(
     // 0. Tải các trận đấu thực tế đã lưu trong CSDL Supabase (Bypass RLS qua getRealtimeMatchesFromDatabaseAction)
     const fetchExistingMatches = async () => {
       try {
-        let rawMatches: any[] = [];
         const serverRes = await getRealtimeMatchesFromDatabaseAction();
-        if (serverRes.success && serverRes.data && serverRes.data.length > 0) {
-          rawMatches = serverRes.data;
+        if (serverRes.success && Array.isArray(serverRes.data)) {
+          const mapped = serverRes.data
+            .filter((d: any) => d.status !== "cancelled" && d.status !== "expired")
+            .map((d) => mapDbMatchToFeedItem(d as MatchItem));
+
+          setMatches(mapped);
+          if (typeof window !== "undefined") {
+            try {
+              localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(mapped));
+            } catch {}
+          }
         } else {
+          // Fallback: Query trực tiếp qua public client
           const { data: dbData, error } = await supabase
             .from("matches")
             .select("*")
@@ -260,77 +306,16 @@ export function useRealtimeMatchFeed(
             .neq("status", "expired")
             .order("created_at", { ascending: false })
             .limit(50);
-          if (!error && dbData && dbData.length > 0) {
-            const hostTeamIds = Array.from(new Set(dbData.map((m: any) => m.host_team_id).filter(Boolean)));
-            if (hostTeamIds.length > 0) {
-              const { data: teamsList } = await supabase
-                .from("teams")
-                .select("id, team_name, trust_score, skill_tier, has_warning_badge, captain_name, captain_phone, captain_zalo")
-                .in("id", hostTeamIds);
-              const teamMap = new Map(teamsList?.map((t: any) => [t.id, t]) || []);
-              rawMatches = dbData.map((m: any) => ({
-                ...m,
-                teams: teamMap.get(m.host_team_id) || undefined,
-              }));
-            } else {
-              rawMatches = dbData;
+
+          if (!error && Array.isArray(dbData)) {
+            const mapped = dbData.map((d) => mapDbMatchToFeedItem(d as MatchItem));
+            setMatches(mapped);
+            if (typeof window !== "undefined") {
+              try {
+                localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(mapped));
+              } catch {}
             }
           }
-        }
-
-        if (rawMatches.length > 0) {
-          const mapped = rawMatches
-            .filter((d: any) => d.status !== "cancelled" && d.status !== "expired")
-            .map((d) => mapDbMatchToFeedItem(d as MatchItem));
-          setMatches((prev) => {
-            const map = new Map<string, MatchFeedItem>();
-            mapped.forEach((m) => {
-              if (!m.id?.startsWith("seed-") && !m.id?.startsWith("mock-")) {
-                map.set(m.id, m);
-              }
-            });
-            prev.forEach((m) => {
-              // Bỏ qua kèo ảo / kèo mẫu seed
-              if (m.id?.startsWith("seed-") || m.id?.startsWith("mock-")) return;
-              if (m.status === "CANCELLED" || m.status === "EXPIRED") return;
-
-              // 🛡️ CHỐNG TỰ SINH 2 KÈO: Bỏ qua kèo tạm nếu CSDL đã tải về kèo thật cùng sân & giờ
-              const isDuplicateOfDb = mapped.some(
-                (dbM) =>
-                  dbM.id === m.id ||
-                  (dbM.pitchName.trim().toLowerCase() === m.pitchName.trim().toLowerCase() &&
-                   dbM.startTime.trim() === m.startTime.trim() &&
-                   (dbM.matchDateIso === m.matchDateIso || dbM.matchDate === m.matchDate))
-              );
-              if (!map.has(m.id) && !isDuplicateOfDb) {
-                map.set(m.id, m);
-              }
-            });
-            const merged = Array.from(map.values());
-            if (typeof window !== "undefined") {
-              try {
-                localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(merged));
-              } catch {}
-            }
-            return merged;
-          });
-        } else {
-          // Nếu CSDL rỗng hoặc chưa có trận nào, dọn dẹp sạch toàn bộ kèo seed/mock khỏi state
-          setMatches((prev) => {
-            const cleanPrev = prev.filter(
-              (m) =>
-                !m.id?.startsWith("seed-") &&
-                !m.id?.startsWith("mock-") &&
-                m.status !== "CANCELLED" &&
-                m.status !== "EXPIRED"
-            );
-            if (typeof window !== "undefined") {
-              try {
-                localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(cleanPrev));
-              } catch {}
-            }
-            return cleanPrev;
-          });
         }
       } catch (err) {
         console.error("fetchExistingMatches error:", err);
@@ -340,6 +325,12 @@ export function useRealtimeMatchFeed(
     };
 
     fetchExistingMatches();
+
+    // Tự động kéo lại dữ liệu tươi mới từ CSDL mỗi khi người dùng quay lại tab web
+    const onWindowFocus = () => {
+      fetchExistingMatches();
+    };
+    window.addEventListener("focus", onWindowFocus);
 
     const channel = supabase
       .channel("realtime-matches-channel", {
@@ -612,11 +603,15 @@ export function useRealtimeMatchFeed(
       })
       .subscribe((status) => {
         setIsRealtimeConnected(status === "SUBSCRIBED");
+        if (status === "SUBSCRIBED") {
+          fetchExistingMatches();
+        }
       });
 
     channelRef.current = channel;
 
     return () => {
+      window.removeEventListener("focus", onWindowFocus);
       supabase.removeChannel(channel);
     };
   }, []);

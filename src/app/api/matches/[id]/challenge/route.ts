@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { MatchService } from "@/services/matchService";
+import { confirmMatchChallengeAction } from "@/actions/auth";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(
   request: Request,
@@ -20,10 +22,11 @@ export async function POST(
       );
     }
 
-    const result = await MatchService.challengeMatch({
+    const result = await confirmMatchChallengeAction({
       matchId,
       guestTeamName: body.guestTeamName,
       guestCaptainPhone: body.guestCaptainPhone,
+      guestCaptainZalo: body.guestCaptainZalo,
       guestTrustScore: Number(body.guestTrustScore ?? 100),
     });
 
@@ -31,7 +34,11 @@ export async function POST(
       return NextResponse.json(result, { status: 409 });
     }
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      success: true,
+      code: "LOCKED_SUCCESSFULLY",
+      message: "Khóa kèo thành công và đã lưu vào CSDL!",
+    });
   } catch (error) {
     return NextResponse.json(
       {

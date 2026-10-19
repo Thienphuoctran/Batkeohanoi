@@ -709,132 +709,100 @@ export async function createMatchInDatabaseAction(payload: {
         : new Date(kickoffDate.getTime() + 15 * 60 * 1000);
 
     let hostTeamId = payload.hostTeamId;
+    let foundValidTeam = false;
+
     const isValidUuid =
       typeof hostTeamId === "string" &&
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
         hostTeamId
       );
 
-    if (!isValidUuid) {
-      if (payload.hostTeamName) {
-        const { data: teamByName } = await adminClient
-          .from("teams")
-          .select("id")
-          .eq("team_name", payload.hostTeamName.trim())
-          .maybeSingle();
-        if (teamByName?.id) {
-          hostTeamId = teamByName.id;
-        }
+    if (isValidUuid) {
+      const { data: existingTeam } = await adminClient
+        .from("teams")
+        .select("id")
+        .eq("id", hostTeamId)
+        .maybeSingle();
+      if (existingTeam?.id) {
+        foundValidTeam = true;
       }
+    }
 
-      if (!hostTeamId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(hostTeamId)) {
-        const { data: firstTeam } = await adminClient
+    if (!foundValidTeam && payload.hostTeamName) {
+      const { data: teamByName } = await adminClient
+        .from("teams")
+        .select("id")
+        .ilike("team_name", payload.hostTeamName.trim())
+        .maybeSingle();
+      if (teamByName?.id) {
+        hostTeamId = teamByName.id;
+        foundValidTeam = true;
+      }
+    }
+
+    if (!foundValidTeam) {
+      const { data: anyTeam } = await adminClient
+        .from("teams")
+        .select("id")
+        .limit(1)
+        .maybeSingle();
+      if (anyTeam?.id) {
+        hostTeamId = anyTeam.id;
+        foundValidTeam = true;
+      } else {
+        const teamName = payload.hostTeamName?.trim() || "FC Phủi Hà Nội";
+        const captainName = payload.captainName?.trim() || "Đội Trưởng";
+        const phone = payload.captainPhone?.trim() || "0988666888";
+        const { data: newTeam } = await adminClient
           .from("teams")
+          .insert({
+            team_name: teamName,
+            captain_name: captainName,
+            captain_phone: phone,
+            captain_zalo: payload.captainZalo?.trim() || phone,
+            home_district: "CauGiay",
+            skill_tier: payload.skillTier || 2,
+            trust_score: 100,
+          })
           .select("id")
-          .limit(1)
-          .maybeSingle();
-        if (firstTeam?.id) {
-          hostTeamId = firstTeam.id;
-        } else {
-          const teamName = payload.hostTeamName?.trim() || "FC Phủi Hà Nội";
-          const captainName = payload.captainName?.trim() || "Đội Trưởng";
-          const phone = payload.captainPhone?.trim() || "0988666888";
-          const { data: newTeam } = await adminClient
-            .from("teams")
-            .insert({
-              team_name: teamName,
-              captain_name: captainName,
-              captain_phone: phone,
-              captain_zalo: payload.captainZalo?.trim() || phone,
-              home_district: payload.district || "CauGiay",
-              skill_tier: payload.skillTier || 2,
-              trust_score: 100,
-            })
-            .select("id")
-            .single();
-          if (newTeam?.id) {
-            hostTeamId = newTeam.id;
-          }
+          .single();
+        if (newTeam?.id) {
+          hostTeamId = newTeam.id;
+          foundValidTeam = true;
         }
       }
     }
+
+    // Đóng gói metadata địa chỉ, gmaps, expires_at vào notes an toàn (chống lỗi thiếu cột trên PostgreSQL)
+    const extraMeta = {
+      address: payload.pitchAddress || undefined,
+      gmapsUrl: payload.gmapsUrl || undefined,
+      isGmapsIntegrated: payload.isGmapsIntegrated,
+      expiresAt: expiresDate.toISOString(),
+      rawNotes: payload.notes || "",
+    };
+    const combinedNotes = payload.notes
+      ? `${payload.notes} | meta:${JSON.stringify(extraMeta)}`
+      : `meta:${JSON.stringify(extraMeta)}`;
 
     const insertObj: Record<string, any> = {
       host_team_id: hostTeamId,
-      pitch_custom_name: payload.pitchCustomName,
-      district: payload.district || "Hà Nội",
+      pitch_custom_name: payload.pitchCustomName || "Sân Bóng Đá",
+      district: payload.district || "Cầu Giấy",
       kickoff_time: kickoffDate.toISOString(),
-      expires_at: expiresDate.toISOString(),
-      time_slot_label: payload.timeSlotLabel,
-      total_fee: payload.totalFee,
-      split_fee: payload.splitFee,
-      is_sos: payload.isSos,
-      notes: payload.notes || "Giao lưu văn minh, đúng giờ",
+      time_slot_label: payload.timeSlotLabel || "19:00 - 20:30",
+      total_fee: payload.totalFee || 850000,
+      split_fee: payload.splitFee || 425000,
+      is_sos: Boolean(payload.isSos),
+      notes: combinedNotes,
       status: "open",
     };
-
-    if (payload.pitchAddress) {
-      insertObj.pitch_address = payload.pitchAddress;
-    }
-
-    if (payload.gmapsUrl) {
-      insertObj.gmaps_url = payload.gmapsUrl;
-      insertObj.is_gmaps_integrated = payload.isGmapsIntegrated ?? true;
-    }
 
     let { data, error } = await adminClient
       .from("matches")
       .insert(insertObj)
       .select()
       .single();
-
-    // Fallback nếu CSDL chưa thêm cột gmaps, expires_at hoặc pitch_address hoặc lỗi host_team_id foreign key
-    if (error && (error.message?.includes("gmaps") || error.message?.includes("expires") || error.message?.includes("pitch_address") || error.message?.includes("foreign key") || error.message?.includes("host_team_id"))) {
-      if (error.message.includes("pitch_address")) {
-        delete insertObj.pitch_address;
-      }
-      if (error.message.includes("gmaps")) {
-        delete insertObj.gmaps_url;
-        delete insertObj.is_gmaps_integrated;
-      }
-      if (error.message.includes("expires")) {
-        delete insertObj.expires_at;
-      }
-      if (error.message.includes("foreign key") || error.message.includes("host_team_id")) {
-        const { data: fallbackTeam } = await adminClient
-          .from("teams")
-          .select("id")
-          .limit(1)
-          .maybeSingle();
-        if (fallbackTeam?.id) {
-          insertObj.host_team_id = fallbackTeam.id;
-        } else {
-          const { data: newTeam } = await adminClient
-            .from("teams")
-            .insert({
-              team_name: "FC Cầu Giấy Phủi",
-              captain_name: "Đội Trưởng Mẫu",
-              captain_phone: "0988666888",
-              captain_zalo: "0988666888",
-              home_district: "CauGiay",
-              skill_tier: 2,
-              trust_score: 100,
-            })
-            .select("id")
-            .single();
-          if (newTeam?.id) {
-            insertObj.host_team_id = newTeam.id;
-          }
-        }
-      }
-      const retry = await adminClient
-        .from("matches")
-        .insert(insertObj)
-        .select()
-        .single();
-      data = retry.data;
-      error = retry.error;
-    }
 
     if (error) {
       console.error("[createMatchInDatabaseAction Error]", error);
@@ -1103,26 +1071,61 @@ export async function sendEmergencyBroadcastAction(payload: {
 // 9. Xóa hoặc Hủy Kèo Đấu Trực Tiếp Trong Database Supabase (Chống Tái Xuất Hiện Khi F5)
 export async function deleteOrCancelMatchAction(matchId: string) {
   try {
-    const adminClient = getAdminClient();
+    if (!matchId) {
+      return { success: false, error: "Thiếu ID trận đấu cần xóa." };
+    }
 
-    // 1. Dọn dẹp bản ghi kháng cáo liên kết (nếu có) để tránh xung đột Foreign Key
+    const adminClient = getAdminClient();
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(matchId);
+
+    let targetDbId = matchId;
+
+    if (!isUuid) {
+      // Nếu client gửi ID tạm (match-new-...), tìm kiếm trận đấu có notes chứa ID này
+      const { data: matchedRows } = await adminClient
+        .from("matches")
+        .select("id")
+        .ilike("notes", `%${matchId}%`)
+        .limit(1);
+
+      if (matchedRows && matchedRows.length > 0) {
+        targetDbId = matchedRows[0].id;
+      } else {
+        // Nếu không tìm thấy trong DB thì bản ghi không tồn tại trong DB, coi như đã sạch
+        revalidatePath("/");
+        return { success: true, message: "Kèo chưa từng lưu DB hoặc đã được dọn sạch." };
+      }
+    }
+
+    // 1. Dọn dẹp bản ghi phụ thuộc để tránh xung đột khóa ngoại
     try {
-      await adminClient.from("match_appeals").delete().eq("match_id", matchId);
+      await adminClient.from("match_appeals").delete().eq("match_id", targetDbId);
+      await adminClient.from("roll_call_sessions").delete().eq("match_id", targetDbId);
+      await adminClient.from("blind_reviews").delete().eq("match_id", targetDbId);
     } catch {}
 
-    // 2. Thử xóa hoàn toàn khỏi bảng matches
+    // 2. Thực hiện Soft Delete: Cập nhật status = 'cancelled' (Chuẩn thể thao, giữ audit trail)
+    const { error: updateError } = await adminClient
+      .from("matches")
+      .update({
+        status: "cancelled",
+        notes: "[Đã xóa/hủy bởi đội trưởng]",
+      })
+      .eq("id", targetDbId);
+
+    // 3. Cố gắng Hard Delete bản ghi khỏi bảng matches
     const { error: delError } = await adminClient
       .from("matches")
       .delete()
-      .eq("id", matchId);
+      .eq("id", targetDbId);
 
-    // 3. Nếu có lỗi ràng buộc khóa ngoại khác, cập nhật status = 'cancelled'
-    if (delError) {
-      console.warn("[deleteMatch] delete error, fallback update to cancelled:", delError.message);
-      await adminClient
-        .from("matches")
-        .update({ status: "cancelled" })
-        .eq("id", matchId);
+    // Nếu cả update lẫn delete đều thất bại
+    if (updateError && delError) {
+      console.error("[deleteOrCancelMatchAction DB Error]", { updateError, delError });
+      return {
+        success: false,
+        error: updateError.message || delError.message || "Lỗi CSDL khi xóa kèo.",
+      };
     }
 
     revalidatePath("/");

@@ -632,13 +632,7 @@ export default function HanoiMatchmakingPlatform() {
       }));
     }
 
-    setMatches((prev) => [newMatch, ...prev]);
-    setActiveTab(newMatch.isSOS ? "sos" : "feed");
-
-    // Phát sóng Realtime sang các thiết bị khác đang mở bảng tin (Zero Reload)
-    await broadcastNewMatch(newMatch);
-
-    // Luôn luôn lưu kèo vào CSDL Supabase (kể cả khi chưa đăng ký tài khoản, dùng fallback host team an toàn)
+    // 🛡️ BƯỚC 1: LƯU VÀO CSDL SUPABASE TRƯỚC TIÊN (Database as Single Source of Truth)
     const hostTeamIdToSave = team?.id || "team-cg-01";
     const dbRes = await createMatchInDatabaseAction({
       hostTeamId: hostTeamIdToSave,
@@ -661,53 +655,50 @@ export default function HanoiMatchmakingPlatform() {
       pitchAddress: newMatch.pitchAddress,
     });
 
-    // 🛡️ CHỐNG TỰ SINH 2 KÈO: Cập nhật ngay ID chính thức từ Supabase cho kèo vừa tạo
-    if (dbRes?.success && dbRes.match?.id) {
-      const officialId = dbRes.match.id;
-      setMatches((prev) =>
-        prev.map((m) =>
-          m.id === newMatch.id ||
-          (m.pitchName.trim().toLowerCase() === newMatch.pitchName.trim().toLowerCase() &&
-           m.startTime === newMatch.startTime &&
-           (m.matchDateIso === newMatch.matchDateIso || m.matchDate === newMatch.matchDate))
-            ? {
-                ...m,
-                id: officialId,
-                isCreatedByCurrentUser: true,
-                pitchAddress: newMatch.pitchAddress,
-                gmapsUrl: newMatch.gmapsUrl,
-                isGmapsIntegrated: newMatch.isGmapsIntegrated,
-              }
-            : m
-        )
+    if (!dbRes?.success || !dbRes.match?.id) {
+      console.error("❌ createMatchInDatabaseAction failed:", dbRes?.error);
+      pushBotLog(
+        "❌ Lỗi Khi Lưu Kèo Vào CSDL",
+        `Không thể lưu bài đăng kèo vào máy chủ Supabase: ${dbRes?.error || "Lỗi không xác định"}. Vui lòng thử lại!`,
+        "Lỗi Lưu Kèo"
       );
-
-      // Đồng bộ phát sóng với ID chính thức
-      await broadcastNewMatch({
-        ...newMatch,
-        id: officialId,
-      });
-    } else {
-      console.warn("⚠️ createMatchInDatabaseAction warning:", dbRes?.error);
-      // Fallback: Nếu CSDL gặp lỗi tạm thời, vẫn broadcast newMatch để máy B nhận được ngay
-      await broadcastNewMatch(newMatch);
+      alert(`⚠️ Không thể lưu kèo đấu vào CSDL: ${dbRes?.error || "Lỗi kết nối. Vui lòng thử lại!"}`);
+      return;
     }
 
+    // 🛡️ BƯỚC 2: CSDL ĐÃ XÁC NHẬN THÀNH CÔNG -> Tạo đối tượng chính thức với UUID từ PostgreSQL
+    const officialId = dbRes.match.id;
+    const officialMatch: MatchFeedItem = {
+      ...newMatch,
+      id: officialId,
+      isCreatedByCurrentUser: true,
+      pitchAddress: newMatch.pitchAddress,
+      gmapsUrl: newMatch.gmapsUrl,
+      isGmapsIntegrated: newMatch.isGmapsIntegrated,
+    };
+
+    // 🛡️ BƯỚC 3: Cập nhật State và chuyển Tab
+    setMatches((prev) => [officialMatch, ...prev.filter((m) => m.id !== officialId)]);
+    setActiveTab(officialMatch.isSOS ? "sos" : "feed");
+
+    // 🛡️ BƯỚC 4: Phát sóng WebSocket Realtime kèm UUID chính thức tới toàn bộ thiết bị
+    await broadcastNewMatch(officialMatch);
+
     pushBotLog(
-      newMatch.isSOS
+      officialMatch.isSOS
         ? "🚨 Đã Phát Tín Hiệu Cứu Hộ SOS"
         : "⚽ Đã Đăng Kèo Mới Lên Bảng Tin",
-      `${newMatch.hostTeam.name} tìm đối tại ${newMatch.pitchName} (${newMatch.startTime} - ${newMatch.matchDate}). Đã gắn định tuyến Zalo (${newMatch.hostTeam.captainPhone}).`,
-      newMatch.isSOS ? "SOS < 1h" : "Kèo Mới",
-      newMatch.hostTeam.captainZalo || newMatch.hostTeam.captainPhone,
-      `${newMatch.hostTeam.captainName} (${newMatch.hostTeam.shortName})`
+      `${officialMatch.hostTeam.name} tìm đối tại ${officialMatch.pitchName} (${officialMatch.startTime} - ${officialMatch.matchDate}). Kèo đã lưu thành công vào CSDL.`,
+      officialMatch.isSOS ? "SOS < 1h" : "Kèo Mới",
+      officialMatch.hostTeam.captainZalo || officialMatch.hostTeam.captainPhone,
+      `${officialMatch.hostTeam.captainName} (${officialMatch.hostTeam.shortName})`
     );
 
     try {
       await fetch("/api/matches", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newMatch),
+        body: JSON.stringify(officialMatch),
       });
     } catch (err) {
       console.log("Local match synchronized");
@@ -831,18 +822,29 @@ export default function HanoiMatchmakingPlatform() {
     }
   ) => {
     const target = matches.find((m) => m.id === matchId);
-
-    // 1. Gỡ ngay khỏi danh sách hiển thị (Optimistic UI)
-    setMatches((prev) => prev.filter((m) => m.id !== matchId));
     setCancellingMatch(null);
 
-    // 2. Phát sóng WebSocket Realtime cho toàn bộ các thiết bị khác đang mở bảng tin
+    // 🛡️ BƯỚC 1: XÓA TRỰC TIẾP TRONG CSDL SUPABASE TRƯỚC (Database as Single Source of Truth)
+    const dbRes = await deleteOrCancelMatchAction(matchId);
+
+    if (!dbRes?.success) {
+      console.error("❌ deleteOrCancelMatchAction failed:", dbRes?.error);
+      pushBotLog(
+        "❌ Lỗi Khi Xóa Kèo Trên CSDL",
+        `Không thể xóa kèo #${matchId} khỏi CSDL Supabase: ${dbRes?.error || "Lỗi khóa ngoại hoặc quyền truy cập"}. Vui lòng thử lại!`,
+        "Lỗi Xóa Kèo"
+      );
+      alert(`⚠️ Không thể xóa kèo khỏi máy chủ CSDL: ${dbRes?.error || "Vui lòng thử lại!"}`);
+      return;
+    }
+
+    // 🛡️ BƯỚC 2: CSDL ĐÃ XÁC NHẬN THÀNH CÔNG -> Gỡ khỏi State và phát sóng
+    setMatches((prev) => prev.filter((m) => m.id !== matchId));
+
+    // 🛡️ BƯỚC 3: Phát sóng WebSocket Realtime cho các thiết bị khác đồng bộ
     await broadcastMatchDelete(matchId);
 
-    // 3. Xóa hoặc cập nhật status = 'cancelled' vĩnh viễn trong CSDL Supabase
-    await deleteOrCancelMatchAction(matchId);
-
-    // 4. Đồng bộ xóa sạch khỏi localStorage
+    // 🛡️ BƯỚC 4: Đồng bộ xóa sạch khỏi localStorage
     if (typeof window !== "undefined") {
       try {
         const saved = localStorage.getItem("batkeo7_matches_v2");
@@ -866,19 +868,19 @@ export default function HanoiMatchmakingPlatform() {
     if (options.submittedAppeal) {
       pushBotLog(
         `🛡️ Đã Gửi Đơn Kháng Cáo (#${options.submittedAppeal.id}) Lên BQT`,
-        `Kèo tại ${target?.pitchName || "sân"} đã hủy. Đơn kháng cáo của bạn đã được chuyển tới Trạm Xét Duyệt 1-Chạm (/admin) & Telegram BQT để khôi phục 100 điểm Uy Tín!`,
+        `Kèo tại ${target?.pitchName || "sân"} đã hủy trên CSDL. Đơn kháng cáo của bạn đã được chuyển tới Trạm Xét Duyệt 1-Chạm (/admin) & Telegram BQT để khôi phục 100 điểm Uy Tín!`,
         "Chờ Duyệt Kháng Cáo"
       );
     } else if (options.incurredPenalty) {
       pushBotLog(
         `⚠️ Đã Hủy Kèo Sát Giờ (Trừ -${options.penaltyPoints}đ Uy Tín)`,
-        `Kèo đấu tại ${target?.pitchName || "sân"} (${target?.startTime || ""}) đã bị hủy không kèm kháng cáo. Đội bị trừ -${options.penaltyPoints} điểm Uy Tín theo quy định.`,
+        `Kèo đấu tại ${target?.pitchName || "sân"} (${target?.startTime || ""}) đã bị hủy thành công trên CSDL. Đội bị trừ -${options.penaltyPoints} điểm Uy Tín theo quy định.`,
         `-${options.penaltyPoints}đ Uy Tín`
       );
     } else {
       pushBotLog(
         "🗑️ Đã Xóa Kèo Đấu Hợp Lệ (Không Trừ Điểm)",
-        `Kèo đấu tại ${target?.pitchName || "sân"} (${target?.startTime || ""}) đã được gỡ bỏ khỏi bảng tin trước giờ quy định.`,
+        `Kèo đấu tại ${target?.pitchName || "sân"} (${target?.startTime || ""}) đã được xóa vĩnh viễn khỏi CSDL và bảng tin.`,
         "Đã Xóa Kèo"
       );
     }
