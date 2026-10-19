@@ -590,28 +590,57 @@ export async function createTeamOnboardingAction(formData: FormData) {
     is_phone_verified: true,
   });
 
-  const { data: newTeam, error: teamErr } = await adminClient
+  const deviceFingerprint =
+    (formData.get("deviceFingerprint") as string)?.trim() || "BK7-UNKNOWN";
+  const isSuspiciousDevice = formData.get("isSuspiciousDevice") === "true";
+
+  // Thử insert đầy đủ thông tin thiết bị (nếu bảng teams đã có cột), nếu chưa chạy SQL thì fallback an toàn
+  const baseTeamPayload: Record<string, any> = {
+    captain_id: user.id,
+    team_name: teamName,
+    captain_name: captainName,
+    captain_phone: phone,
+    captain_zalo: phone,
+    jersey_color: jerseyColor,
+    avg_age: avgAge,
+    skill_tier: skillTier,
+    trust_score: isSuspiciousDevice ? 75 : 100,
+    late_cancels_count: 0,
+    clean_streak_count: 0,
+    has_warning_badge: isSuspiciousDevice,
+    home_district: homeDistrict,
+    bank_account_no: bankAccountNo,
+    bank_account_name: bankAccountName,
+    bank_code: bankCode,
+  };
+
+  let newTeam: any = null;
+  let teamErr: any = null;
+
+  // Thử insert kèm device_fingerprint
+  const res1 = await adminClient
     .from("teams")
     .insert({
-      captain_id: user.id,
-      team_name: teamName,
-      captain_name: captainName,
-      captain_phone: phone,
-      captain_zalo: phone,
-      jersey_color: jerseyColor,
-      avg_age: avgAge,
-      skill_tier: skillTier,
-      trust_score: 100,
-      late_cancels_count: 0,
-      clean_streak_count: 0,
-      has_warning_badge: false,
-      home_district: homeDistrict,
-      bank_account_no: bankAccountNo,
-      bank_account_name: bankAccountName,
-      bank_code: bankCode,
+      ...baseTeamPayload,
+      device_fingerprint: deviceFingerprint,
+      is_suspicious_device: isSuspiciousDevice,
     })
     .select()
     .single();
+
+  if (res1.error && res1.error.message?.includes("device_fingerprint")) {
+    // Fallback nếu cột chưa được thêm trên Supabase DB
+    const res2 = await adminClient
+      .from("teams")
+      .insert(baseTeamPayload)
+      .select()
+      .single();
+    newTeam = res2.data;
+    teamErr = res2.error;
+  } else {
+    newTeam = res1.data;
+    teamErr = res1.error;
+  }
 
   if (teamErr || !newTeam) {
     return {
@@ -639,12 +668,82 @@ export async function createTeamOnboardingAction(formData: FormData) {
 
   await sendTelegramAlert(alertText);
 
+  if (isSuspiciousDevice) {
+    const smurfAlert =
+      `🚨 <b>CẢNH BÁO NICK NGHI VẤN LẬP ĐỘI MỚI (ANTI-SMURF RADAR)</b>\n` +
+      `• Đội mới: <b>${teamName}</b>\n` +
+      `• Đội trưởng: <b>${captainName}</b> (${phone})\n` +
+      `• Mã thiết bị: <code>${deviceFingerprint}</code>\n` +
+      `⚠️ <b>CẢNH BÁO:</b> Thiết bị này từng gắn liền với đội vi phạm bùng kèo hoặc hạ uy tín. Hệ thống đã tự động gán điểm thử thách 75đ và gắn cờ nghi vấn! Vui lòng vào /admin kiểm tra đối soát.`;
+    await sendTelegramAlert(smurfAlert);
+  }
+
   revalidatePath("/");
   return {
     success: true,
     message: `Chúc mừng bạn đã tạo thành công đội ${teamName}!`,
     team: newTeam,
   };
+}
+
+// 5.1. Quản trị Anti-Smurf: Gộp vi phạm hoặc phạt kế thừa từ Admin Hub
+export async function adminMergeOrPenalizeSmurfAction({
+  targetTeamId,
+  penaltyPoints,
+  warningBadge,
+  reason,
+}: {
+  targetTeamId: string;
+  penaltyPoints: number;
+  warningBadge?: boolean;
+  reason: string;
+}) {
+  try {
+    const adminClient = getAdminClient();
+    const { data: targetTeam, error: fetchErr } = await adminClient
+      .from("teams")
+      .select("id, team_name, trust_score, captain_phone")
+      .eq("id", targetTeamId)
+      .single();
+
+    if (fetchErr || !targetTeam) {
+      return { success: false, message: "Không tìm thấy đội bóng mục tiêu." };
+    }
+
+    const currentScore = targetTeam.trust_score || 100;
+    const newScore = Math.max(0, currentScore - penaltyPoints);
+
+    const updatePayload: Record<string, any> = {
+      trust_score: newScore,
+      has_warning_badge: warningBadge ?? true,
+    };
+
+    const { error: updateErr } = await adminClient
+      .from("teams")
+      .update(updatePayload)
+      .eq("id", targetTeamId);
+
+    if (updateErr) {
+      return { success: false, message: updateErr.message };
+    }
+
+    await sendTelegramAlert(
+      `⚖️ <b>ADMIN XỬ PHẠT NICK ẢO / KẾ THỪA ÁN TÍCH (ANTI-SMURF)</b>\n` +
+      `• Đội bị phạt: <b>${targetTeam.team_name}</b> (SĐT: ${targetTeam.captain_phone})\n` +
+      `• Điểm tín nhiệm mới: <b>${newScore}/100</b> (-${penaltyPoints}đ)\n` +
+      `• Lý do: ${reason}`
+    );
+
+    revalidatePath("/");
+    revalidatePath("/admin");
+    return {
+      success: true,
+      message: `Đã áp dụng mức phạt cho đội ${targetTeam.team_name} thành công!`,
+    };
+  } catch (err: any) {
+    console.error("[adminMergeOrPenalizeSmurfAction Error]", err);
+    return { success: false, message: err?.message || "Lỗi xử phạt." };
+  }
 }
 
 // 6. Lưu kèo đấu thật vào bảng public.matches trên Supabase khi Đội trưởng tạo kèo

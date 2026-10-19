@@ -642,9 +642,15 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-extrabold uppercase tracking-wider">
-                  Đội Chính Chủ Đã Xác Thực
-                </span>
+                {matchStats.total < 3 ? (
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-extrabold uppercase tracking-wider">
+                    🌱 Đội Mới ({matchStats.total} Trận)
+                  </span>
+                ) : (
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40 font-extrabold uppercase tracking-wider">
+                    ⭐ Đã Xác Thực ({matchStats.total} Trận)
+                  </span>
+                )}
                 <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
                   ★ Bảo Chứng GiaoHuu.vn
                 </span>
@@ -747,6 +753,27 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             </span>
           </div>
         </div>
+
+        {/* Lộ Trình Đá Đẹp Xóa Án Tích & Phục Hồi 100 Điểm (Nếu bị trừ điểm) */}
+        {team.trust_score < 100 && (
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs relative z-10">
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-amber-300 flex items-center gap-1.5">
+                <Flame className="w-4 h-4 text-amber-400" />
+                Lộ Trình Đá Đẹp Xóa Án Tích &amp; Phục Hồi 100 Điểm
+              </span>
+              <p className="text-[11px] text-slate-300 leading-relaxed">
+                Mỗi trận hoàn thành qua Mã Bắt Tay được <strong className="text-emerald-400">+5đ</strong>. Chuỗi <strong className="text-white">5 trận Fair-play liên tiếp</strong> sẽ tự động xóa sạch nhãn đỏ vi phạm và phục hồi trọn vẹn 100/100 điểm tín nhiệm!
+              </p>
+            </div>
+            <div className="flex items-center sm:flex-col items-end gap-1 shrink-0 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-amber-500/20">
+              <span className="text-[10px] text-slate-400 font-bold uppercase">Tiến Độ Xóa Phạt</span>
+              <span className="text-sm font-mono font-black text-amber-300">
+                {matchStats.total % 5}/5 Trận
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Thanh công cụ quản trị đội bóng */}
         <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 relative z-10">

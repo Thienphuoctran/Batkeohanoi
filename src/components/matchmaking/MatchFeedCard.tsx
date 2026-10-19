@@ -217,6 +217,21 @@ export function MatchFeedCard({
                     Kèo của bạn
                   </span>
                 )}
+                {host.totalMatches !== undefined && host.totalMatches < 3 ? (
+                  <span
+                    className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 inline-flex items-center gap-0.5"
+                    title="Đội bóng mới gia nhập hệ thống (Dưới 3 trận)"
+                  >
+                    <span>🌱 Đội Mới ({host.totalMatches} trận)</span>
+                  </span>
+                ) : (
+                  <span
+                    className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 inline-flex items-center gap-0.5"
+                    title="Đội bóng phong trào đã thi đấu xác thực"
+                  >
+                    <span>⭐ Đã Xác Thực ({host.totalMatches || 5} trận)</span>
+                  </span>
+                )}
                 <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-amber-400 tabular-nums">
                   <Star className="w-3 h-3 fill-amber-400" />
                   {avgStar}

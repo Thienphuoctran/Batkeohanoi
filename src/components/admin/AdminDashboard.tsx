@@ -52,6 +52,7 @@ import {
   resolveMatchAppealAction,
   sendEmergencyBroadcastAction,
   signOutAction,
+  adminMergeOrPenalizeSmurfAction,
 } from '@/actions/auth';
 import { useAuthTeam } from '@/hooks/useAuthTeam';
 import { AuthModal } from '@/components/auth/AuthModal';
@@ -139,6 +140,14 @@ export function AdminDashboard() {
   const [forfeitOption, setForfeitOption] = useState<'VICTIM' | 'SOS'>('VICTIM');
   const [actionToast, setActionToast] = useState<string | null>(null);
 
+  // Anti-Smurf Radar state
+  const [teamsList, setTeamsList] = useState<any[]>([]);
+  const [smurfSearchQuery, setSmurfSearchQuery] = useState('');
+  const [penalizingTeam, setPenalizingTeam] = useState<any | null>(null);
+  const [smurfPenaltyPoints, setSmurfPenaltyPoints] = useState(30);
+  const [smurfReason, setSmurfReason] = useState('Nghi vấn lập nick ảo trốn điểm phạt bùng kèo');
+  const [loadingTeams, setLoadingTeams] = useState(false);
+
   // Broadcast form
   const [broadcastTitle, setBroadcastTitle] = useState(BROADCAST_TEMPLATES[0].title);
   const [broadcastMessage, setBroadcastMessage] = useState(BROADCAST_TEMPLATES[0].message);
@@ -156,10 +165,29 @@ export function AdminDashboard() {
     return localStorage.getItem(PIN_STORAGE_KEY) || DEFAULT_ADMIN_PIN;
   };
 
+  const fetchTeams = async () => {
+    try {
+      setLoadingTeams(true);
+      const { data, error } = await supabase
+        .from('teams')
+        .select('id, team_name, captain_name, captain_phone, trust_score, device_fingerprint, is_suspicious_device, has_warning_badge, created_at')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (data && !error) {
+        setTeamsList(data);
+      }
+    } catch (err) {
+      console.warn('Fetch teams error', err);
+    } finally {
+      setLoadingTeams(false);
+    }
+  };
+
   const syncDataFromStorage = () => {
     setAppeals(getStoredAppeals());
     setEscrowRecords(getStoredEscrowRecords());
     setBroadcasts(getStoredBroadcasts());
+    fetchTeams();
     try {
       const savedMatches =
         localStorage.getItem('batkeo7_matches_v2') ||
@@ -195,6 +223,45 @@ export function AdminDashboard() {
       };
     }
   }, []);
+
+  const handleApplySmurfPenalty = async (teamItem: any) => {
+    if (
+      !window.confirm(
+        `Xác nhận xử phạt đội "${teamItem.team_name}" (-${smurfPenaltyPoints}đ Uy Tín)?`
+      )
+    )
+      return;
+    try {
+      const res = await adminMergeOrPenalizeSmurfAction({
+        targetTeamId: teamItem.id,
+        penaltyPoints: smurfPenaltyPoints,
+        warningBadge: true,
+        reason: smurfReason,
+      });
+      if (res.success) {
+        showToast(`✅ Đã áp dụng xử phạt đội ${teamItem.team_name}!`);
+        setTeamsList((prev) =>
+          prev.map((t) =>
+            t.id === teamItem.id
+              ? {
+                  ...t,
+                  trust_score: Math.max(
+                    0,
+                    (t.trust_score || 100) - smurfPenaltyPoints
+                  ),
+                  has_warning_badge: true,
+                }
+              : t
+          )
+        );
+        setPenalizingTeam(null);
+      } else {
+        alert(res.message);
+      }
+    } catch (e: any) {
+      alert(e?.message || 'Lỗi khi xử phạt.');
+    }
+  };
 
   const handleUnlockPin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -823,6 +890,13 @@ export function AdminDashboard() {
               <Radio className="w-4 h-4 mr-1.5" />
               4. Phát Sóng Khẩn Cấp Telegram
             </TabsTrigger>
+            <TabsTrigger
+              value="antismurf"
+              className="flex-1 min-w-[180px] data-[state=active]:bg-rose-500 data-[state=active]:text-white font-black text-xs py-2.5 rounded-xl"
+            >
+              <ShieldAlert className="w-4 h-4 mr-1.5" />
+              5. Radar Soi Nick Ảo ({teamsList.filter((t) => t.is_suspicious_device).length})
+            </TabsTrigger>
           </TabsList>
 
           {/* TAB 1 (ĐỀ XUẤT 2): TRẠM XÉT DUYỆT KHÁNG CÁO 1-CHẠM */}
@@ -1425,6 +1499,161 @@ export function AdminDashboard() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* TAB 5: RADAR SOI NICK ẢO & KIỂM SOÁT TÂN BINH (ANTI-SMURF FRAMEWORK) */}
+          <TabsContent value="antismurf" className="space-y-4">
+            <Card className="bg-slate-900/90 border-slate-800 rounded-2xl">
+              <CardHeader className="pb-3 border-b border-slate-800/80 flex flex-row flex-wrap items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-base font-black text-white flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5 text-rose-400" />
+                    Radar Soi Nick Ảo &amp; Chống Trốn Phạt Bùng Kèo (Anti-Smurf Radar)
+                  </CardTitle>
+                  <CardDescription className="text-xs text-slate-400 mt-1">
+                    Nhận diện thiết bị (Device Fingerprint), cờ nghi vấn tân binh vừa đăng ký và công cụ 1-Click gộp vi phạm / kế thừa án tích.
+                  </CardDescription>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={fetchTeams}
+                  className="border-slate-700 text-slate-300 hover:text-white text-xs h-8 rounded-xl gap-1.5"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loadingTeams ? 'animate-spin' : ''}`} />
+                  Làm mới
+                </Button>
+              </CardHeader>
+
+              <CardContent className="p-4 space-y-4">
+                {/* Search & Stats */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <Input
+                    placeholder="Tìm theo tên đội, SĐT hoặc mã thiết bị..."
+                    value={smurfSearchQuery}
+                    onChange={(e) => setSmurfSearchQuery(e.target.value)}
+                    className="bg-slate-950 border-slate-800 text-xs text-white max-w-sm"
+                  />
+                  <div className="flex items-center gap-2 text-xs">
+                    <Badge className="bg-slate-800 text-slate-300 border-slate-700">
+                      Tổng số đội: {teamsList.length}
+                    </Badge>
+                    <Badge className="bg-rose-500/20 text-rose-300 border-rose-500/40">
+                      ⚠️ Thiết bị nghi vấn: {teamsList.filter((t) => t.is_suspicious_device).length}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Bảng danh sách đội bóng & Dấu vân tay thiết bị */}
+                <div className="rounded-xl border border-slate-800 overflow-hidden bg-slate-950/80">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-slate-900/90 border-b border-slate-800 text-[11px] font-black text-slate-300 uppercase tracking-wider">
+                          <th className="py-3 px-3.5">Tên Đội Bóng</th>
+                          <th className="py-3 px-3">Đội Trưởng &amp; SĐT</th>
+                          <th className="py-3 px-3">Điểm Uy Tín</th>
+                          <th className="py-3 px-3.5">Mã Thiết Bị (Fingerprint)</th>
+                          <th className="py-3 px-3.5">Trạng Thái An Ninh</th>
+                          <th className="py-3 px-3.5 text-right">Hành Động Admin</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/70">
+                        {teamsList
+                          .filter((t) => {
+                            if (!smurfSearchQuery.trim()) return true;
+                            const q = smurfSearchQuery.toLowerCase();
+                            return (
+                              t.team_name?.toLowerCase().includes(q) ||
+                              t.captain_name?.toLowerCase().includes(q) ||
+                              t.captain_phone?.includes(q) ||
+                              t.device_fingerprint?.toLowerCase().includes(q)
+                            );
+                          })
+                          .map((item) => {
+                            const isSuspicious = item.is_suspicious_device;
+                            const isLowScore = (item.trust_score || 100) < 70;
+                            return (
+                              <tr
+                                key={item.id}
+                                className={`hover:bg-slate-900/50 transition ${
+                                  isSuspicious ? 'bg-rose-950/15' : ''
+                                }`}
+                              >
+                                <td className="py-3 px-3.5 font-bold text-white">
+                                  <div className="flex items-center gap-1.5">
+                                    <span>{item.team_name}</span>
+                                    {isLowScore && (
+                                      <Badge className="bg-rose-500/20 text-rose-300 border-rose-500/40 text-[9px] px-1.5 py-0">
+                                        &lt;70đ
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="py-3 px-3 text-slate-300">
+                                  <div>{item.captain_name}</div>
+                                  <div className="text-[10px] text-sky-400 font-mono">
+                                    {item.captain_phone}
+                                  </div>
+                                </td>
+                                <td className="py-3 px-3 font-mono font-black">
+                                  <span
+                                    className={
+                                      (item.trust_score || 100) >= 70
+                                        ? 'text-emerald-400'
+                                        : 'text-rose-400'
+                                    }
+                                  >
+                                    {item.trust_score ?? 100} / 100★
+                                  </span>
+                                </td>
+                                <td className="py-3 px-3.5 font-mono text-[11px] text-slate-400">
+                                  {item.device_fingerprint ? (
+                                    <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-sky-300">
+                                      {item.device_fingerprint}
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-600 italic">Chưa ghi nhận</span>
+                                  )}
+                                </td>
+                                <td className="py-3 px-3.5">
+                                  {isSuspicious ? (
+                                    <Badge className="bg-rose-500/20 text-rose-300 border-rose-500/40 text-[10px] gap-1 font-bold">
+                                      <AlertTriangle className="w-3 h-3 text-rose-400" />
+                                      Trùng thiết bị bị phạt
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/30 text-[10px]">
+                                      ✓ Hợp lệ
+                                    </Badge>
+                                  )}
+                                </td>
+                                <td className="py-3 px-3.5 text-right">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleApplySmurfPenalty(item)}
+                                    className="border-rose-500/40 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 text-xs h-7 px-2.5 rounded-lg font-bold"
+                                  >
+                                    Phạt Kế Thừa (-30đ)
+                                  </Button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        {teamsList.length === 0 && (
+                          <tr>
+                            <td colSpan={6} className="text-center py-8 text-slate-500">
+                              Đang tải danh sách đội hoặc chưa có dữ liệu đội mới.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

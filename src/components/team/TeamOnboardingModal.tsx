@@ -3,6 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { createTeamOnboardingAction } from "@/actions/auth";
 import {
+  getPersistentDeviceFingerprint,
+  isCurrentDeviceSuspicious,
+} from "@/lib/deviceFingerprint";
+import {
   CreditCard,
   CheckCircle2,
   ChevronRight,
@@ -74,6 +78,15 @@ export const TeamOnboardingModal: React.FC<TeamOnboardingModalProps> = ({
     formData.append("bankAccountNo", bankAccountNo);
     formData.append("bankAccountName", bankAccountName);
     formData.append("bankCode", bankCode);
+
+    try {
+      const deviceFp = await getPersistentDeviceFingerprint();
+      const isSuspicious = isCurrentDeviceSuspicious();
+      formData.append("deviceFingerprint", deviceFp);
+      formData.append("isSuspiciousDevice", isSuspicious ? "true" : "false");
+    } catch (e) {
+      console.warn("Could not get device fingerprint", e);
+    }
 
     const res = await createTeamOnboardingAction(formData);
     setLoading(false);

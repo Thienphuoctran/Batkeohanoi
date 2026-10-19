@@ -44,6 +44,7 @@ import {
   normalizeVietnamPhone,
   playNotificationChime,
 } from "@/lib/zalo";
+import { markDeviceAsPenalized } from "@/lib/deviceFingerprint";
 import { isMatchExpired } from "@/lib/matchTime";
 import { useRealtimeMatchFeed } from "@/hooks/useRealtimeMatches";
 import { useAuthTeam } from "@/hooks/useAuthTeam";
@@ -542,6 +543,15 @@ export default function HanoiMatchmakingPlatform() {
 
   // Xử lý khi bị đối thủ bùng kèo (xác thực GPS tại sân bóng) -> Bồi thường 200k vào ví
   const handleReportNoShow = (matchId: string, reason: string) => {
+    const target = matches.find((m) => m.id === matchId);
+    if (target) {
+      const penalizedTeamName =
+        target.hostTeam.name === team?.team_name
+          ? target.guestTeam?.name || "Đội khách"
+          : target.hostTeam.name;
+      markDeviceAsPenalized(penalizedTeamName, reason || "Bùng kèo sân bóng");
+    }
+
     setMatches((prev) =>
       prev.map((m) =>
         m.id === matchId ? { ...m, status: "DISPUTED" } : m
@@ -896,6 +906,10 @@ export default function HanoiMatchmakingPlatform() {
 
     if (options.incurredPenalty && options.penaltyPoints > 0) {
       setMyTrustScore((prev) => Math.max(0, prev - options.penaltyPoints));
+      markDeviceAsPenalized(
+        team?.team_name || "Đội của tôi",
+        `Hủy kèo bị phạt -${options.penaltyPoints}đ Uy Tín`
+      );
     }
 
     if (options.submittedAppeal) {

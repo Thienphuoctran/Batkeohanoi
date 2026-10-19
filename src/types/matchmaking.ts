@@ -49,6 +49,8 @@ export interface TeamProfile {
     accountNumber: string;
     accountOwner: string;
   };
+  deviceFingerprint?: string;
+  isSuspiciousDevice?: boolean;
 }
 
 export type MatchStatus =
