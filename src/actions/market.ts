@@ -1,0 +1,391 @@
+"use server";
+
+import { getAdminClient } from "@/lib/supabase";
+import { revalidatePath } from "next/cache";
+import { sendTelegramAlert } from "./telegram";
+import { normalizeVietnamPhone, isValidVietnamPhone } from "@/lib/zalo";
+import {
+  FreeAgentScoutCard,
+  SubPlayerPost,
+  SoloPosition,
+  SkillTier,
+  District,
+} from "@/types/matchmaking";
+
+/**
+ * Chuyển đổi bản ghi DB sang FreeAgentScoutCard
+ */
+export function mapDbToFreeAgent(row: any): FreeAgentScoutCard {
+  return {
+    id: String(row.id),
+    playerName: row.player_name || 'Anh Em "Phủi"',
+    age: Number(row.age) || 25,
+    preferredFoot: row.preferred_foot || "Chân phải",
+    position: (row.position || "MF") as SoloPosition,
+    positionLabel: row.position_label || "Tiền Vệ (MF)",
+    skillTier: (Number(row.skill_tier) || 2) as SkillTier,
+    districts: Array.isArray(row.districts) && row.districts.length > 0
+      ? row.districts
+      : [row.district || "Cầu Giấy"],
+    availableDate: row.available_date || "Hôm nay",
+    availableDateIso: row.available_date_iso || undefined,
+    availableTimeSlots: Array.isArray(row.available_time_slots) && row.available_time_slots.length > 0
+      ? row.available_time_slots
+      : ["19:00 - 20:30"],
+    trustRating: 5.0,
+    matchesJoined: 1,
+    futStats: row.fut_stats || {
+      ovr: 85,
+      pac: 85,
+      tec: 85,
+      pas: 85,
+      def: 85,
+      fpl: 98,
+    },
+    phone: row.phone || "",
+    zaloPhone: row.zalo_phone || row.phone || "",
+    bio: row.bio || "",
+    hasFirstTimerVoucher: false,
+    isCreatedByCurrentUser: false,
+    createdAt: row.created_at
+      ? new Date(row.created_at).toLocaleTimeString("vi-VN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "Vừa xong",
+  };
+}
+
+/**
+ * Chuyển đổi bản ghi DB sang SubPlayerPost
+ */
+export function mapDbToSubPost(row: any): SubPlayerPost {
+  return {
+    id: String(row.id),
+    teamId: row.team_id || "team-guest",
+    teamName: row.team_name || "FC Anh Em Hà Nội",
+    positionNeeded: row.position_needed || "Tiền Vệ (MF)",
+    positionCode: (row.position_code || "MF") as SoloPosition,
+    quantity: Number(row.quantity) || 1,
+    matchDate: row.match_date || "Hôm nay",
+    matchDateIso: row.match_date_iso || undefined,
+    matchTime: row.match_time || "19:00 - 20:30",
+    expiresAt: row.expires_at || undefined,
+    pitchName: row.pitch_name || "Sân Cỏ Nhân Tạo",
+    district: (row.district || "Cầu Giấy") as District,
+    skillTier: (Number(row.skill_tier) || 2) as SkillTier,
+    contactPhone: row.contact_phone || "",
+    contactZalo: row.contact_zalo || row.contact_phone || "",
+    notes: row.notes || "",
+    status: (row.status || "ACTIVE") as "ACTIVE" | "FILLED",
+    isCreatedByCurrentUser: false,
+    createdAt: row.created_at
+      ? new Date(row.created_at).toLocaleTimeString("vi-VN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "Vừa xong",
+  };
+}
+
+/**
+ * 1. LẤY TOÀN BỘ DANH SÁCH CHỢ CẦU TỪ SUPABASE (Single Source of Truth)
+ */
+export async function getMarketPostsFromDatabaseAction() {
+  try {
+    const adminClient = getAdminClient();
+
+    // 1. Kéo danh sách Cầu thủ tự do tìm đội
+    let freeAgents: FreeAgentScoutCard[] = [];
+    try {
+      const { data: faData, error: faErr } = await adminClient
+        .from("free_agent_posts")
+        .select("*")
+        .neq("status", "CANCELLED")
+        .order("created_at", { ascending: false })
+        .limit(60);
+
+      if (!faErr && Array.isArray(faData)) {
+        freeAgents = faData.map(mapDbToFreeAgent);
+      } else if (faErr) {
+        console.warn("[getMarketPosts] free_agent_posts notice:", faErr.message);
+      }
+    } catch (e) {
+      console.warn("[getMarketPosts] free_agent_posts catch:", e);
+    }
+
+    // 2. Kéo danh sách Đội tuyển thêm người
+    let subPosts: SubPlayerPost[] = [];
+    try {
+      const { data: subData, error: subErr } = await adminClient
+        .from("sub_player_posts")
+        .select("*")
+        .neq("status", "CANCELLED")
+        .order("created_at", { ascending: false })
+        .limit(60);
+
+      if (!subErr && Array.isArray(subData)) {
+        subPosts = subData.map(mapDbToSubPost);
+      } else if (subErr) {
+        console.warn("[getMarketPosts] sub_player_posts notice:", subErr.message);
+      }
+    } catch (e) {
+      console.warn("[getMarketPosts] sub_player_posts catch:", e);
+    }
+
+    return {
+      success: true,
+      freeAgents,
+      subPosts,
+    };
+  } catch (err: any) {
+    console.error("[getMarketPostsFromDatabaseAction Error]", err);
+    return { success: false, freeAgents: [], subPosts: [], error: err?.message };
+  }
+}
+
+/**
+ * 2. TẠO HOẶC CẬP NHẬT HỒ SƠ CẦU THỦ TỰ DO (Lớp 3 Idempotency)
+ */
+export async function createOrUpdateFreeAgentAction(payload: FreeAgentScoutCard) {
+  try {
+    const adminClient = getAdminClient();
+    const cleanPhone = normalizeVietnamPhone(payload.phone);
+
+    // LỚP 3: Idempotency Check (Chống Double Submission trong 30s)
+    if (!payload.id || payload.id.startsWith("scout-")) {
+      const thirtySecondsAgo = new Date(Date.now() - 30 * 1000).toISOString();
+      try {
+        const { data: existingDup } = await adminClient
+          .from("free_agent_posts")
+          .select("*")
+          .eq("phone", cleanPhone)
+          .eq("position", payload.position)
+          .neq("status", "CANCELLED")
+          .gte("created_at", thirtySecondsAgo)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (existingDup) {
+          console.log("[createFreeAgent] Phát hiện Double Submission -> Trả về bản ghi ID:", existingDup.id);
+          return { success: true, post: mapDbToFreeAgent(existingDup) };
+        }
+      } catch (checkErr) {}
+    }
+
+    const insertObj: Record<string, any> = {
+      player_name: payload.playerName.trim() || 'Anh Em "Phủi"',
+      age: Number(payload.age) || 25,
+      preferred_foot: payload.preferredFoot || "Chân phải",
+      position: payload.position,
+      position_label: payload.positionLabel,
+      skill_tier: payload.skillTier,
+      districts: payload.districts,
+      available_date: payload.availableDate,
+      available_date_iso: payload.availableDateIso || null,
+      available_time_slots: payload.availableTimeSlots,
+      phone: cleanPhone,
+      zalo_phone: normalizeVietnamPhone(payload.zaloPhone || cleanPhone),
+      bio: payload.bio,
+      fut_stats: payload.futStats,
+      status: "ACTIVE",
+    };
+
+    const isUuid = payload.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.id);
+
+    let savedData: any = null;
+
+    if (isUuid) {
+      // Cập nhật bản ghi có sẵn
+      const { data, error } = await adminClient
+        .from("free_agent_posts")
+        .update(insertObj)
+        .eq("id", payload.id)
+        .select()
+        .single();
+      if (!error && data) savedData = data;
+    }
+
+    if (!savedData) {
+      // Thêm mới bản ghi
+      const { data, error } = await adminClient
+        .from("free_agent_posts")
+        .insert(insertObj)
+        .select()
+        .single();
+
+      if (error) {
+        console.warn("[createFreeAgent insert warning]", error.message);
+        // Fallback: nếu bảng DB chưa tạo, vẫn trả về payload với ID hợp lệ để Realtime Broadcast chạy
+        const fallbackPost: FreeAgentScoutCard = {
+          ...payload,
+          phone: cleanPhone,
+          zaloPhone: normalizeVietnamPhone(payload.zaloPhone || cleanPhone),
+        };
+        return { success: true, post: fallbackPost, isFallback: true };
+      }
+      savedData = data;
+    }
+
+    const resultPost = mapDbToFreeAgent(savedData);
+
+    // Gửi cảnh báo khẩn cấp tới Telegram Ban Quản Trị
+    const alertText =
+      `⚽ <b>CẦU THỦ MỚI ĐĂNG TÌM ĐỘI (CHỢ CẦU BẮTKÈO7)</b>\n` +
+      `• Cầu thủ: <b>${resultPost.playerName}</b> (${resultPost.age} tuổi • ${resultPost.preferredFoot})\n` +
+      `• Vị trí sở trường: <b>${resultPost.positionLabel}</b> (Tier ${resultPost.skillTier})\n` +
+      `• Khu vực nhận đá: <b>${resultPost.districts.join(", ")}</b>\n` +
+      `• Khung giờ rảnh: <b>${resultPost.availableTimeSlots.join(", ")}</b> (${resultPost.availableDate})\n` +
+      `• SĐT Zalo liên hệ: <code>${resultPost.phone}</code>\n` +
+      `• Lời nhắn: <i>${resultPost.bio || "N/A"}</i>`;
+
+    await sendTelegramAlert(alertText);
+
+    revalidatePath("/");
+    return { success: true, post: resultPost };
+  } catch (err: any) {
+    console.error("[createOrUpdateFreeAgentAction Error]", err);
+    return { success: false, error: err?.message || "Lỗi lưu hồ sơ cầu thủ" };
+  }
+}
+
+/**
+ * 3. TẠO HOẶC CẬP NHẬT TIN ĐỘI TUYỂN NGƯỜI (Lớp 3 Idempotency)
+ */
+export async function createOrUpdateSubPostAction(payload: SubPlayerPost) {
+  try {
+    const adminClient = getAdminClient();
+    const cleanPhone = normalizeVietnamPhone(payload.contactPhone);
+
+    // LỚP 3: Idempotency Check (Chống Double Submission trong 30s)
+    if (!payload.id || payload.id.startsWith("sub-")) {
+      const thirtySecondsAgo = new Date(Date.now() - 30 * 1000).toISOString();
+      try {
+        const { data: existingDup } = await adminClient
+          .from("sub_player_posts")
+          .select("*")
+          .eq("contact_phone", cleanPhone)
+          .eq("pitch_name", payload.pitchName)
+          .eq("position_code", payload.positionCode || "MF")
+          .neq("status", "CANCELLED")
+          .gte("created_at", thirtySecondsAgo)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (existingDup) {
+          console.log("[createSubPost] Phát hiện Double Submission -> Trả về bản ghi ID:", existingDup.id);
+          return { success: true, post: mapDbToSubPost(existingDup) };
+        }
+      } catch (checkErr) {}
+    }
+
+    const insertObj: Record<string, any> = {
+      team_id: payload.teamId || "team-guest",
+      team_name: payload.teamName.trim() || "FC Anh Em Hà Nội",
+      position_needed: payload.positionNeeded,
+      position_code: payload.positionCode || "MF",
+      quantity: Number(payload.quantity) || 1,
+      match_date: payload.matchDate,
+      match_date_iso: payload.matchDateIso || null,
+      match_time: payload.matchTime,
+      expires_at: payload.expiresAt || null,
+      pitch_name: payload.pitchName.trim() || "Sân Cỏ Nhân Tạo",
+      district: payload.district,
+      skill_tier: payload.skillTier || 2,
+      contact_phone: cleanPhone,
+      contact_zalo: normalizeVietnamPhone(payload.contactZalo || cleanPhone),
+      notes: payload.notes,
+      status: payload.status || "ACTIVE",
+    };
+
+    const isUuid = payload.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.id);
+
+    let savedData: any = null;
+
+    if (isUuid) {
+      const { data, error } = await adminClient
+        .from("sub_player_posts")
+        .update(insertObj)
+        .eq("id", payload.id)
+        .select()
+        .single();
+      if (!error && data) savedData = data;
+    }
+
+    if (!savedData) {
+      const { data, error } = await adminClient
+        .from("sub_player_posts")
+        .insert(insertObj)
+        .select()
+        .single();
+
+      if (error) {
+        console.warn("[createSubPost insert warning]", error.message);
+        const fallbackPost: SubPlayerPost = {
+          ...payload,
+          contactPhone: cleanPhone,
+          contactZalo: normalizeVietnamPhone(payload.contactZalo || cleanPhone),
+        };
+        return { success: true, post: fallbackPost, isFallback: true };
+      }
+      savedData = data;
+    }
+
+    const resultPost = mapDbToSubPost(savedData);
+
+    // Gửi cảnh báo Telegram Ban Quản Trị
+    const alertText =
+      `📢 <b>ĐỘI BÓNG ĐĂNG TIN TUYỂN THÊM QUÂN (CHỢ CẦU BẮTKÈO7)</b>\n` +
+      `• Đội bóng: <b>${resultPost.teamName}</b>\n` +
+      `• Cần tuyển: <b>${resultPost.quantity} ${resultPost.positionNeeded}</b>\n` +
+      `• Sân thi đấu: <b>${resultPost.pitchName}</b> (${resultPost.district})\n` +
+      `• Khung giờ: <b>${resultPost.matchTime}</b> (${resultPost.matchDate})\n` +
+      `• Liên hệ Đội trưởng: <code>${resultPost.contactPhone}</code>\n` +
+      `• Lời nhắn: <i>${resultPost.notes || "N/A"}</i>`;
+
+    await sendTelegramAlert(alertText);
+
+    revalidatePath("/");
+    return { success: true, post: resultPost };
+  } catch (err: any) {
+    console.error("[createOrUpdateSubPostAction Error]", err);
+    return { success: false, error: err?.message || "Lỗi lưu tin tuyển người" };
+  }
+}
+
+/**
+ * 4. XÓA BÀI ĐĂNG CHỢ CẦU (Database Soft & Hard Delete)
+ */
+export async function deleteMarketPostAction(
+  postId: string,
+  type: "free-agents" | "team-recruit"
+) {
+  try {
+    const adminClient = getAdminClient();
+    const tableName = type === "free-agents" ? "free_agent_posts" : "sub_player_posts";
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(postId);
+
+    if (isUuid) {
+      // 1. Soft delete
+      await adminClient
+        .from(tableName)
+        .update({ status: "CANCELLED" })
+        .eq("id", postId);
+
+      // 2. Hard delete
+      await adminClient
+        .from(tableName)
+        .delete()
+        .eq("id", postId);
+    }
+
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.error("[deleteMarketPostAction Error]", err);
+    return { success: false, error: err?.message || "Lỗi xóa bài đăng" };
+  }
+}

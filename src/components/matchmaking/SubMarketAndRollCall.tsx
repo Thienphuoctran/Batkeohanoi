@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import {
   UserPlus,
   Phone,
@@ -43,6 +43,12 @@ import {
 import { FutCardModal } from "./FutCardModal";
 import { SpotlightCard } from "@/components/reactbits/SpotlightCard";
 import { ClickSpark } from "@/components/reactbits/ClickSpark";
+import { useRealtimeMarket } from "@/hooks/useRealtimeMarket";
+import {
+  createOrUpdateFreeAgentAction,
+  createOrUpdateSubPostAction,
+  deleteMarketPostAction,
+} from "@/actions/market";
 
 interface SubMarketAndRollCallProps {
   viewMode?: "sub-market" | "roll-call" | "both";
@@ -80,10 +86,22 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     "free-agents"
   );
 
-  // Dữ liệu 2 chiều
-  const [freeAgents, setFreeAgents] =
-    useState<FreeAgentScoutCard[]>(MOCK_FREE_AGENTS);
-  const [subPosts, setSubPosts] = useState<SubPlayerPost[]>(MOCK_SUB_PLAYERS);
+  // Dữ liệu 2 chiều kết nối Supabase Realtime & Database (Single Source of Truth)
+  const {
+    freeAgents,
+    setFreeAgents,
+    subPosts,
+    setSubPosts,
+    isLoadingMarket,
+    broadcastFreeAgentCreated,
+    broadcastFreeAgentDeleted,
+    broadcastSubPostCreated,
+    broadcastSubPostDeleted,
+  } = useRealtimeMarket();
+
+  // 🛡️ LỚP 1: Khóa nút bấm chống spam & gửi đúp
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSavingRef = useRef(false);
 
   // Bộ lọc đa chiều
   const [posFilter, setPosFilter] = useState<"ALL" | SoloPosition>("ALL");
@@ -279,131 +297,172 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     setIsPostModalOpen(true);
   };
 
-  // Xóa hồ sơ Cầu thủ tự do
-  const handleDeleteAgent = (id: string) => {
+  // 🛡️ Xóa hồ sơ Cầu thủ tự do (Database-First)
+  const handleDeleteAgent = async (id: string) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa hồ sơ cầu thủ này?")) {
+      await deleteMarketPostAction(id, "free-agents");
       setFreeAgents((prev) => prev.filter((a) => a.id !== id));
+      await broadcastFreeAgentDeleted(id);
     }
   };
 
-  // Xóa tin Đội tuyển người
-  const handleDeleteSubPost = (id: string) => {
+  // 🛡️ Xóa tin Đội tuyển người (Database-First)
+  const handleDeleteSubPost = async (id: string) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa tin tuyển cầu thủ này?")) {
+      await deleteMarketPostAction(id, "team-recruit");
       setSubPosts((prev) => prev.filter((p) => p.id !== id));
+      await broadcastSubPostDeleted(id);
     }
   };
 
-  // Lưu form Đăng tin / Cập nhật
-  const handleSavePost = (e: React.FormEvent) => {
+  // 🛡️ Lưu form Đăng tin / Cập nhật (Database-First + 3 Lớp Chốt Chặn)
+  const handleSavePost = async (e: React.FormEvent) => {
     e.preventDefault();
-    const posObj =
-      POSITION_OPTIONS.find((p) => p.code === positionCode) ||
-      POSITION_OPTIONS[2];
+    if (isSavingRef.current || isSubmitting) return;
 
-    if (formMode === "free-agents") {
-      const isGK = positionCode === "GK";
-      const newCard: FreeAgentScoutCard = {
-        id: editingAgentId || `scout-${Date.now()}`,
-        playerName: playerName.trim() || 'Anh Em "Phủi"',
-        age: Number(playerAge) || 25,
-        preferredFoot,
-        position: positionCode,
-        positionLabel: posObj.label,
-        skillTier,
-        districts: [district],
-        availableTimeSlots: timeSlot
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-        trustRating: 5.0,
-        matchesJoined: editingAgentId
-          ? freeAgents.find((a) => a.id === editingAgentId)?.matchesJoined || 1
-          : 1,
-        futStats: {
-          ovr: isGK ? 88 : 85,
-          pac: positionCode === "FW" ? 91 : 83,
-          tec: positionCode === "MF" ? 89 : 84,
-          pas: 86,
-          def: isGK || positionCode === "DF" ? 91 : 76,
-          fpl: 98,
-        },
-        phone: phone.trim() || "0988.666.888",
-        zaloPhone: normalizeVietnamPhone(phone.trim() || "0988666888"),
-        availableDate: formatMatchDateDisplay(matchDateIso),
-        availableDateIso: matchDateIso,
-        bio:
-          bioOrNotes.trim() ||
-          "Đá nhiệt tình, văn minh, đúng giờ, tìm đội giao lưu lâu dài.",
-        hasFirstTimerVoucher: false,
-        isCreatedByCurrentUser: true,
-        createdAt: editingAgentId ? "Đã cập nhật" : "Vừa xong",
-      };
+    isSavingRef.current = true;
+    setIsSubmitting(true);
 
-      if (editingAgentId) {
-        setFreeAgents((prev) =>
-          prev.map((a) => (a.id === editingAgentId ? newCard : a))
-        );
+    try {
+      const posObj =
+        POSITION_OPTIONS.find((p) => p.code === positionCode) ||
+        POSITION_OPTIONS[2];
+
+      if (formMode === "free-agents") {
+        const isGK = positionCode === "GK";
+        const newCard: FreeAgentScoutCard = {
+          id: editingAgentId || `scout-${Date.now()}`,
+          playerName: playerName.trim() || 'Anh Em "Phủi"',
+          age: Number(playerAge) || 25,
+          preferredFoot,
+          position: positionCode,
+          positionLabel: posObj.label,
+          skillTier,
+          districts: [district],
+          availableTimeSlots: timeSlot
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+          trustRating: 5.0,
+          matchesJoined: editingAgentId
+            ? freeAgents.find((a) => a.id === editingAgentId)?.matchesJoined || 1
+            : 1,
+          futStats: {
+            ovr: isGK ? 88 : 85,
+            pac: positionCode === "FW" ? 91 : 83,
+            tec: positionCode === "MF" ? 89 : 84,
+            pas: 86,
+            def: isGK || positionCode === "DF" ? 91 : 76,
+            fpl: 98,
+          },
+          phone: phone.trim() || "0988.666.888",
+          zaloPhone: normalizeVietnamPhone(phone.trim() || "0988666888"),
+          availableDate: formatMatchDateDisplay(matchDateIso),
+          availableDateIso: matchDateIso,
+          bio:
+            bioOrNotes.trim() ||
+            "Đá nhiệt tình, văn minh, đúng giờ, tìm đội giao lưu lâu dài.",
+          hasFirstTimerVoucher: false,
+          isCreatedByCurrentUser: true,
+          createdAt: editingAgentId ? "Đã cập nhật" : "Vừa xong",
+        };
+
+        // 🛡️ BƯỚC 1: LƯU VÀO CSDL SUPABASE TRƯỚC TIÊN (Database-First)
+        const dbRes = await createOrUpdateFreeAgentAction(newCard);
+        if (!dbRes.success) {
+          alert(`⚠️ Không thể lưu hồ sơ cầu thủ vào máy chủ: ${dbRes.error || "Vui lòng thử lại!"}`);
+          return;
+        }
+
+        const officialCard = dbRes.post || newCard;
+
+        // 🛡️ BƯỚC 2: Cập nhật State máy A
+        if (editingAgentId) {
+          setFreeAgents((prev) =>
+            prev.map((a) => (a.id === editingAgentId ? officialCard : a))
+          );
+        } else {
+          setFreeAgents((prev) => [officialCard, ...prev.filter((a) => a.id !== officialCard.id)]);
+          setSelectedFutPlayer(officialCard);
+        }
+
+        // 🛡️ BƯỚC 3: Phát sóng WebSocket Realtime cho máy B
+        await broadcastFreeAgentCreated(officialCard);
+        setMarketMode("free-agents");
       } else {
-        setFreeAgents((prev) => [newCard, ...prev]);
-        // Mở ngay thẻ FUT Card Ảo cho cầu thủ vừa tạo để trải nghiệm Viral!
-        setSelectedFutPlayer(newCard);
-      }
-      setMarketMode("free-agents");
-    } else {
-      const mappedPosNeeded: SubPlayerPost["positionNeeded"] =
-        positionCode === "GK"
-          ? "Thủ Môn (GK)"
-          : positionCode === "DF"
-          ? "Trung Vệ (CB)"
-          : positionCode === "MF"
-          ? "Tiền Vệ (MF)"
-          : "Tiền Đạo (FW)";
+        const mappedPosNeeded: SubPlayerPost["positionNeeded"] =
+          positionCode === "GK"
+            ? "Thủ Môn (GK)"
+            : positionCode === "DF"
+            ? "Trung Vệ (CB)"
+            : positionCode === "MF"
+            ? "Tiền Vệ (MF)"
+            : "Tiền Đạo (FW)";
 
-      const formattedDate = formatMatchDateDisplay(matchDateIso);
-      const expiresDateObj = getMatchExpiresDate(
-        {
-          matchDate: matchDateIso,
+        const formattedDate = formatMatchDateDisplay(matchDateIso);
+        const expiresDateObj = getMatchExpiresDate(
+          {
+            matchDate: matchDateIso,
+            matchDateIso,
+            startTime: timeSlot,
+          },
+          15
+        );
+
+        const newPost: SubPlayerPost = {
+          id: editingSubId || `sub-${Date.now()}`,
+          teamId: `team-${Date.now()}`,
+          teamName: teamName.trim() || "FC Anh Em Hà Nội",
+          positionNeeded: mappedPosNeeded,
+          positionCode,
+          quantity: Number(quantity) || 1,
+          matchDate: formattedDate,
           matchDateIso,
-          startTime: timeSlot,
-        },
-        15
-      );
+          matchTime: timeSlot.trim() || "19:00 - 20:30",
+          expiresAt: expiresDateObj.toISOString(),
+          pitchName: pitchName.trim() || "Sân Cỏ Nhân Tạo",
+          district,
+          skillTier,
+          contactPhone: phone.trim() || "0988.765.432",
+          contactZalo: normalizeVietnamPhone(phone.trim() || "0988765432"),
+          notes:
+            bioOrNotes.trim() ||
+            "Đội vui vẻ hòa đồng, cần anh em ra sân đúng giờ.",
+          isCreatedByCurrentUser: true,
+          status: "ACTIVE",
+          createdAt: editingSubId ? "Đã cập nhật" : "Vừa xong",
+        };
 
-      const newPost: SubPlayerPost = {
-        id: editingSubId || `sub-${Date.now()}`,
-        teamId: `team-${Date.now()}`,
-        teamName: teamName.trim() || "FC Anh Em Hà Nội",
-        positionNeeded: mappedPosNeeded,
-        positionCode,
-        quantity: Number(quantity) || 1,
-        matchDate: formattedDate,
-        matchDateIso,
-        matchTime: timeSlot.trim() || "19:00 - 20:30",
-        expiresAt: expiresDateObj.toISOString(),
-        pitchName: pitchName.trim() || "Sân Cỏ Nhân Tạo",
-        district,
-        skillTier,
-        contactPhone: phone.trim() || "0988.765.432",
-        contactZalo: normalizeVietnamPhone(phone.trim() || "0988765432"),
-        notes:
-          bioOrNotes.trim() ||
-          "Đội vui vẻ hòa đồng, cần anh em ra sân đúng giờ.",
-        isCreatedByCurrentUser: true,
-        status: "ACTIVE",
-        createdAt: editingSubId ? "Đã cập nhật" : "Vừa xong",
-      };
+        // 🛡️ BƯỚC 1: LƯU VÀO CSDL SUPABASE TRƯỚC TIÊN (Database-First)
+        const dbRes = await createOrUpdateSubPostAction(newPost);
+        if (!dbRes.success) {
+          alert(`⚠️ Không thể lưu tin tuyển quân vào máy chủ: ${dbRes.error || "Vui lòng thử lại!"}`);
+          return;
+        }
 
-      if (editingSubId) {
-        setSubPosts((prev) =>
-          prev.map((p) => (p.id === editingSubId ? newPost : p))
-        );
-      } else {
-        setSubPosts((prev) => [newPost, ...prev]);
+        const officialPost = dbRes.post || newPost;
+
+        // 🛡️ BƯỚC 2: Cập nhật State máy A
+        if (editingSubId) {
+          setSubPosts((prev) =>
+            prev.map((p) => (p.id === editingSubId ? officialPost : p))
+          );
+        } else {
+          setSubPosts((prev) => [officialPost, ...prev.filter((p) => p.id !== officialPost.id)]);
+        }
+
+        // 🛡️ BƯỚC 3: Phát sóng WebSocket Realtime cho máy B
+        await broadcastSubPostCreated(officialPost);
+        setMarketMode("team-recruit");
       }
-      setMarketMode("team-recruit");
-    }
 
-    setIsPostModalOpen(false);
+      setIsPostModalOpen(false);
+    } catch (err: any) {
+      console.error("[handleSavePost Error]", err);
+    } finally {
+      isSavingRef.current = false;
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -655,7 +714,13 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
 
       {/* 4. DANH SÁCH CHẾ ĐỘ 1: CẦU THỦ TÌM ĐỘI (FREE AGENT SCOUT FEED) */}
       {marketMode === "free-agents" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        isLoadingMarket ? (
+          <div className="surface-card rounded-2xl border border-emerald-500/20 p-10 text-center space-y-3">
+            <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-xs font-bold text-slate-300">Đang đồng bộ hồ sơ cầu thủ tự do từ CSDL Supabase...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {filteredFreeAgents.length > 0 ? (
             filteredFreeAgents.map((agent) => {
               const isGK = agent.position === "GK";
@@ -844,11 +909,18 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
             </div>
           )}
         </div>
+        )
       )}
 
       {/* 5. DANH SÁCH CHẾ ĐỘ 2: ĐỘI TUYỂN THÊM NGƯỜI (TEAM RECRUITMENT FEED) */}
       {marketMode === "team-recruit" && (
-        <div className="space-y-3">
+        isLoadingMarket ? (
+          <div className="surface-card rounded-2xl border border-amber-500/20 p-10 text-center space-y-3">
+            <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-xs font-bold text-slate-300">Đang đồng bộ danh sách đội tuyển người từ CSDL Supabase...</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
           {filteredSubPosts.length > 0 ? (
             filteredSubPosts.map((post) => {
               const isGK = post.positionNeeded.includes("GK");
@@ -980,6 +1052,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
             </div>
           )}
         </div>
+        )
       )}
 
       {/* 6. MODAL ĐĂNG TIN / CHỈNH SỬA 2 CHIỀU */}
@@ -1291,13 +1364,21 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                 </Button>
                 <Button
                   type="submit"
-                  className="h-9 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs"
+                  disabled={isSubmitting}
+                  className="h-9 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs disabled:opacity-50 flex items-center gap-1.5"
                 >
-                  {editingAgentId || editingSubId
-                    ? "Lưu Thay Đổi"
-                    : formMode === "free-agents"
-                    ? "Đăng Hồ Sơ & Xuất Thẻ FUT"
-                    : "Đăng Tin Tuyển Người"}
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                      <span>Đang Lưu Lên Chợ Cầu...</span>
+                    </>
+                  ) : editingAgentId || editingSubId ? (
+                    "Lưu Thay Đổi"
+                  ) : formMode === "free-agents" ? (
+                    "Đăng Hồ Sơ & Xuất Thẻ FUT"
+                  ) : (
+                    "Đăng Tin Tuyển Người"
+                  )}
                 </Button>
               </div>
             </form>

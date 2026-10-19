@@ -120,21 +120,53 @@ CREATE TABLE IF NOT EXISTS public.matches (
 CREATE INDEX IF NOT EXISTS idx_matches_status_district ON public.matches(status, district);
 CREATE INDEX IF NOT EXISTS idx_matches_date_time ON public.matches(match_date, start_time);
 
--- 2.4 Bảng Chợ Cầu Lẻ (Sub Players Market)
+-- 2.4 Bảng Chợ Cầu 2 Chiều: Cầu Thủ Tự Do Tìm Đội (Free Agent Posts)
+CREATE TABLE IF NOT EXISTS public.free_agent_posts (
+  id VARCHAR(64) PRIMARY KEY,
+  player_name VARCHAR(100) NOT NULL,
+  age INT DEFAULT 25,
+  preferred_foot VARCHAR(30) DEFAULT 'Chân phải',
+  position VARCHAR(20) NOT NULL DEFAULT 'MF', -- GK, DF, MF, FW
+  position_label VARCHAR(60) NOT NULL DEFAULT 'Tiền Vệ (MF)',
+  skill_tier INT DEFAULT 2 CHECK (skill_tier IN (1, 2, 3)),
+  districts TEXT[] DEFAULT ARRAY['Cầu Giấy'],
+  available_date VARCHAR(60),
+  available_date_iso DATE DEFAULT CURRENT_DATE,
+  available_time_slots TEXT[] DEFAULT ARRAY['19:00 - 20:30'],
+  phone VARCHAR(20) NOT NULL,
+  zalo_phone VARCHAR(20),
+  bio TEXT,
+  fut_stats JSONB DEFAULT '{"ovr": 85, "pac": 85, "tec": 85, "pas": 85, "def": 85, "fpl": 98}'::jsonb,
+  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 2.4b Bảng Chợ Cầu 2 Chiều: Đội Tuyển Thêm Người (Sub Player Posts)
 CREATE TABLE IF NOT EXISTS public.sub_player_posts (
   id VARCHAR(64) PRIMARY KEY,
-  team_id VARCHAR(64) NOT NULL REFERENCES public.teams(id),
-  position_needed VARCHAR(60) NOT NULL, -- GK, DF, MF, FW
+  team_id VARCHAR(64),
+  team_name VARCHAR(120) NOT NULL,
+  position_needed VARCHAR(60) NOT NULL, -- Thủ Môn (GK), Trung Vệ (CB), Tiền Vệ (MF), Tiền Đạo (FW)
+  position_code VARCHAR(20) DEFAULT 'MF',
   quantity INT NOT NULL DEFAULT 1,
-  match_time_desc VARCHAR(80) NOT NULL,
-  pitch_desc VARCHAR(120) NOT NULL,
+  match_date VARCHAR(60),
+  match_date_iso DATE DEFAULT CURRENT_DATE,
+  match_time VARCHAR(80) NOT NULL,
+  expires_at TIMESTAMPTZ,
+  pitch_name VARCHAR(120) NOT NULL,
   district VARCHAR(40) NOT NULL,
-  share_cost_desc VARCHAR(120) NOT NULL,
+  skill_tier INT DEFAULT 2 CHECK (skill_tier IN (1, 2, 3)),
   contact_phone VARCHAR(20) NOT NULL,
   contact_zalo VARCHAR(20),
+  notes TEXT,
   status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_free_agents_pos_date ON public.free_agent_posts(position, available_date_iso);
+CREATE INDEX IF NOT EXISTS idx_sub_posts_district_time ON public.sub_player_posts(district, match_date_iso);
 
 -- 2.5 Bảng Điểm Danh Quân Số (Roll Call)
 CREATE TABLE IF NOT EXISTS public.roll_call_sessions (
