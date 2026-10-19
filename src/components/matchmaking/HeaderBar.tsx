@@ -416,7 +416,7 @@ export function HeaderBar({
                 : "text-stone-700 hover:text-stone-900 hover:bg-stone-200"
             }`}
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-stone-900" />
+            <ShieldCheck className="w-3.5 h-3.5 text-current" />
             <span className="whitespace-nowrap">Đội Tôi</span>
           </button>
         </div>

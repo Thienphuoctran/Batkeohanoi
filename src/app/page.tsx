@@ -1095,68 +1095,214 @@ export default function HanoiMatchmakingPlatform() {
   return (
     <div className="min-h-screen bg-kraft-newspaper text-stone-900 flex flex-col pb-16 relative overflow-x-hidden selection:bg-amber-300 selection:text-stone-900">
       {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI RÌA TRÁI (DESKTOP VINTAGE SCRAPBOOK) */}
-      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "hidden" : "xl:flex"} flex-col gap-5 fixed left-4 top-24 w-56 pointer-events-none opacity-80 z-0`}>
-        <div className="card-retro-paper p-3 rounded-xl border border-stone-300 shadow-md rotate-[-2deg] relative">
-          <div className="washi-tape -top-2 left-6" />
+      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "hidden" : "xl:flex"} flex-col gap-4 fixed left-3 2xl:left-6 top-20 w-60 2xl:w-64 pointer-events-none opacity-90 z-0`}>
+        {/* 1. TỜ BÁO PHỦI IN CHÍNH THỨC CÓ ẢNH TƯ LIỆU */}
+        <div className="card-retro-paper p-3 rounded-2xl border border-stone-300 shadow-md rotate-[-2deg] relative overflow-hidden pointer-events-auto">
+          <div className="washi-tape -top-2 left-6 rotate-[-2deg]" />
           <div className="flex items-center justify-between border-b border-stone-300 pb-1.5 mb-2">
-            <span className="text-[10px] font-black uppercase text-red-700 tracking-wider">TIN PHỦI HÀ NỘI</span>
-            <span className="text-[9px] font-mono text-stone-500">SỐ 2026</span>
+            <span className="text-[10px] font-black uppercase text-red-700 tracking-wider flex items-center gap-1">
+              <span>📰 BẢN TIN PHỦI</span>
+            </span>
+            <span className="text-[9px] font-mono text-stone-500 font-bold">SỐ 2026</span>
           </div>
-          <div className="space-y-1.5">
+
+          {/* Khung ảnh tư liệu báo chí (Ảnh 2 từ người dùng) với Fallback thông minh */}
+          <div className="relative mb-2 rounded-lg overflow-hidden border border-stone-300 bg-stone-100 aspect-[16/10] shadow-inner group">
+            <img
+              src="/images/vintage-scrapbook.jpg"
+              alt="Bản tin bóng đá phủi giaohuu.vn"
+              className="w-full h-full object-cover filter contrast-105 sepia-[0.15] transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => {
+                // Fallback nếu người dùng chưa kịp copy ảnh vào public/images/
+                e.currentTarget.style.display = "none";
+                const fallback = e.currentTarget.parentElement?.querySelector(".img-fallback");
+                if (fallback) (fallback as HTMLElement).style.display = "flex";
+              }}
+            />
+            <div className="img-fallback hidden w-full h-full flex-col items-center justify-center bg-[#ede8dc] text-stone-700 p-2 text-center">
+              <span className="text-xl mb-1">📰</span>
+              <span className="text-[10px] font-black uppercase tracking-tight text-stone-800">Bản Tin GiaoHuu.vn</span>
+              <span className="text-[9px] text-stone-500">Phóng sự bóng đá sân 7</span>
+            </div>
+            <div className="absolute bottom-1 right-1 bg-stone-900/80 backdrop-blur-xs text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
+              TƯ LIỆU PHỦI
+            </div>
+          </div>
+
+          <div className="space-y-1">
             <div className="text-[11px] font-black text-stone-900 leading-tight">
               Khung giờ vàng 19h00: Cụm sân Cầu Giấy kín lịch đối đầu
             </div>
-            <p className="text-[10px] text-stone-600 line-clamp-3 leading-relaxed">
-              Các đội bóng phủi Thủ đô đang tích cực ghép kèo giao hữu sân 7. Hệ thống cọc 200k giúp triệt tiêu 100% tình trạng bùng kèo sát giờ.
+            <p className="text-[10px] text-stone-600 line-clamp-2 leading-relaxed">
+              Các đội bóng phủi Thủ đô đang tích cực ghép kèo giao hữu sân 7. Hệ thống cọc 200k giúp triệt tiêu 100% tình trạng bùng kèo.
             </p>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-stone-200 flex items-center justify-between">
+          <div className="mt-2 pt-1.5 border-t border-stone-200 flex items-center justify-between">
             <span className="rubber-stamp text-[8px] py-0.5 px-1.5">KÈO UY TÍN</span>
-            <span className="text-[9px] text-stone-500 font-bold">GiaoHuu.vn</span>
+            <span className="text-[9px] text-stone-600 font-extrabold font-mono">GiaoHuu.vn</span>
           </div>
         </div>
 
-        <div className="card-retro-paper p-3 rounded-xl border border-stone-300 shadow-md rotate-[1.5deg] relative">
-          <div className="washi-tape -top-2 right-6" />
-          <div className="text-[10px] font-black text-stone-800 uppercase border-b border-stone-300 pb-1 mb-1.5 flex items-center gap-1">
-            <span>🛡️ BẢO CHỨNG SỐ</span>
+        {/* 2. ẢNH POLAROID: CẦU THỦ ĂN MỪNG "CHƠI ĐẸP - FAIR PLAY" */}
+        <div className="bg-white p-2 pb-3.5 rounded-xl border border-stone-300 shadow-md rotate-[2.5deg] relative pointer-events-auto">
+          <div className="washi-tape -top-2.5 right-6 rotate-[3deg]" />
+          <div className="relative aspect-[4/3] rounded bg-stone-100 overflow-hidden border border-stone-200 mb-1.5">
+            <img
+              src="/images/vintage-scrapbook.jpg"
+              alt="Kỷ niệm sau trận giao hữu 7v7"
+              className="w-full h-full object-cover object-bottom filter contrast-105"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                const fallback = e.currentTarget.parentElement?.querySelector(".polaroid-fallback");
+                if (fallback) (fallback as HTMLElement).style.display = "flex";
+              }}
+            />
+            <div className="polaroid-fallback hidden w-full h-full flex-col items-center justify-center bg-[#f7f5ef] p-2 text-center">
+              <span className="text-2xl mb-1">🤝⚽</span>
+              <span className="text-[10px] font-black text-stone-800 uppercase">Fair Play 100/100</span>
+            </div>
+            <div className="absolute top-1 left-1 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded shadow">
+              FAIR PLAY
+            </div>
           </div>
-          <p className="text-[10px] text-stone-600 leading-relaxed">
-            Hủy sát giờ &lt;1h đền 100% tiền sân. Bắt tay OTP 4 số trực tiếp tại cổng sân bóng.
+          <div className="text-center">
+            <p className="text-[10px] font-bold text-stone-800 tracking-tight">
+              “Kỷ niệm sau trận giao hữu 7v7”
+            </p>
+            <span className="text-[8px] text-stone-500 font-medium">Bắt tay hữu nghị • Sân Phòng Không</span>
+          </div>
+        </div>
+
+        {/* 3. TỜ SỔ TAY KẺ Ô: SA BÀN CHIẾN THUẬT 3-2-1 */}
+        <div className="card-retro-paper p-2.5 rounded-xl border border-stone-300 shadow-sm rotate-[-1.5deg] relative text-[10px] pointer-events-auto">
+          <div className="washi-tape -top-2 left-8 rotate-[-1deg]" />
+          <div className="flex items-center justify-between border-b border-stone-200 pb-1 mb-1.5">
+            <span className="font-black text-stone-800 flex items-center gap-1">
+              <span>📋 SƠ ĐỒ 3-2-1 PHỦI</span>
+            </span>
+            <span className="text-[8px] text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.2 rounded border border-emerald-300">CHUẨN SÂN 7</span>
+          </div>
+          <div className="bg-[#ede8dc] p-2 rounded border border-dashed border-stone-300 space-y-1 font-mono text-[9px] text-stone-700">
+            <div className="text-center font-bold text-red-700">⚡ [FW] Tiền Đạo Cắm</div>
+            <div className="flex justify-between px-2 font-bold text-blue-700">
+              <span>🎯 [LMF] Cánh Trái</span>
+              <span>🎯 [RMF] Cánh Phải</span>
+            </div>
+            <div className="flex justify-between px-1 font-bold text-emerald-800">
+              <span>🛡️ [LB]</span>
+              <span>🛡️ [CB] Thòng</span>
+              <span>🛡️ [RB]</span>
+            </div>
+            <div className="text-center font-bold text-amber-800">🧤 [GK] Thủ Môn</div>
+          </div>
+          <p className="text-[9px] text-stone-500 mt-1 italic text-center">
+            “Kỷ luật vị trí — Không ham dâng cao!”
           </p>
         </div>
       </aside>
 
       {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI RÌA PHẢI (DESKTOP VINTAGE SCRAPBOOK) */}
-      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "hidden" : "xl:flex"} flex-col gap-5 fixed right-4 top-24 w-56 pointer-events-none opacity-80 z-0`}>
-        <div className="card-retro-paper p-3 rounded-xl border border-stone-300 shadow-md rotate-[2deg] relative">
-          <div className="washi-tape -top-2 right-6" />
+      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "hidden" : "xl:flex"} flex-col gap-4 fixed right-3 2xl:right-6 top-20 w-60 2xl:w-64 pointer-events-none opacity-90 z-0`}>
+        {/* 1. TỜ BÁO TIÊU ĐIỂM SÂN CỎ CÓ ẢNH TƯ LIỆU */}
+        <div className="card-retro-paper p-3 rounded-2xl border border-stone-300 shadow-md rotate-[2deg] relative overflow-hidden pointer-events-auto">
+          <div className="washi-tape -top-2 right-6 rotate-[2deg]" />
           <div className="flex items-center justify-between border-b border-stone-300 pb-1.5 mb-2">
-            <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">TIÊU ĐIỂM SÂN CỎ</span>
-            <span className="text-[9px] font-mono text-stone-500">26°C TF</span>
+            <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider flex items-center gap-1">
+              <span>🌱 TIÊU ĐIỂM SÂN CỎ</span>
+            </span>
+            <span className="text-[9px] font-mono text-stone-600 font-bold">26°C TF</span>
           </div>
-          <div className="space-y-1.5">
+
+          {/* Khung ảnh tư liệu báo chí (Ảnh 2 từ người dùng) */}
+          <div className="relative mb-2 rounded-lg overflow-hidden border border-stone-300 bg-stone-100 aspect-[16/10] shadow-inner group">
+            <img
+              src="/images/vintage-scrapbook.jpg"
+              alt="Mặt cỏ sân 7 Hà Nội"
+              className="w-full h-full object-cover object-top filter contrast-105 sepia-[0.15] transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                const fallback = e.currentTarget.parentElement?.querySelector(".img-fallback-right");
+                if (fallback) (fallback as HTMLElement).style.display = "flex";
+              }}
+            />
+            <div className="img-fallback-right hidden w-full h-full flex-col items-center justify-center bg-[#ede8dc] text-stone-700 p-2 text-center">
+              <span className="text-xl mb-1">🏟️</span>
+              <span className="text-[10px] font-black uppercase tracking-tight text-stone-800">Sân Cỏ Nhân Tạo Hà Nội</span>
+              <span className="text-[9px] text-stone-500">Mặt cỏ đay cao cấp 50mm</span>
+            </div>
+            <div className="absolute top-1 right-1 bg-emerald-700 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow">
+              CỎ KHÔ RÁO
+            </div>
+          </div>
+
+          <div className="space-y-1">
             <div className="text-[11px] font-black text-stone-900 leading-tight">
               Thời tiết tối nay toàn Hà Nội: Cỏ khô ráo, gió mát lý tưởng
             </div>
-            <p className="text-[10px] text-stone-600 line-clamp-3 leading-relaxed">
+            <p className="text-[10px] text-stone-600 line-clamp-2 leading-relaxed">
               Mặt sân cỏ nhân tạo đạt độ bám tối đa, thích hợp thi đấu tốc độ cao và sút xa uy lực.
             </p>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-stone-200 flex items-center justify-between">
+          <div className="mt-2 pt-1.5 border-t border-stone-200 flex items-center justify-between">
             <span className="rubber-stamp text-[8px] py-0.5 px-1.5 border-emerald-700 text-emerald-800">HÀ NỘI 7v7</span>
-            <span className="text-[9px] text-stone-500 font-bold">V2.0</span>
+            <span className="text-[9px] text-stone-500 font-bold font-mono">Bản Tin Tối</span>
           </div>
         </div>
 
-        <div className="card-retro-paper p-3 rounded-xl border border-stone-300 shadow-md rotate-[-1.5deg] relative">
-          <div className="washi-tape -top-2 left-6" />
-          <div className="text-[10px] font-black text-stone-800 uppercase border-b border-stone-300 pb-1 mb-1.5 flex items-center gap-1">
-            <span>🤝 MÃ BẮT TAY OTP</span>
+        {/* 2. CUỐNG VÉ TRẬN ĐẤU RETRO (MATCH TICKET STUB) */}
+        <div className="ticket-stub p-3 bg-[#fbf9f4] rounded-xl border border-stone-300 shadow-md rotate-[-2deg] relative pointer-events-auto">
+          <div className="washi-tape -top-2 left-6 rotate-[-1deg]" />
+          <div className="flex items-center justify-between border-b border-dashed border-stone-300 pb-1.5 mb-2">
+            <span className="text-[9px] font-black uppercase text-amber-800 tracking-wider">
+              🎟️ CUỐNG VÉ THI ĐẤU
+            </span>
+            <span className="text-[8px] font-mono font-bold text-stone-500">NO. 88392</span>
           </div>
-          <p className="text-[10px] text-stone-600 leading-relaxed">
-            Hai đội trưởng gặp nhau tại sân nhập mã 4 số nhận ngay +10 điểm uy tín vào thẻ căn cước bóng đá.
-          </p>
+          <div className="space-y-1 text-[10px]">
+            <div className="flex justify-between text-stone-800 font-bold">
+              <span>BẢO CHỨNG:</span>
+              <span className="text-emerald-800 font-black">200.000đ</span>
+            </div>
+            <div className="flex justify-between text-stone-600">
+              <span>QUY CHUẨN:</span>
+              <span className="font-bold text-stone-800">Sân 7 Phủi Hà Nội</span>
+            </div>
+            <div className="flex justify-between text-stone-600">
+              <span>HỦY SÁT GIỜ:</span>
+              <span className="font-bold text-red-700">Đền 100% tiền sân</span>
+            </div>
+          </div>
+          <div className="mt-2 pt-1.5 border-t border-dashed border-stone-300 flex items-center justify-between">
+            <div className="font-mono text-[8px] tracking-widest text-stone-400">||||| | |||| |||</div>
+            <span className="rubber-stamp text-[8px] py-0.2 px-1 text-emerald-800 border-emerald-700">XÁC THỰC</span>
+          </div>
+        </div>
+
+        {/* 3. POLAROID: TRÀ ĐÁ VỈA HÈ SAU TRẬN */}
+        <div className="bg-white p-2 pb-3 rounded-xl border border-stone-300 shadow-md rotate-[1.5deg] relative pointer-events-auto">
+          <div className="washi-tape -top-2 right-8 rotate-[2deg]" />
+          <div className="relative aspect-[4/3] rounded bg-stone-100 overflow-hidden border border-stone-200 mb-1.5">
+            <img
+              src="/images/vintage-scrapbook.jpg"
+              alt="Văn hóa trà đá phủi sau trận"
+              className="w-full h-full object-cover object-center filter contrast-105"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                const fallback = e.currentTarget.parentElement?.querySelector(".polaroid-tea-fallback");
+                if (fallback) (fallback as HTMLElement).style.display = "flex";
+              }}
+            />
+            <div className="polaroid-tea-fallback hidden w-full h-full flex-col items-center justify-center bg-[#f7f5ef] p-2 text-center">
+              <span className="text-2xl mb-1">🍵🥜</span>
+              <span className="text-[10px] font-black text-stone-800 uppercase">Trà Đá Phủi FC</span>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-[10px] font-bold text-stone-800">
+              “Văn hóa trà đá sau trận 19h”
+            </p>
+            <span className="text-[8px] text-stone-500">Mã Bắt Tay OTP 4 Số Nhận +10 Uy Tín</span>
+          </div>
         </div>
       </aside>
 
@@ -1508,28 +1654,45 @@ export default function HanoiMatchmakingPlatform() {
           {/* WORKSPACE 2: TAB CỨU HỘ SOS CHUYÊN BIỆT */}
           {activeTab === "sos" && (
             <div className="space-y-4">
-              <div className="rounded-2xl bg-gradient-to-r from-rose-950/70 via-slate-900 to-slate-900 border border-rose-500/40 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-sm sm:text-base font-black text-rose-400 flex items-center gap-2">
-                    <Flame className="w-4 h-4 fill-current animate-bounce" />
-                    <span>TRẠM CỨU HỘ KÈO PHÚT CHÓT (&lt; 1 TIẾNG)</span>
-                  </h2>
-                  <p className="text-xs text-slate-300 mt-0.5">
-                    Cứu kèo giúp sân không bị bỏ trống • Thưởng +8 điểm tín nhiệm &amp; Bảo chứng an toàn 100%
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                  <PhuiSticker variant="the-phat" size={70} angle={6} className="hidden sm:inline-block shrink-0" />
-                  <button
-                    onClick={() => {
-                      setIsCreateSosMode(true);
-                      setIsCreateOpen(true);
-                    }}
-                    className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-black text-xs shadow-lg shadow-rose-500/30 flex items-center gap-1.5 transition active:scale-95 shrink-0"
-                  >
-                    <Flame className="w-3.5 h-3.5 fill-current" />
-                    <span>Phát Tín Hiệu SOS</span>
-                  </button>
+              <div className="card-retro-paper relative rounded-3xl border-2 border-red-300 p-4 sm:p-5 shadow-lg overflow-hidden">
+                <div className="washi-tape -top-2.5 left-8 rotate-[-2deg]" />
+                <div className="washi-tape -top-2.5 right-8 rotate-[3deg]" />
+
+                {/* Dải ruy băng sọc cứu hộ khẩn cấp retro */}
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_10px,#fbbf24_10px,#fbbf24_20px)]" />
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10 pt-1">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-100 border border-red-300 text-[10px] font-black text-red-700 uppercase tracking-wider">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping" />
+                        TRẠM CỨU HỘ KÈO PHÚT CHÓT
+                      </span>
+                      <span className="rubber-stamp text-[9px] py-0.5 px-2 border-red-700 text-red-800">
+                        HỎA TỐC &lt; 1H
+                      </span>
+                    </div>
+                    <h2 className="text-base sm:text-lg font-black text-stone-900 flex items-center gap-2">
+                      <Flame className="w-5 h-5 text-red-600 fill-current animate-bounce" />
+                      <span>TRẠM CỨU HỘ KÈO PHÚT CHÓT HÀ NỘI</span>
+                    </h2>
+                    <p className="text-xs text-stone-600 mt-0.5 font-medium">
+                      Cứu kèo giúp sân không bị bỏ trống • Thưởng +8 điểm tín nhiệm &amp; Bảo chứng an toàn 100%
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end shrink-0">
+                    <PhuiSticker variant="the-phat" size={70} angle={6} className="hidden sm:inline-block shrink-0" />
+                    <button
+                      onClick={() => {
+                        setIsCreateSosMode(true);
+                        setIsCreateOpen(true);
+                      }}
+                      className="ticket-stub px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 shrink-0"
+                    >
+                      <Flame className="w-4 h-4 fill-current" />
+                      <span>Phát Tín Hiệu SOS</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1552,15 +1715,21 @@ export default function HanoiMatchmakingPlatform() {
                   })}
                 </div>
               ) : (
-                <div className="surface-card rounded-2xl border border-white/[0.08] p-8 text-center space-y-3 text-xs text-slate-400">
-                  <p>Hiện tại không có kèo SOS nào cần cứu hộ.</p>
-                  <p className="text-slate-300">Đội bạn đang bị đối thủ bùng kèo hoặc thiếu đối phút chót?</p>
+                <div className="card-retro-paper rounded-2xl border border-stone-300 p-8 text-center space-y-3 text-xs text-stone-600 shadow-sm relative overflow-hidden">
+                  <div className="washi-tape -top-2 left-1/2 -translate-x-1/2" />
+                  <div className="w-12 h-12 rounded-full bg-red-100 border border-red-300 text-red-600 flex items-center justify-center mx-auto text-xl shadow-inner">
+                    <Flame className="w-6 h-6 fill-current animate-pulse" />
+                  </div>
+                  <p className="font-bold text-stone-900 text-sm">Hiện tại không có kèo SOS nào cần cứu hộ.</p>
+                  <p className="text-stone-600 max-w-sm mx-auto">
+                    Đội bạn đang bị đối thủ bùng kèo hoặc thiếu đối phút chót? Phát tín hiệu để các đội quanh khu vực hỗ trợ ngay!
+                  </p>
                   <button
                     onClick={() => {
                       setIsCreateSosMode(true);
                       setIsCreateOpen(true);
                     }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md transition active:scale-95"
+                    className="ticket-stub inline-flex items-center gap-1.5 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md transition active:scale-95"
                   >
                     <Flame className="w-3.5 h-3.5 fill-current" />
                     <span>Phát Tín Hiệu Cứu Kèo Khẩn Cấp Ngay</span>
@@ -1603,19 +1772,20 @@ export default function HanoiMatchmakingPlatform() {
                   onRefreshTeam={refreshAuth}
                 />
               ) : (
-                <div className="surface-card rounded-2xl border border-emerald-500/35 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                <div className="card-retro-paper relative rounded-3xl border border-stone-300 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md overflow-hidden">
+                  <div className="washi-tape -top-2 left-6 rotate-[-2deg]" />
+                  <div className="space-y-1 relative z-10">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
                       Định danh minh bạch • 1 SĐT = 1 Đội
                     </span>
-                    <h3 className="text-base font-extrabold text-white pt-1">
+                    <h3 className="text-base font-black text-stone-900 pt-1">
                       {!isAuthenticated
                         ? "Bạn chưa đăng nhập tài khoản Đội trưởng"
                         : "Hoàn tất 3 bước tạo Hồ sơ Đội bóng của bạn"}
                     </h3>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-stone-600">
                       Cấp ngay <strong>Thẻ Căn Cước Bóng Đá Số</strong> kèm{" "}
-                      <strong className="text-emerald-400">
+                      <strong className="text-emerald-800">
                         100/100 điểm tín nhiệm
                       </strong>{" "}
                       (Miễn cọc tiền mặt) và khóa SĐT Zalo chính chủ chống bùng kèo.
@@ -1629,7 +1799,7 @@ export default function HanoiMatchmakingPlatform() {
                         setIsTeamOnboardingOpen(true);
                       }
                     }}
-                    className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs shrink-0 shadow-lg shadow-emerald-500/20 transition"
+                    className="ticket-stub px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs shrink-0 shadow-md transition active:scale-95"
                   >
                     {!isAuthenticated
                       ? "Đăng ký / Đăng nhập Đội trưởng"

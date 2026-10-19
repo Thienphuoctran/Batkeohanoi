@@ -590,23 +590,26 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
 
   return (
     <div className="space-y-4">
-      {/* 1. HEADER & SEGMENTED SWITCHER 2 CHIỀU */}
-      <div className="surface-card rounded-2xl border border-emerald-500/30 p-4 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* 1. HEADER & SEGMENTED SWITCHER 2 CHIỀU (VINTAGE NEWSPAPER STYLE) */}
+      <div className="card-retro-paper rounded-3xl border border-stone-300 p-4 sm:p-5 space-y-4 shadow-lg relative overflow-hidden">
+        <div className="washi-tape -top-2.5 left-8 rotate-[-2deg]" />
+        <div className="washi-tape -top-2.5 right-8 rotate-[2deg]" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10 pt-1">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-black text-emerald-300 uppercase tracking-wider">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-[10px] font-black text-emerald-800 uppercase tracking-wider">
                 Chợ Cầu 2 Chiều • Toàn Hà Nội
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-[10px] font-black text-amber-300">
-                ⚡ Ghép Đối &amp; Tuyển Quân 24/7
+              <span className="rubber-stamp text-[9px] py-0.5 px-2 border-amber-700 text-amber-800 font-bold">
+                ⚡ GHÉP ĐỐI 24/7
               </span>
             </div>
-            <h2 className="text-base sm:text-lg font-black text-white mt-1.5 flex items-center gap-2">
-              <UserPlus className="w-5 h-5 text-emerald-400" />
+            <h2 className="text-base sm:text-xl font-black text-stone-900 mt-1.5 flex items-center gap-2">
+              <UserPlus className="w-5 h-5 text-emerald-800" />
               <span>Chợ Cầu Lẻ &amp; Cầu Thủ Tự Do Tìm Đội</span>
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-stone-600 mt-0.5 font-medium">
               Ghép cầu thủ tự do vào đội thiếu người sát giờ • Đánh giá uy tín cá nhân &amp; Xuất thẻ FUT Card
             </p>
           </div>
@@ -614,7 +617,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
           <div className="flex items-center gap-2 shrink-0">
             <Button
               onClick={() => handleOpenCreateModal(marketMode)}
-              className="h-10 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-emerald-500/20 active:scale-95 transition-all"
+              className="ticket-stub h-10 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs gap-1.5 shadow-md active:scale-95 transition-all"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>
@@ -627,14 +630,14 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
         </div>
 
         {/* NÚT CHUYỂN CHẾ ĐỘ (SEGMENTED SWITCHER 2 CHIỀU) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-1.5 rounded-2xl bg-slate-950/90 border border-slate-800">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-1.5 rounded-2xl bg-[#ede8dc] border border-stone-300 relative z-10">
           <button
             type="button"
             onClick={() => setMarketMode("free-agents")}
-            className={`py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all ${
+            className={`py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all active:scale-95 ${
               marketMode === "free-agents"
-                ? "bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 shadow-md"
-                : "text-slate-400 hover:text-white"
+                ? "bg-stone-900 text-white shadow-md border border-stone-900"
+                : "text-stone-700 hover:text-stone-900 hover:bg-stone-200/70"
             }`}
           >
             <span className="text-base">🏃</span>
@@ -642,8 +645,8 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
             <span
               className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
                 marketMode === "free-agents"
-                  ? "bg-slate-950/20 text-slate-950"
-                  : "bg-slate-800 text-slate-300"
+                  ? "bg-white/20 text-white"
+                  : "bg-stone-300 text-stone-800"
               }`}
             >
               {freeAgents.length}
@@ -653,10 +656,10 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
           <button
             type="button"
             onClick={() => setMarketMode("team-recruit")}
-            className={`py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all ${
+            className={`py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all active:scale-95 ${
               marketMode === "team-recruit"
-                ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 shadow-md"
-                : "text-slate-400 hover:text-white"
+                ? "bg-stone-900 text-white shadow-md border border-stone-900"
+                : "text-stone-700 hover:text-stone-900 hover:bg-stone-200/70"
             }`}
           >
             <span className="text-base">🛡️</span>
@@ -664,8 +667,8 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
             <span
               className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
                 marketMode === "team-recruit"
-                  ? "bg-slate-950/20 text-slate-950"
-                  : "bg-slate-800 text-slate-300"
+                  ? "bg-white/20 text-white"
+                  : "bg-stone-300 text-stone-800"
               }`}
             >
               {subPosts.length}
@@ -676,45 +679,46 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
 
       {/* 2. THUẬT TOÁN QUICK MATCH 100% (GHÉP ĐÔI TỨC THÌ) */}
       {quickMatchPairs.length > 0 && (
-        <div className="rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-amber-950/50 border border-emerald-500/40 p-3.5 space-y-2.5 shadow-lg">
-          <div className="flex items-center justify-between gap-2">
+        <div className="rounded-3xl bg-[#fbf9f4] border-2 border-amber-300/80 p-4 space-y-3 shadow-md text-stone-900 relative overflow-hidden">
+          <div className="washi-tape -top-2 left-6 rotate-[-2deg]" />
+          <div className="flex items-center justify-between gap-2 relative z-10">
             <div className="flex items-center gap-2">
-              <span className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300">
+              <span className="w-8 h-8 rounded-xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800 shadow-inner">
                 <Zap className="w-4 h-4 fill-current" />
               </span>
               <div>
-                <h3 className="text-xs font-black text-emerald-300 uppercase tracking-wide">
+                <h3 className="text-xs font-black text-amber-900 uppercase tracking-wide">
                   ⚡ Thuật Toán Quick Match 100% — Phát Hiện Trùng Khớp Tức Thì
                 </h3>
-                <p className="text-[11px] text-slate-300">
+                <p className="text-[11px] text-stone-600 font-medium">
                   Hệ thống tự động khớp vị trí &amp; khu vực giữa Đội đang thiếu người và Cầu thủ tự do
                 </p>
               </div>
             </div>
-            <span className="hidden sm:inline-block px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black">
+            <span className="hidden sm:inline-block px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black">
               Khớp trong 30s
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 relative z-10">
             {quickMatchPairs.map(({ id, agent, teamPost }) => (
               <div
                 key={id}
-                className="rounded-xl bg-slate-950/85 border border-white/10 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+                className="rounded-xl bg-[#ede8dc] border border-stone-300 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs"
               >
                 <div className="space-y-1 text-xs">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-black text-[10px]">
+                    <span className="px-2 py-0.5 rounded bg-amber-200 border border-amber-400 text-stone-900 font-black text-[10px]">
                       100% MATCH • {agent.position}
                     </span>
-                    <span className="text-slate-400 text-[11px] font-bold">
+                    <span className="text-stone-600 text-[11px] font-bold">
                       📍 {teamPost.district} ({teamPost.matchTime})
                     </span>
                   </div>
-                  <div className="text-white font-bold">
-                    🏃 <span className="text-emerald-300">{agent.playerName}</span>{" "}
-                    <span className="text-slate-400">⇄</span> 🛡️{" "}
-                    <span className="text-amber-300">{teamPost.teamName}</span>
+                  <div className="text-stone-900 font-bold">
+                    🏃 <span className="text-emerald-800 font-black">{agent.playerName}</span>{" "}
+                    <span className="text-stone-400">⇄</span> 🛡️{" "}
+                    <span className="text-amber-800 font-black">{teamPost.teamName}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
@@ -722,7 +726,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     href={getZaloDeepLink(agent.phone, agent.zaloPhone)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2.5 py-1.5 rounded-lg bg-[#0068FF] hover:bg-[#0057D9] text-white text-[11px] font-extrabold transition"
+                    className="ticket-stub px-3 py-1.5 rounded-lg bg-[#0068FF] hover:bg-[#0057D9] text-white text-[11px] font-extrabold transition shadow-xs"
                   >
                     Zalo Cầu Thủ
                   </a>
@@ -733,7 +737,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[11px] font-extrabold transition"
+                    className="ticket-stub px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-extrabold transition shadow-xs"
                   >
                     Zalo Đội
                   </a>
@@ -745,7 +749,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
       )}
 
       {/* 3. BỘ LỌC VỊ TRÍ + GK HOTLINE + QUẬN + TIER */}
-      <div className="surface-card rounded-2xl border border-white/[0.08] p-3.5 space-y-3">
+      <div className="card-retro-paper rounded-2xl border border-stone-300 p-3.5 space-y-3 shadow-sm">
         {/* Hàng 1: Vị trí + GK Hotline */}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -764,8 +768,8 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                 }}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
                   posFilter === item.id && !onlyGkHotline
-                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-400 ring-1 ring-emerald-400"
-                    : "bg-slate-950/90 text-slate-400 border-slate-800 hover:text-white"
+                    ? "bg-stone-900 text-white font-black border-stone-900 shadow-sm"
+                    : "bg-[#ede8dc] text-stone-700 border-stone-300 hover:text-stone-900 hover:bg-stone-200"
                 }`}
               >
                 {item.label}
@@ -783,8 +787,8 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
             }}
             className={`px-3 py-1.5 rounded-xl text-xs font-black border flex items-center gap-1.5 transition ${
               onlyGkHotline
-                ? "bg-amber-400 text-slate-950 border-amber-300 shadow-lg shadow-amber-500/20"
-                : "bg-amber-500/15 text-amber-300 border-amber-500/40 hover:bg-amber-500/25"
+                ? "ticket-stub bg-amber-500 text-stone-950 border-amber-600 shadow-sm"
+                : "bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200 font-bold"
             }`}
           >
             <Flame className="w-3.5 h-3.5 fill-current" />
@@ -793,10 +797,10 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
         </div>
 
         {/* Hàng 2: Lọc theo Quận Hà Nội & Tier */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pt-2 border-t border-white/[0.06]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pt-2 border-t border-stone-200">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1 mr-1">
-              <MapPin className="w-3 h-3 text-emerald-400" />
+            <span className="text-[11px] font-bold text-stone-700 flex items-center gap-1 mr-1">
+              <MapPin className="w-3 h-3 text-red-600" />
               Khu vực:
             </span>
             {HANOI_DISTRICTS_FILTER.map((dist) => (
@@ -805,8 +809,8 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                 onClick={() => setDistrictFilter(dist)}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
                   districtFilter === dist
-                    ? "bg-emerald-500/25 text-emerald-200 border border-emerald-400"
-                    : "bg-slate-950/80 text-slate-400 hover:text-white border border-white/[0.06]"
+                    ? "bg-stone-900 text-white font-black border border-stone-900 shadow-sm"
+                    : "bg-[#ede8dc] text-stone-700 hover:text-stone-900 hover:bg-stone-200 border border-stone-300"
                 }`}
               >
                 {dist === "ALL" ? "Toàn Hà Nội" : dist}
@@ -815,7 +819,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-bold text-slate-400 mr-1">
+            <span className="text-[11px] font-bold text-stone-700 mr-1">
               Trình độ:
             </span>
             {(["ALL", 1, 2, 3] as const).map((t) => (
@@ -824,8 +828,14 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                 onClick={() => setTierFilter(t)}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition ${
                   tierFilter === t
-                    ? "bg-amber-500/25 text-amber-300 border-amber-400"
-                    : "bg-slate-950/80 text-slate-400 border-white/[0.06] hover:text-white"
+                    ? t === 1
+                      ? "bg-blue-800 text-white border-blue-900 shadow-sm font-black"
+                      : t === 2
+                      ? "bg-emerald-800 text-white border-emerald-900 shadow-sm font-black"
+                      : t === 3
+                      ? "bg-red-800 text-white border-red-900 shadow-sm font-black"
+                      : "bg-stone-900 text-white font-black border-stone-900 shadow-sm"
+                    : "bg-[#ede8dc] text-stone-700 border-stone-300 hover:text-stone-900 hover:bg-stone-200"
                 }`}
               >
                 {t === "ALL" ? "Mọi Tier" : `Tier ${t}`}
@@ -838,9 +848,9 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
       {/* 4. DANH SÁCH CHẾ ĐỘ 1: CẦU THỦ TÌM ĐỘI (FREE AGENT SCOUT FEED) */}
       {marketMode === "free-agents" && (
         isLoadingMarket ? (
-          <div className="surface-card rounded-2xl border border-emerald-500/20 p-10 text-center space-y-3">
-            <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-xs font-bold text-slate-300">Đang đồng bộ hồ sơ cầu thủ tự do từ CSDL Supabase...</p>
+          <div className="card-retro-paper rounded-2xl border border-stone-300 p-10 text-center space-y-3">
+            <div className="w-8 h-8 border-2 border-emerald-700 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-xs font-bold text-stone-700">Đang đồng bộ hồ sơ cầu thủ tự do từ CSDL Supabase...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
@@ -852,13 +862,12 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               const isOwner = isAgentOwner(agent);
 
               return (
-                <SpotlightCard
+                <div
                   key={agent.id}
-                  spotlightColor={isGK ? "rgba(245, 158, 11, 0.2)" : "rgba(16, 185, 129, 0.15)"}
-                  className={`rounded-2xl border p-4 flex flex-col justify-between transition-all ${
+                  className={`card-retro-paper rounded-2xl border p-4 flex flex-col justify-between transition-all ${
                     isGK
-                      ? "bg-gradient-to-br from-amber-950/35 via-slate-900/95 to-slate-950 border-amber-500/50 shadow-lg shadow-amber-500/5"
-                      : "surface-card border-white/[0.08]"
+                      ? "border-2 border-amber-400 bg-amber-50/40 shadow-md"
+                      : "border-stone-300 shadow-sm"
                   }`}
                 >
                   <div>
@@ -866,11 +875,11 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
                       <div className="flex flex-wrap items-center gap-1.5">
                         {isGK ? (
-                          <span className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 text-[11px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
+                          <span className="px-2.5 py-1 rounded-lg bg-amber-400 text-stone-950 text-[11px] font-black uppercase tracking-wider shadow-xs flex items-center gap-1 border border-amber-500">
                             <span>🧤 HÀNG HIẾM - THỦ MÔN</span>
                           </span>
                         ) : (
-                          <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-extrabold">
+                          <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-black">
                             {agent.position === "DF"
                               ? "🛡️"
                               : agent.position === "MF"
@@ -881,14 +890,14 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                         )}
 
                         <span
-                          className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border ${tierInfo.badgeColor}`}
+                          className="px-2 py-0.5 rounded-lg text-[10px] font-bold border bg-[#ede8dc] border-stone-300 text-stone-700"
                         >
                           Tier {agent.skillTier}: {tierInfo.name}
                         </span>
 
                         {isOwner && (
-                          <span className="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
-                            ★ BÀI ĐĂNG CỦA BẠN
+                          <span className="px-2 py-0.5 rounded-lg bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                            ★ BÀI CỦA BẠN
                           </span>
                         )}
                       </div>
@@ -897,7 +906,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       <button
                         type="button"
                         onClick={() => setSelectedFutPlayer(agent)}
-                        className="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-400/50 text-amber-300 text-[11px] font-black flex items-center gap-1 shadow-sm transition active:scale-95"
+                        className="ticket-stub px-2.5 py-1 rounded-xl bg-stone-900 text-amber-300 border border-amber-400/50 text-[11px] font-black flex items-center gap-1 shadow-xs transition active:scale-95"
                         title="Xem Thẻ Cầu Thủ EA FC / FIFA FUT Card Ảo"
                       >
                         <Trophy className="w-3 h-3 text-amber-400" />
@@ -908,19 +917,19 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     {/* Tên & Biệt danh + Tuổi + Chân thuận */}
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h3 className="text-base font-black text-white flex items-center gap-1.5">
+                        <h3 className="text-base font-black text-stone-900 flex items-center gap-1.5">
                           <span>{agent.playerName}</span>
-                          <span className="text-xs font-bold text-slate-400">
+                          <span className="text-xs font-bold text-stone-500">
                             • {agent.age}t • {agent.preferredFoot}
                           </span>
                         </h3>
                         <div className="flex flex-wrap items-center gap-2 mt-1">
-                          <span className="inline-flex items-center gap-1 text-xs font-black text-amber-400">
-                            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                          <span className="inline-flex items-center gap-1 text-xs font-black text-amber-700">
+                            <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                             {agent.trustRating.toFixed(1)} ★
                           </span>
                           {isHighTrust && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-300">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-[10px] font-bold text-emerald-800">
                               <ShieldCheck className="w-3 h-3" />
                               Cầu thủ uy tín ({agent.matchesJoined} trận)
                             </span>
@@ -930,43 +939,43 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     </div>
 
                     {/* Khu vực & Khung giờ rảnh + Đóng góp kinh phí */}
-                    <div className="mt-3 rounded-xl bg-slate-950/80 border border-slate-800/90 p-2.5 space-y-1.5 text-xs">
+                    <div className="mt-3 rounded-xl bg-[#ede8dc] border border-stone-200 p-2.5 space-y-1.5 text-xs">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-slate-300 flex items-center gap-1.5 font-semibold">
-                          <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span className="text-stone-700 flex items-center gap-1.5 font-semibold">
+                          <MapPin className="w-3.5 h-3.5 text-red-600 shrink-0" />
                           Khu vực:{" "}
-                          <strong className="text-white">
+                          <strong className="text-stone-900">
                             {agent.districts.join(", ")}
                           </strong>
                         </span>
-                        <span className="text-amber-300 font-bold flex items-center gap-1 tabular-nums">
+                        <span className="text-amber-800 font-bold flex items-center gap-1 tabular-nums">
                           <Clock className="w-3.5 h-3.5" />
                           Ca: {agent.availableTimeSlots.join(", ")}
                         </span>
                       </div>
-                      <div className="pt-1 border-t border-slate-800/80 flex items-center justify-between text-slate-400 text-[11px]">
+                      <div className="pt-1 border-t border-stone-300/80 flex items-center justify-between text-stone-600 text-[11px]">
                         <span>Kinh phí &amp; Màu áo:</span>
-                        <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                        <span className="text-emerald-800 font-bold flex items-center gap-1">
                           💬 Trao đổi qua Zalo
                         </span>
                       </div>
                     </div>
 
                     {agent.bio && (
-                      <p className="text-[11px] text-slate-400 italic mt-2 line-clamp-2">
+                      <p className="text-[11px] text-stone-600 italic mt-2 line-clamp-2">
                         “{agent.bio}”
                       </p>
                     )}
                   </div>
 
                   {/* Footer Nút Hành Động 1-Chạm */}
-                  <div className="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-white/[0.06]">
+                  <div className="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-stone-200">
                     {isOwner ? (
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={() => handleOpenEditAgent(agent)}
-                          className="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-center gap-1 transition"
+                          className="px-2.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-800 text-xs font-bold flex items-center gap-1 transition"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                           <span>Sửa</span>
@@ -974,7 +983,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                         <button
                           type="button"
                           onClick={() => handleDeleteAgent(agent)}
-                          className="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center gap-1 transition active:scale-95"
+                          className="px-2.5 py-1.5 rounded-xl bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 text-xs font-bold flex items-center gap-1 transition active:scale-95"
                           title="Chỉ người đăng bài mới có quyền xóa"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -982,7 +991,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                         </button>
                       </div>
                     ) : (
-                      <span className="text-[10px] text-slate-500">
+                      <span className="text-[10px] text-stone-500">
                         Đăng {agent.createdAt}
                       </span>
                     )}
@@ -993,7 +1002,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                           href={getZaloDeepLink(agent.phone, agent.zaloPhone)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="h-9 px-3 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-blue-600/20 transition active:scale-95"
+                          className="ticket-stub h-9 px-3.5 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-black text-xs inline-flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95"
                         >
                           <MessageSquare className="w-3.5 h-3.5 fill-current" />
                           <span>Mời vào đội (Zalo)</span>
@@ -1001,32 +1010,32 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       </ClickSpark>
                       <a
                         href={`tel:${normalizeVietnamPhone(agent.phone)}`}
-                        className="h-9 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/15 transition active:scale-95"
+                        className="ticket-stub h-9 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs inline-flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95"
                       >
                         <Phone className="w-3.5 h-3.5" />
                         <span>Gọi trực tiếp</span>
                       </a>
                     </div>
                   </div>
-                </SpotlightCard>
+                </div>
               );
             })
           ) : (
-            <div className="md:col-span-2 surface-card rounded-2xl border border-white/[0.08] p-10 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-xl">
+            <div className="md:col-span-2 card-retro-paper rounded-2xl border border-stone-300 p-10 text-center space-y-3 shadow-sm">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center justify-center mx-auto text-xl shadow-inner">
                 🏃
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-extrabold text-white">
+                <p className="text-sm font-black text-stone-900">
                   Chưa có cầu thủ tự do nào đăng hồ sơ
                 </p>
-                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                <p className="text-xs text-stone-600 max-w-md mx-auto">
                   Bạn đang tìm đội đá bóng tối nay hoặc cố định hàng tuần? Tạo hồ sơ để các đội bóng khu vực của bạn kết nối Zalo ngay!
                 </p>
               </div>
               <Button
                 onClick={() => handleOpenCreateModal("free-agents")}
-                className="h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-emerald-500/20"
+                className="ticket-stub h-10 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs gap-1.5 shadow-md"
               >
                 <Plus className="w-4 h-4 stroke-[2.5]" />
                 <span>+ Đăng Hồ Sơ Cầu Thủ Tự Do Ngay</span>
@@ -1040,9 +1049,9 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
       {/* 5. DANH SÁCH CHẾ ĐỘ 2: ĐỘI TUYỂN THÊM NGƯỜI (TEAM RECRUITMENT FEED) */}
       {marketMode === "team-recruit" && (
         isLoadingMarket ? (
-          <div className="surface-card rounded-2xl border border-amber-500/20 p-10 text-center space-y-3">
-            <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-xs font-bold text-slate-300">Đang đồng bộ danh sách đội tuyển người từ CSDL Supabase...</p>
+          <div className="card-retro-paper rounded-2xl border border-stone-300 p-10 text-center space-y-3">
+            <div className="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-xs font-bold text-stone-700">Đang đồng bộ danh sách đội tuyển người từ CSDL Supabase...</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -1054,10 +1063,10 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               return (
                 <div
                   key={post.id}
-                  className={`spotlight-card rounded-2xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                  className={`card-retro-paper rounded-2xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm ${
                     isGK
-                      ? "border-amber-500/40 bg-gradient-to-r from-amber-950/25 via-slate-900 to-slate-900"
-                      : "border-white/[0.08]"
+                      ? "border-2 border-amber-400 bg-amber-50/40"
+                      : "border-stone-300"
                   }`}
                 >
                   <div className="space-y-1.5">
@@ -1065,48 +1074,48 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       <span
                         className={`px-2.5 py-0.5 rounded-lg text-xs font-black border ${
                           isGK
-                            ? "bg-amber-400 text-slate-950 border-amber-300"
-                            : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+                            ? "bg-amber-400 text-stone-950 border-amber-500"
+                            : "bg-emerald-100 text-emerald-800 border-emerald-300"
                         }`}
                       >
                         {isGK ? "🧤 CẦN GẤP THỦ MÔN:" : "🛡️ Tuyển"}{" "}
                         {post.quantity} {post.positionNeeded}
                       </span>
-                      <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-200 text-[11px] font-bold">
+                      <span className="px-2 py-0.5 rounded bg-[#ede8dc] border border-stone-300 text-stone-800 text-[11px] font-bold">
                         📍 {post.district}
                       </span>
                       {post.skillTier && (
-                        <span className="px-2 py-0.5 rounded bg-slate-800/80 text-amber-300 text-[11px] font-bold">
+                        <span className="px-2 py-0.5 rounded bg-[#ede8dc] border border-stone-300 text-amber-800 text-[11px] font-bold">
                           Tier {post.skillTier}
                         </span>
                       )}
-                      <span className="text-xs text-amber-300 font-bold flex items-center gap-1 tabular-nums">
-                        <Clock className="w-3.5 h-3.5" />
+                      <span className="text-xs text-stone-700 font-bold flex items-center gap-1 tabular-nums">
+                        <Clock className="w-3.5 h-3.5 text-stone-500" />
                         <span>{post.matchTime}</span>
                         {post.matchDate && (
-                          <span className="text-emerald-300 font-bold">
+                          <span className="text-emerald-800 font-bold">
                             • {post.matchDate}
                           </span>
                         )}
                       </span>
                       {isOwner && (
-                        <span className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                        <span className="px-2.5 py-0.5 rounded-lg bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
                           ★ TIN CỦA ĐỘI BẠN
                         </span>
                       )}
                     </div>
 
-                    <h3 className="text-sm sm:text-base font-extrabold text-white">
+                    <h3 className="text-sm sm:text-base font-black text-stone-900">
                       {post.teamName} —{" "}
-                      <span className="text-emerald-300">{post.pitchName}</span>
+                      <span className="text-emerald-800 font-bold">{post.pitchName}</span>
                     </h3>
 
-                    <p className="text-xs text-slate-400 font-medium flex items-center gap-1">
+                    <p className="text-xs text-stone-600 font-medium flex items-center gap-1">
                       💬 Kinh phí &amp; trang phục trao đổi trực tiếp qua Zalo
                     </p>
 
                     {post.notes && (
-                      <p className="text-[11px] text-slate-400 italic">
+                      <p className="text-[11px] text-stone-600 italic">
                         “{post.notes}”
                       </p>
                     )}
@@ -1118,7 +1127,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                         <button
                           type="button"
                           onClick={() => handleOpenEditSubPost(post)}
-                          className="h-9 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold inline-flex items-center gap-1 transition"
+                          className="h-9 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-800 text-xs font-bold inline-flex items-center gap-1 transition"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                           <span>Sửa</span>
@@ -1126,7 +1135,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                         <button
                           type="button"
                           onClick={() => handleDeleteSubPost(post)}
-                          className="h-9 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95"
+                          className="h-9 px-3 rounded-xl bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95"
                           title="Chỉ đội trưởng đăng bài mới có quyền xóa"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1141,14 +1150,14 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       )}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="h-9 px-3.5 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-blue-600/20 transition"
+                      className="ticket-stub h-9 px-3.5 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-black text-xs inline-flex items-center justify-center gap-1.5 shadow-xs transition"
                     >
                       <MessageSquare className="w-3.5 h-3.5 fill-current" />
                       <span>Zalo Xin Đá</span>
                     </a>
                     <a
                       href={`tel:${normalizeVietnamPhone(post.contactPhone)}`}
-                      className="h-9 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/15 transition"
+                      className="ticket-stub h-9 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs inline-flex items-center justify-center gap-1.5 shadow-xs transition"
                     >
                       <Phone className="w-3.5 h-3.5" />
                       <span>Gọi Đội Trưởng</span>
@@ -1158,21 +1167,21 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               );
             })
           ) : (
-            <div className="surface-card rounded-2xl border border-white/[0.08] p-10 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-xl">
+            <div className="card-retro-paper rounded-2xl border border-stone-300 p-10 text-center space-y-3 shadow-sm">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 text-amber-800 flex items-center justify-center mx-auto text-xl shadow-inner">
                 🛡️
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-extrabold text-white">
+                <p className="text-sm font-black text-stone-900">
                   Chưa có đội bóng nào đăng tuyển vị trí này
                 </p>
-                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                <p className="text-xs text-stone-600 max-w-md mx-auto">
                   Đội của bạn đang thiếu vị trí (Thủ môn, Hậu vệ, Tiền vệ, Tiền đạo) trước giờ bóng lăn? Đăng tin để tìm cầu thủ xung quanh khu vực sân!
                 </p>
               </div>
               <Button
                 onClick={() => handleOpenCreateModal("team-recruit")}
-                className="h-10 px-5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-amber-500/20"
+                className="ticket-stub h-10 px-5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-black text-xs gap-1.5 shadow-md"
               >
                 <Plus className="w-4 h-4 stroke-[2.5]" />
                 <span>+ Đăng Tin Tuyển Người Ngay</span>
@@ -1183,16 +1192,16 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
         )
       )}
 
-      {/* 6. MODAL ĐĂNG TIN / CHỈNH SỬA 2 CHIỀU */}
+      {/* 6. MODAL ĐĂNG TIN / CHỈNH SỬA 2 CHIỀU (VINTAGE RETRO SCRAPBOOK STYLE) */}
       {isPostModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4">
-          <div className="w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[#0f172a] border border-white/10 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-slate-950/80">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4">
+          <div className="w-full max-w-lg rounded-t-3xl sm:rounded-2xl card-retro-paper border border-stone-300 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col text-stone-900 relative">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-300 bg-[#ede8dc]">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800">
                   Chợ Cầu 2 Chiều • BắtKèo7 Hà Nội
                 </span>
-                <h3 className="text-base font-extrabold text-white mt-0.5">
+                <h3 className="text-base font-black text-stone-900 mt-0.5">
                   {editingAgentId || editingSubId
                     ? "Chỉnh Sửa Tin Đăng Chợ Cầu"
                     : formMode === "free-agents"
@@ -1202,7 +1211,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               </div>
               <button
                 onClick={() => setIsPostModalOpen(false)}
-                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white"
+                className="w-8 h-8 rounded-lg bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-stone-600 hover:text-stone-900 transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1214,14 +1223,14 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
             >
               {/* Chuyển đổi loại tin nếu đang tạo mới */}
               {!editingAgentId && !editingSubId && (
-                <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-950 border border-slate-800">
+                <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-[#ede8dc] border border-stone-300">
                   <button
                     type="button"
                     onClick={() => setFormMode("free-agents")}
-                    className={`py-2 rounded-lg font-extrabold text-xs transition ${
+                    className={`py-2 rounded-lg font-black text-xs transition ${
                       formMode === "free-agents"
-                        ? "bg-emerald-500 text-slate-950"
-                        : "text-slate-400 hover:text-white"
+                        ? "bg-stone-900 text-white shadow-xs"
+                        : "text-stone-700 hover:text-stone-900"
                     }`}
                   >
                     🏃 Tôi là Cầu Thủ Tìm Đội
@@ -1229,10 +1238,10 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                   <button
                     type="button"
                     onClick={() => setFormMode("team-recruit")}
-                    className={`py-2 rounded-lg font-extrabold text-xs transition ${
+                    className={`py-2 rounded-lg font-black text-xs transition ${
                       formMode === "team-recruit"
-                        ? "bg-amber-400 text-slate-950"
-                        : "text-slate-400 hover:text-white"
+                        ? "bg-stone-900 text-white shadow-xs"
+                        : "text-stone-700 hover:text-stone-900"
                     }`}
                   >
                     🛡️ Đội Tôi Cần Tuyển Người
@@ -1244,7 +1253,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               {formMode === "free-agents" ? (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <div className="sm:col-span-2">
-                    <label className="block font-semibold text-slate-300 mb-1">
+                    <label className="block font-bold text-stone-700 mb-1">
                       Tên &amp; Biệt danh cầu thủ
                     </label>
                     <input
@@ -1253,11 +1262,11 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       value={playerName}
                       onChange={(e) => setPlayerName(e.target.value)}
                       placeholder='VD: Tuấn "Cò", Hùng "Gôn"...'
-                      className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                      className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:outline-none focus:border-stone-800"
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-slate-300 mb-1">
+                    <label className="block font-bold text-stone-700 mb-1">
                       Tuổi
                     </label>
                     <input
@@ -1266,14 +1275,14 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       max={65}
                       value={playerAge}
                       onChange={(e) => setPlayerAge(Number(e.target.value))}
-                      className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                      className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:outline-none focus:border-stone-800"
                     />
                   </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block font-semibold text-slate-300 mb-1">
+                    <label className="block font-bold text-stone-700 mb-1">
                       Tên Đội Bóng
                     </label>
                     <input
@@ -1282,11 +1291,11 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       value={teamName}
                       onChange={(e) => setTeamName(e.target.value)}
                       placeholder="VD: FC Anh Em Cầu Giấy"
-                      className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                      className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:outline-none focus:border-stone-800"
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-slate-300 mb-1">
+                    <label className="block font-bold text-stone-700 mb-1">
                       Tên Sân Bóng Thi Đấu
                     </label>
                     <input
@@ -1295,7 +1304,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       value={pitchName}
                       onChange={(e) => setPitchName(e.target.value)}
                       placeholder="VD: Sân Thành Phát"
-                      className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                      className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:outline-none focus:border-stone-800"
                     />
                   </div>
                 </div>
@@ -1303,7 +1312,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
 
               {/* Chọn Vị Trí Thi Đấu */}
               <div>
-                <label className="block font-semibold text-slate-300 mb-1.5">
+                <label className="block font-bold text-stone-700 mb-1.5">
                   Vị trí thi đấu (Chọn GK để kích hoạt Huy hiệu Hàng Hiếm Thủ Môn)
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -1315,9 +1324,9 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       className={`p-2.5 rounded-xl border text-center transition ${
                         positionCode === p.code
                           ? p.code === "GK"
-                            ? "bg-amber-500/25 border-amber-400 text-amber-300 font-black ring-1 ring-amber-400"
-                            : "bg-emerald-500/20 border-emerald-400 text-emerald-300 font-black ring-1 ring-emerald-400"
-                          : "bg-slate-950 border-white/10 text-slate-400"
+                            ? "bg-amber-400 border-amber-500 text-stone-950 font-black shadow-xs"
+                            : "bg-stone-900 border-stone-900 text-white font-black shadow-xs"
+                          : "bg-[#ede8dc] border-stone-300 text-stone-700 hover:text-stone-900"
                       }`}
                     >
                       <div className="text-base">{p.icon}</div>
@@ -1330,10 +1339,10 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               </div>
 
               {/* Ngày thi đấu & Chọn nhanh ngày */}
-              <div className="space-y-1.5 p-2.5 rounded-xl bg-slate-950/80 border border-white/10">
+              <div className="space-y-1.5 p-2.5 rounded-xl bg-[#ede8dc] border border-stone-300">
                 <div className="flex items-center justify-between">
-                  <label className="font-semibold text-slate-300 flex items-center gap-1.5 text-[11px]">
-                    <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                  <label className="font-bold text-stone-800 flex items-center gap-1.5 text-[11px]">
+                    <Calendar className="w-3.5 h-3.5 text-red-600" />
                     <span>Ngày đá ({formatMatchDateDisplay(matchDateIso)})</span>
                   </label>
                   <input
@@ -1342,7 +1351,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     min={getTodayIsoDate()}
                     value={matchDateIso}
                     onChange={(e) => setMatchDateIso(e.target.value)}
-                    className="h-7 px-2 rounded-lg bg-slate-900 border border-emerald-500/40 text-emerald-300 font-mono text-[11px] font-bold"
+                    className="h-7 px-2 rounded-lg bg-[#fbf9f4] border border-stone-300 text-stone-900 font-mono text-[11px] font-bold"
                   />
                 </div>
                 <div className="flex flex-wrap gap-1">
@@ -1353,8 +1362,8 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       onClick={() => setMatchDateIso(d.isoDate)}
                       className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition border ${
                         matchDateIso === d.isoDate
-                          ? "bg-emerald-500/20 border-emerald-400 text-emerald-300"
-                          : "bg-slate-900 border-white/[0.08] text-slate-400 hover:text-white"
+                          ? "bg-stone-900 border-stone-900 text-white font-black"
+                          : "bg-[#fbf9f4] border-stone-300 text-stone-700 hover:text-stone-900 hover:bg-stone-200"
                       }`}
                     >
                       {d.label}
@@ -1366,7 +1375,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               {/* Khu vực, Khung giờ & Chân thuận / Số lượng */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-bold text-stone-700 mb-1">
                     Khu vực Quận/Huyện
                   </label>
                   <input
@@ -1374,11 +1383,11 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     value={district}
                     onChange={(e) => setDistrict(e.target.value)}
                     placeholder="VD: Cầu Giấy, Nam Từ Liêm..."
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:outline-none focus:border-stone-800"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-bold text-stone-700 mb-1">
                     Khung giờ đá
                   </label>
                   <input
@@ -1386,12 +1395,12 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     value={timeSlot}
                     onChange={(e) => setTimeSlot(e.target.value)}
                     placeholder="VD: 19:00 - 20:30, 20:30..."
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-amber-300 font-bold"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-amber-800 font-bold focus:outline-none focus:border-stone-800"
                   />
                 </div>
                 {formMode === "free-agents" ? (
                   <div>
-                    <label className="block font-semibold text-slate-300 mb-1">
+                    <label className="block font-bold text-stone-700 mb-1">
                       Chân thuận
                     </label>
                     <select
@@ -1399,7 +1408,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       onChange={(e) =>
                         setPreferredFoot(e.target.value as any)
                       }
-                      className="w-full h-9 px-2.5 rounded-xl bg-slate-950 border border-white/10 text-white"
+                      className="w-full h-9 px-2.5 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:outline-none focus:border-stone-800"
                     >
                       <option value="Chân phải">Chân phải</option>
                       <option value="Chân trái">Chân trái</option>
@@ -1408,7 +1417,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                   </div>
                 ) : (
                   <div>
-                    <label className="block font-semibold text-slate-300 mb-1">
+                    <label className="block font-bold text-stone-700 mb-1">
                       Số lượng cần tuyển
                     </label>
                     <input
@@ -1417,7 +1426,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                       max={7}
                       value={quantity}
                       onChange={(e) => setQuantity(Number(e.target.value))}
-                      className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                      className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:outline-none focus:border-stone-800"
                     />
                   </div>
                 )}
@@ -1426,7 +1435,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               {/* Chọn Tier & Ghi chú trao đổi kinh phí */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-bold text-stone-700 mb-1">
                     Phân tầng trình độ (Tier)
                   </label>
                   <select
@@ -1434,7 +1443,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     onChange={(e) =>
                       setSkillTier(Number(e.target.value) as SkillTier)
                     }
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:outline-none focus:border-stone-800"
                   >
                     <option value={1}>Tier 1: Dưỡng sinh (Cấm va chạm)</option>
                     <option value={2}>Tier 2: Phong trào văn phòng</option>
@@ -1443,10 +1452,10 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                 </div>
 
                 <div className="flex flex-col justify-end">
-                  <div className="p-2.5 rounded-xl bg-slate-950/80 border border-emerald-500/20 text-[11px] text-slate-300 flex items-center gap-2">
+                  <div className="p-2.5 rounded-xl bg-[#ede8dc] border border-stone-300 text-[11px] text-stone-700 flex items-center gap-2">
                     <span className="text-base">💬</span>
                     <span>
-                      <strong className="text-emerald-400">Trao đổi qua Zalo:</strong> Tiền sân, nước uống và màu áo hai bên chủ động thống nhất khi kết nối.
+                      <strong className="text-emerald-800">Trao đổi qua Zalo:</strong> Tiền sân, nước uống và màu áo hai bên chủ động thống nhất khi kết nối.
                     </span>
                   </div>
                 </div>
@@ -1455,7 +1464,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               {/* Số điện thoại Zalo & Ghi chú */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-bold text-stone-700 mb-1">
                     SĐT / Zalo liên hệ 1-chạm
                   </label>
                   <input
@@ -1464,11 +1473,11 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="VD: 0988.234.567"
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white font-mono"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 font-mono focus:outline-none focus:border-stone-800"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-bold text-stone-700 mb-1">
                     Giới thiệu lối đá / Lời nhắn
                   </label>
                   <input
@@ -1476,28 +1485,28 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                     value={bioOrNotes}
                     onChange={(e) => setBioOrNotes(e.target.value)}
                     placeholder="VD: Đá nhiệt tình, không vào bóng rát..."
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:outline-none focus:border-stone-800"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-stone-300">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setIsPostModalOpen(false)}
-                  className="h-9 text-xs text-slate-400"
+                  className="h-9 text-xs text-stone-600 hover:text-stone-900"
                 >
                   Hủy
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-9 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs disabled:opacity-50 flex items-center gap-1.5"
+                  className="ticket-stub h-9 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs disabled:opacity-50 flex items-center gap-1.5 shadow-sm"
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                      <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       <span>Đang Lưu Lên Chợ Cầu...</span>
                     </>
                   ) : editingAgentId || editingSubId ? (

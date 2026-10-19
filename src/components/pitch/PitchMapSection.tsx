@@ -867,34 +867,37 @@ export const PitchMapSection: React.FC = () => {
   }, [activePitch]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-4 text-slate-100">
+    <div className="w-full max-w-4xl mx-auto space-y-4 text-stone-900">
       
-      {/* HEADER WIDGET: BẢN ĐỒ CỤM SÂN BÓNG ĐÁ HÀ NỘI */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-4 sm:p-5 shadow-2xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-3.5">
+      {/* HEADER WIDGET: BẢN ĐỒ CỤM SÂN BÓNG ĐÁ HÀ NỘI (VINTAGE RETRO STYLE) */}
+      <div className="card-retro-paper relative overflow-hidden rounded-3xl border border-stone-300 p-4 sm:p-5 shadow-lg">
+        <div className="washi-tape -top-2.5 left-8 rotate-[-2deg]" />
+        <div className="washi-tape -top-2.5 right-8 rotate-[2deg]" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-3.5 relative z-10 pt-1">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-sky-400 flex items-center justify-center text-slate-950 shadow-lg shadow-emerald-500/20 font-black">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 shadow-inner font-black shrink-0">
               <MapPin className="w-6 h-6 stroke-[2.5]" />
             </div>
             <div>
-              <div className="flex items-center space-x-2">
-                <h2 className="text-base sm:text-lg font-extrabold text-white">Bản Đồ Cụm Sân Bóng Phủi Hà Nội</h2>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">
+              <div className="flex items-center space-x-2 flex-wrap">
+                <h2 className="text-base sm:text-xl font-black text-stone-900">Bản Đồ Cụm Sân Bóng Phủi Hà Nội</h2>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
                   {HANOI_PITCHES.length} Cụm Sân Tuyển Chọn
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-stone-600 mt-0.5 font-medium">
                 Bản đồ Google Maps tương tác trực tiếp • Chỉ đường bằng giọng nói 1-chạm • Bãi đỗ ô tô &amp; Hotline đặt sân
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <a
               href={computedDirectionsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md transition cursor-pointer"
+              className="ticket-stub px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs flex items-center gap-1.5 shadow-md transition cursor-pointer"
             >
               <Navigation className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Chỉ Đường Sân Đang Chọn</span>
@@ -904,15 +907,15 @@ export const PitchMapSection: React.FC = () => {
         </div>
 
         {/* THANH TÌM KIẾM NHANH SÂN BÓNG */}
-        <div className="pt-3 flex flex-col sm:flex-row gap-2">
+        <div className="pt-3 flex flex-col sm:flex-row gap-2 relative z-10">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm theo tên sân (Phòng Không, Kim Giang, Định Công, Linh Đàm, Thành Phát...), đường phố..."
-              className="w-full h-9 pl-9 pr-3 rounded-xl bg-slate-950/90 border border-white/[0.1] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full h-9 pl-9 pr-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-stone-800"
             />
           </div>
 
@@ -930,8 +933,8 @@ export const PitchMapSection: React.FC = () => {
                 onClick={() => setAmenityFilter(f.id)}
                 className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap border transition ${
                   amenityFilter === f.id
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                    : 'bg-slate-950 border-white/[0.08] text-slate-400 hover:text-white'
+                    ? 'bg-stone-900 text-white font-black border-stone-900 shadow-sm'
+                    : 'bg-[#ede8dc] border-stone-300 text-stone-700 hover:text-stone-900 hover:bg-stone-200'
                 }`}
               >
                 {f.label}
@@ -941,9 +944,9 @@ export const PitchMapSection: React.FC = () => {
         </div>
 
         {/* DISTRICT FILTER CHIPS - ĐẦY ĐỦ CÁC QUẬN TRỌNG ĐIỂM */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pt-2 pb-0.5 text-xs">
-          <span className="text-slate-400 text-[11px] font-medium shrink-0 mr-1 flex items-center">
-            <MapPin className="w-3 h-3 text-emerald-400 mr-0.5" /> Khu vực:
+        <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pt-2 pb-0.5 text-xs relative z-10">
+          <span className="text-stone-700 text-[11px] font-bold shrink-0 mr-1 flex items-center">
+            <MapPin className="w-3 h-3 text-red-600 mr-0.5" /> Khu vực:
           </span>
           {[
             { id: 'all', label: 'Tất cả Hà Nội' },
@@ -961,10 +964,10 @@ export const PitchMapSection: React.FC = () => {
             <button
               key={d.id}
               onClick={() => setSelectedDistrict(d.id)}
-              className={`px-3 py-1 rounded-full text-[11px] font-semibold shrink-0 transition-all border ${
+              className={`px-3 py-1 rounded-full text-[11px] font-bold shrink-0 transition-all border ${
                 selectedDistrict === d.id 
-                  ? 'bg-emerald-500/20 text-emerald-200 border-emerald-400 ring-1 ring-emerald-400 shadow-sm' 
-                  : 'bg-slate-950 text-slate-400 border-white/[0.08] hover:text-slate-200'
+                  ? 'bg-stone-900 text-white font-black border-stone-900 shadow-sm' 
+                  : 'bg-[#ede8dc] text-stone-700 border-stone-300 hover:text-stone-900 hover:bg-stone-200'
               }`}
             >
               {d.label}
@@ -974,18 +977,18 @@ export const PitchMapSection: React.FC = () => {
       </div>
 
       {/* TÍNH NĂNG CHỦ KÈO TÍCH HỢP VỊ TRÍ GOOGLE MAPS */}
-      <div className="bg-gradient-to-r from-sky-950/60 via-slate-900 to-slate-950 p-3.5 rounded-2xl border border-sky-600/40 space-y-2">
+      <div className="card-retro-paper p-3.5 rounded-2xl border border-stone-300 space-y-2 shadow-sm text-stone-900 relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Compass className="w-4 h-4 text-sky-400" />
-            <span className="text-xs font-bold text-white">Chủ Kèo Được Tích Hợp Vị Trí Lên Google Maps</span>
+            <Compass className="w-4 h-4 text-blue-700" />
+            <span className="text-xs font-black text-stone-900">Chủ Kèo Được Tích Hợp Vị Trí Lên Google Maps</span>
           </div>
-          <span className="text-[10px] bg-sky-500/20 text-sky-300 font-bold px-2 py-0.5 rounded border border-sky-500/30">
+          <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded border border-blue-300">
             Chỉ Đường 1-Chạm
           </span>
         </div>
 
-        <p className="text-[11px] text-slate-300 leading-relaxed">
+        <p className="text-[11px] text-stone-600 leading-relaxed font-medium">
           Đội chủ nhà khi tạo kèo có thể dán link ghim Google Maps hoặc hệ thống sẽ tự động tạo link dẫn đường chuẩn xác từ Tên sân + Địa chỉ bạn điền. Đối thủ bấm vào là mở Google Maps dẫn đường ngay.
         </p>
 
@@ -995,13 +998,13 @@ export const PitchMapSection: React.FC = () => {
             value={hostCustomGmapsLink}
             onChange={(e) => setHostCustomGmapsLink(e.target.value)}
             placeholder="Dán link Google Maps hoặc để trống để định vị theo cụm sân đang chọn"
-            className="flex-1 bg-slate-950 border border-white/[0.1] rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-sky-500 focus:outline-none font-mono"
+            className="flex-1 bg-[#fbf9f4] border border-stone-300 rounded-xl px-3 py-1.5 text-xs text-stone-900 placeholder-stone-400 focus:border-stone-800 focus:outline-none font-mono"
           />
           <a
             href={computedTestGmapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold shrink-0 flex items-center justify-center space-x-1.5 transition-all shadow cursor-pointer"
+            className="ticket-stub px-3.5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold shrink-0 flex items-center justify-center space-x-1.5 transition-all shadow cursor-pointer"
           >
             <Navigation className="w-3.5 h-3.5" />
             <span>Test Link Google Maps</span>
@@ -1014,7 +1017,7 @@ export const PitchMapSection: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Cột trái: Danh sách các cụm sân */}
         <div className="space-y-2 max-h-[580px] overflow-y-auto pr-1">
-          <div className="flex items-center justify-between px-1 text-[11px] font-bold text-slate-400">
+          <div className="flex items-center justify-between px-1 text-[11px] font-bold text-stone-600">
             <span>Tìm thấy {filteredPitches.length} cụm sân</span>
             <span>Bấm để xem chi tiết</span>
           </div>
@@ -1024,32 +1027,32 @@ export const PitchMapSection: React.FC = () => {
               <div
                 key={pitch.id}
                 onClick={() => setSelectedPitchId(pitch.id)}
-                className={`p-3 rounded-2xl border cursor-pointer transition-all ${
+                className={`card-retro-paper p-3 rounded-2xl border cursor-pointer transition-all ${
                   isSelected 
-                    ? 'bg-emerald-950/40 border-emerald-500 shadow-lg shadow-emerald-500/10 ring-1 ring-emerald-500/40' 
-                    : 'bg-slate-950/80 border-white/[0.08] hover:border-white/20 hover:bg-slate-900/60'
+                    ? 'border-2 border-emerald-700 bg-emerald-50/50 shadow-md ring-1 ring-emerald-700/30' 
+                    : 'border-stone-300 hover:border-stone-400 hover:bg-[#f5f2e9]'
                 }`}
               >
                 <div className="flex items-start justify-between gap-1.5">
                   <div className="min-w-0">
-                    <h3 className={`text-xs font-bold truncate ${isSelected ? 'text-emerald-300' : 'text-white'}`}>
+                    <h3 className={`text-xs truncate ${isSelected ? 'text-emerald-900 font-black' : 'text-stone-900 font-bold'}`}>
                       {pitch.name}
                     </h3>
-                    <p className="text-[11px] text-slate-400 mt-0.5 flex items-center">
-                      <MapPin className="w-3 h-3 text-emerald-400 mr-1 shrink-0" />
+                    <p className="text-[11px] text-stone-600 mt-0.5 flex items-center">
+                      <MapPin className="w-3 h-3 text-red-600 mr-1 shrink-0" />
                       <span className="truncate">{pitch.address}</span>
                     </p>
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-900 text-slate-300 font-semibold shrink-0 border border-white/5">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#ede8dc] text-stone-700 font-bold shrink-0 border border-stone-300">
                     {pitch.totalSubPitches} sân 7
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] text-slate-400 mt-2 pt-2 border-t border-white/[0.06]">
-                  <span className="text-emerald-400 font-medium truncate max-w-[170px]">
+                <div className="flex items-center justify-between text-[10px] text-stone-600 mt-2 pt-2 border-t border-stone-200">
+                  <span className="text-emerald-800 font-bold truncate max-w-[170px]">
                     {pitch.parkingFee.split('(')[0]}
                   </span>
-                  <span className="text-amber-400 font-bold shrink-0">
+                  <span className="text-amber-700 font-black shrink-0">
                     ★ {pitch.rating}
                   </span>
                 </div>
@@ -1058,7 +1061,7 @@ export const PitchMapSection: React.FC = () => {
           })}
 
           {filteredPitches.length === 0 && (
-            <div className="p-6 rounded-2xl border border-dashed border-white/10 bg-slate-950/40 text-center text-xs text-slate-400">
+            <div className="card-retro-paper p-6 rounded-2xl border border-dashed border-stone-300 text-center text-xs text-stone-600">
               Không tìm thấy cụm sân phù hợp với bộ lọc. Hãy thử chọn quận khác hoặc xóa từ khóa tìm kiếm.
             </div>
           )}
@@ -1067,8 +1070,8 @@ export const PitchMapSection: React.FC = () => {
         {/* Cột phải: Khung bản đồ Google Maps trực tiếp & Thông số cụm sân đang chọn */}
         <div className="md:col-span-2 space-y-3">
           
-          {/* 1. MÀN HÌNH BẢN ĐỒ GOOGLE MAPS TƯƠNG TÁC THẬT 100% (KHÔNG DÙNG RADAR ẢO) */}
-          <div className="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-white/[0.1] bg-slate-950 shadow-2xl flex flex-col justify-between">
+          {/* 1. MÀN HÌNH BẢN ĐỒ GOOGLE MAPS TƯƠNG TÁC THẬT 100% */}
+          <div className="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-stone-300 bg-stone-100 shadow-lg flex flex-col justify-between">
             <iframe
               title={`Google Maps ${activePitch.name}`}
               src={googleMapsEmbedUrl}
@@ -1083,26 +1086,26 @@ export const PitchMapSection: React.FC = () => {
 
             {/* Floating Top Badge */}
             <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
-              <span className="text-[11px] bg-slate-950/90 backdrop-blur-md text-emerald-300 font-bold px-2.5 py-1 rounded-lg border border-emerald-500/40 shadow flex items-center gap-1.5 pointer-events-auto">
-                <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-[11px] bg-white/95 backdrop-blur-md text-stone-900 font-black px-2.5 py-1 rounded-lg border border-stone-300 shadow flex items-center gap-1.5 pointer-events-auto">
+                <MapPin className="w-3.5 h-3.5 text-red-600" />
                 <span className="truncate max-w-[200px] sm:max-w-xs">{activePitch.name}</span>
               </span>
-              <span className="text-[11px] bg-emerald-500 text-slate-950 font-black px-2.5 py-1 rounded-lg shadow pointer-events-auto">
+              <span className="text-[11px] bg-stone-900 text-white font-black px-2.5 py-1 rounded-lg shadow pointer-events-auto">
                 {activePitch.districtLabel}
               </span>
             </div>
 
             {/* Floating Bottom Action Bar */}
-            <div className="absolute bottom-2.5 left-2.5 right-2.5 bg-slate-950/95 backdrop-blur-md p-2.5 rounded-xl border border-white/10 flex items-center justify-between gap-2 shadow-2xl">
+            <div className="absolute bottom-2.5 left-2.5 right-2.5 bg-white/95 backdrop-blur-md p-2.5 rounded-xl border border-stone-300 flex items-center justify-between gap-2 shadow-lg">
               <div className="truncate text-xs">
-                <span className="font-extrabold text-white block truncate">{activePitch.name}</span>
-                <span className="text-[11px] text-slate-400 truncate block">{activePitch.address}</span>
+                <span className="font-black text-stone-900 block truncate">{activePitch.name}</span>
+                <span className="text-[11px] text-stone-600 truncate block font-medium">{activePitch.address}</span>
               </div>
               <div className="flex items-center space-x-1.5 shrink-0">
                 <button
                   type="button"
                   onClick={() => handleShareZaloLocation(activePitch)}
-                  className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded-lg border border-emerald-500/30 transition-all flex items-center space-x-1"
+                  className="ticket-stub px-2.5 py-1.5 bg-[#ede8dc] hover:bg-stone-200 text-stone-800 rounded-lg border border-stone-300 transition-all flex items-center space-x-1"
                   title="Gửi vị trí Zalo"
                 >
                   <Share2 className="w-3.5 h-3.5" />
@@ -1112,7 +1115,7 @@ export const PitchMapSection: React.FC = () => {
                   href={computedDirectionsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 rounded-lg font-black text-[11px] shadow flex items-center space-x-1 transition-all cursor-pointer"
+                  className="ticket-stub px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white rounded-lg font-black text-[11px] shadow flex items-center space-x-1 transition-all cursor-pointer"
                 >
                   <Navigation className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Mở Google Maps</span>
@@ -1123,69 +1126,69 @@ export const PitchMapSection: React.FC = () => {
           </div>
 
           {/* 2. THÔNG SỐ KỸ THUẬT & DỊCH VỤ THỰC TẾ CỦA CỤM SÂN */}
-          <div className="bg-slate-900/80 border border-white/[0.08] rounded-2xl p-4 space-y-3 text-xs">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/[0.08] pb-2.5 gap-1.5">
+          <div className="card-retro-paper border border-stone-300 rounded-2xl p-4 space-y-3 text-xs text-stone-800 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-stone-200 pb-2.5 gap-1.5">
               <div>
-                <span className="font-extrabold text-white text-sm">Thông Số Kỹ Thuật &amp; Bãi Đỗ Xe Thực Tế</span>
-                <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2">
-                  <span className="text-amber-400 font-bold">★ {activePitch.rating}/5.0 ({activePitch.reviewCount} đánh giá)</span>
+                <span className="font-black text-stone-900 text-sm">Thông Số Kỹ Thuật &amp; Bãi Đỗ Xe Thực Tế</span>
+                <div className="text-[11px] text-stone-600 mt-0.5 flex items-center gap-2">
+                  <span className="text-amber-700 font-bold">★ {activePitch.rating}/5.0 ({activePitch.reviewCount} đánh giá)</span>
                   <span>•</span>
                   <span>{activePitch.openingHours}</span>
                 </div>
               </div>
-              <span className="text-slate-300 font-mono text-[11px] bg-slate-950 px-2.5 py-1 rounded-lg border border-white/5">
-                Quản lý: <strong className="text-emerald-300">{activePitch.managerName}</strong>
+              <span className="text-stone-700 font-mono text-[11px] bg-[#ede8dc] px-2.5 py-1 rounded-lg border border-stone-300">
+                Quản lý: <strong className="text-emerald-800 font-bold">{activePitch.managerName}</strong>
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-300">
-              <div className="bg-slate-950 p-2.5 rounded-xl border border-white/[0.06] flex items-start space-x-2">
-                <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-stone-700">
+              <div className="bg-[#ede8dc] p-2.5 rounded-xl border border-stone-200 flex items-start space-x-2">
+                <Sparkles className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-white block">Mặt cỏ sân 7:</strong>
+                  <strong className="text-stone-900 block font-bold">Mặt cỏ sân 7:</strong>
                   <span>{activePitch.turfType}</span>
                 </div>
               </div>
 
-              <div className="bg-slate-950 p-2.5 rounded-xl border border-white/[0.06] flex items-start space-x-2">
-                <Car className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+              <div className="bg-[#ede8dc] p-2.5 rounded-xl border border-stone-200 flex items-start space-x-2">
+                <Car className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-white block">Bãi đỗ ô tô &amp; xe máy:</strong>
+                  <strong className="text-stone-900 block font-bold">Bãi đỗ ô tô &amp; xe máy:</strong>
                   <span>{activePitch.parkingFee}</span>
                 </div>
               </div>
 
-              <div className="bg-slate-950 p-2.5 rounded-xl border border-white/[0.06] flex items-start space-x-2">
-                <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div className="bg-[#ede8dc] p-2.5 rounded-xl border border-stone-200 flex items-start space-x-2">
+                <Zap className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-white block">Hệ thống chiếu sáng:</strong>
+                  <strong className="text-stone-900 block font-bold">Hệ thống chiếu sáng:</strong>
                   <span>{activePitch.floodlight}</span>
                 </div>
               </div>
 
-              <div className="bg-slate-950 p-2.5 rounded-xl border border-white/[0.06] flex items-start space-x-2">
-                <Clock className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+              <div className="bg-[#ede8dc] p-2.5 rounded-xl border border-stone-200 flex items-start space-x-2">
+                <Clock className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-white block">Giá thuê tham khảo:</strong>
-                  <span className="text-rose-300 font-bold">{activePitch.priceRange}</span>
+                  <strong className="text-stone-900 block font-bold">Giá thuê tham khảo:</strong>
+                  <span className="text-red-700 font-black">{activePitch.priceRange}</span>
                 </div>
               </div>
             </div>
 
             {/* Hotline gọi trực tiếp */}
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+            <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
                   <Phone className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-[11px] font-bold text-white">Hotline quản lý đặt sân:</div>
-                  <div className="text-[10px] text-slate-400">Gọi xác nhận trống sân ca 17:30, 19:00, 20:30</div>
+                  <div className="text-[11px] font-bold text-stone-900">Hotline quản lý đặt sân:</div>
+                  <div className="text-[10px] text-stone-600">Gọi xác nhận trống sân ca 17:30, 19:00, 20:30</div>
                 </div>
               </div>
               <a
                 href={`tel:${activePitch.phone}`}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center gap-1 shadow transition cursor-pointer"
+                className="ticket-stub px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs flex items-center gap-1 shadow transition cursor-pointer"
               >
                 <Phone className="w-3.5 h-3.5 fill-current" />
                 <span>{activePitch.phone}</span>
@@ -1194,16 +1197,16 @@ export const PitchMapSection: React.FC = () => {
 
             {/* Danh sách tiện ích có sẵn tại sân */}
             <div className="pt-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+              <span className="text-[10px] font-bold text-stone-600 uppercase tracking-wider block mb-1.5">
                 Tiện ích thực tế có sẵn tại cụm sân:
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {activePitch.amenities.map((item, idx) => (
                   <span 
                     key={idx} 
-                    className="px-2.5 py-1 bg-slate-950 border border-white/[0.08] text-slate-300 rounded-lg text-[10px] flex items-center gap-1"
+                    className="px-2.5 py-1 bg-[#ede8dc] border border-stone-300 text-stone-700 rounded-lg text-[10px] flex items-center gap-1 font-medium"
                   >
-                    <Check className="w-3 h-3 text-emerald-400" />
+                    <Check className="w-3 h-3 text-emerald-700" />
                     <span>{item}</span>
                   </span>
                 ))}
