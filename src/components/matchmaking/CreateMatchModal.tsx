@@ -76,6 +76,7 @@ interface CreateMatchModalProps {
   onRequireAuth?: () => void;
   escrowWallet?: EscrowWallet;
   onOpenEscrowModal?: () => void;
+  initialIsSos?: boolean;
 }
 
 export function CreateMatchModal({
@@ -87,6 +88,7 @@ export function CreateMatchModal({
   onRequireAuth,
   escrowWallet,
   onOpenEscrowModal,
+  initialIsSos,
 }: CreateMatchModalProps) {
   const [hostTeamName, setHostTeamName] = useState(
     verifiedTeam?.team_name || MOCK_TEAMS[0].name
@@ -124,7 +126,7 @@ export function CreateMatchModal({
   const [totalCost, setTotalCost] = useState(850000);
   const [splitRatio, setSplitRatio] = useState<SplitCostRatio>("50_50");
   const [customRatioText, setCustomRatioText] = useState("");
-  const [isSOS, setIsSOS] = useState(false);
+  const [isSOS, setIsSOS] = useState(Boolean(initialIsSos));
   const [notes, setNotes] = useState(
     "Đội văn minh, đúng giờ, giao lưu vui vẻ sau giờ làm."
   );
@@ -139,18 +141,21 @@ export function CreateMatchModal({
   React.useEffect(() => {
     if (isOpen) {
       setIsSubmitting(false);
+      if (typeof initialIsSos === "boolean") {
+        setIsSOS(initialIsSos);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, initialIsSos]);
 
   const quickDates = React.useMemo(() => getQuickDateOptions(4), [isOpen]);
 
   const isSelectedTimeExpired = React.useMemo(() => {
     return isMatchExpired(
       { matchDate: matchDateIso, matchDateIso, startTime: timeSlot },
-      15,
+      isSOS ? 90 : 15,
       Date.now()
     );
-  }, [matchDateIso, timeSlot]);
+  }, [matchDateIso, timeSlot, isSOS]);
 
   const effectiveGmapsUrl = React.useMemo(() => {
     if (!isGmapsIntegrated) return undefined;
@@ -275,7 +280,7 @@ export function CreateMatchModal({
           matchDateIso,
           startTime: startTime || "19:00",
         },
-        15
+        isSOS ? 90 : 15
       );
 
       const newMatch: MatchFeedItem = {

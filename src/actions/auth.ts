@@ -773,12 +773,13 @@ export async function createMatchInDatabaseAction(payload: {
       }
     }
 
-    // Đóng gói metadata địa chỉ, gmaps, expires_at vào notes an toàn (chống lỗi thiếu cột trên PostgreSQL)
+    // Đóng gói metadata địa chỉ, gmaps, expires_at, isSos vào notes an toàn (chống lỗi thiếu cột trên PostgreSQL)
     const extraMeta = {
       address: payload.pitchAddress || undefined,
       gmapsUrl: payload.gmapsUrl || undefined,
       isGmapsIntegrated: payload.isGmapsIntegrated,
       expiresAt: expiresDate.toISOString(),
+      isSos: Boolean(payload.isSos),
       rawNotes: payload.notes || "",
     };
     const combinedNotes = payload.notes
@@ -1215,25 +1216,36 @@ export async function cleanupExpiredMatchesServerAction() {
     }
 
     // Fallback: Quét trực tiếp bằng query
+    // 1. Quét kèo thường (không phải SOS) quá 15 phút sau bóng lăn
     const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
-    const { data: updated, error: updateErr } = await adminClient
+    const { data: updatedNormal } = await adminClient
       .from("matches")
       .update({
         status: "expired",
         notes: "[Tự động đóng bài đăng do quá giờ bóng lăn 15 phút chưa có đối]",
       })
       .eq("status", "open")
+      .eq("is_sos", false)
       .lte("kickoff_time", fifteenMinutesAgo)
       .select("id");
 
-    if (updateErr) {
-      return { success: false, error: updateErr.message };
-    }
+    // 2. Quét kèo SOS (Cứu hộ khẩn cấp) quá 90 phút sau bóng lăn
+    const ninetyMinutesAgo = new Date(Date.now() - 90 * 60 * 1000).toISOString();
+    const { data: updatedSos } = await adminClient
+      .from("matches")
+      .update({
+        status: "expired",
+        notes: "[Tự động đóng bài đăng cứu hộ SOS do quá giờ bóng lăn 90 phút]",
+      })
+      .eq("status", "open")
+      .eq("is_sos", true)
+      .lte("kickoff_time", ninetyMinutesAgo)
+      .select("id");
 
     revalidatePath("/");
     return {
       success: true,
-      cleaned_count: updated?.length || 0,
+      cleaned_count: (updatedNormal?.length || 0) + (updatedSos?.length || 0),
       timestamp: new Date().toISOString(),
     };
   } catch (err: any) {

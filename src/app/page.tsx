@@ -122,6 +122,7 @@ export default function HanoiMatchmakingPlatform() {
   const [respondingCancelMatch, setRespondingCancelMatch] = useState<MatchFeedItem | null>(null);
   const [latestBroadcast, setLatestBroadcast] = useState<EmergencyBroadcastItem | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isCreateSosMode, setIsCreateSosMode] = useState(false);
   const [isBotDrawerOpen, setIsBotDrawerOpen] = useState(false);
   const [unreadBotCount, setUnreadBotCount] = useState(1);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
@@ -308,8 +309,8 @@ export default function HanoiMatchmakingPlatform() {
   const filteredMatches = useMemo(() => {
     return matches.filter((m) => {
       if (m.status === "CANCELLED" || m.status === "EXPIRED") return false;
-      // TẦNG 2: Tự động loại bỏ kèo mở quá 15 phút sau bóng lăn chưa có đối
-      if (isMatchExpired(m, 15, nowTick)) return false;
+      // TẦNG 2: Tự động loại bỏ kèo mở quá thời hạn (Kèo thường 15 phút, Kèo SOS 90 phút)
+      if (isMatchExpired(m, m.isSOS ? 90 : 15, nowTick)) return false;
 
       const passDistrict =
         selectedDistrict === "ALL" ||
@@ -385,12 +386,29 @@ export default function HanoiMatchmakingPlatform() {
     }, 5200);
   };
 
-  const sosMatches = filteredMatches.filter(
-    (m) => m.isSOS && m.status !== "MATCHED"
-  );
-  const regularMatches = filteredMatches.filter(
-    (m) => !m.isSOS || m.status === "MATCHED"
-  );
+  // 🚨 Kèo SOS: Độc lập với bộ lọc khung giờ khắt khe của Feed để hiển thị 100% trên toàn thành phố (hoạt động 90 phút sau bóng lăn)
+  const sosMatches = useMemo(() => {
+    return matches.filter((m) => {
+      if (!m.isSOS || m.status === "MATCHED" || m.status === "CANCELLED" || m.status === "EXPIRED") return false;
+      if (isMatchExpired(m, 90, nowTick)) return false;
+
+      const q = searchQuery.trim().toLowerCase();
+      if (!q) return true;
+      return (
+        m.pitchName.toLowerCase().includes(q) ||
+        m.pitchAddress.toLowerCase().includes(q) ||
+        m.district.toLowerCase().includes(q) ||
+        m.hostTeam.name.toLowerCase().includes(q) ||
+        m.hostTeam.captainName.toLowerCase().includes(q)
+      );
+    });
+  }, [matches, searchQuery, nowTick]);
+
+  const regularMatches = useMemo(() => {
+    return filteredMatches.filter(
+      (m) => !m.isSOS || m.status === "MATCHED"
+    );
+  }, [filteredMatches]);
 
   // Xử lý nạp tiền vào Ví Ký Quỹ Nội Bộ (VietQR Napas247)
   const handleDepositEscrow = (amount: number) => {
@@ -1412,7 +1430,7 @@ export default function HanoiMatchmakingPlatform() {
           {/* WORKSPACE 2: TAB CỨU HỘ SOS CHUYÊN BIỆT */}
           {activeTab === "sos" && (
             <div className="space-y-4">
-              <div className="rounded-2xl bg-gradient-to-r from-rose-950/70 via-slate-900 to-slate-900 border border-rose-500/40 p-4 flex items-center justify-between">
+              <div className="rounded-2xl bg-gradient-to-r from-rose-950/70 via-slate-900 to-slate-900 border border-rose-500/40 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <h2 className="text-sm sm:text-base font-black text-rose-400 flex items-center gap-2">
                     <Flame className="w-4 h-4 fill-current animate-bounce" />
@@ -1422,11 +1440,18 @@ export default function HanoiMatchmakingPlatform() {
                     Cứu kèo giúp sân không bị bỏ trống • Thưởng +8 điểm tín nhiệm &amp; Bảo chứng an toàn 100%
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                   <PhuiSticker variant="the-phat" size={70} angle={6} className="hidden sm:inline-block shrink-0" />
-                  <span className="px-2.5 py-1 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-black">
-                    Ưu tiên số 1
-                  </span>
+                  <button
+                    onClick={() => {
+                      setIsCreateSosMode(true);
+                      setIsCreateOpen(true);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-black text-xs shadow-lg shadow-rose-500/30 flex items-center gap-1.5 transition active:scale-95 shrink-0"
+                  >
+                    <Flame className="w-3.5 h-3.5 fill-current" />
+                    <span>Phát Tín Hiệu SOS</span>
+                  </button>
                 </div>
               </div>
 
@@ -1449,8 +1474,19 @@ export default function HanoiMatchmakingPlatform() {
                   })}
                 </div>
               ) : (
-                <div className="surface-card rounded-2xl border border-white/[0.08] p-8 text-center text-xs text-slate-400">
-                  Hiện tại không có kèo SOS nào cần cứu hộ. Hãy kiểm tra lại sau hoặc mở kèo mới!
+                <div className="surface-card rounded-2xl border border-white/[0.08] p-8 text-center space-y-3 text-xs text-slate-400">
+                  <p>Hiện tại không có kèo SOS nào cần cứu hộ.</p>
+                  <p className="text-slate-300">Đội bạn đang bị đối thủ bùng kèo hoặc thiếu đối phút chót?</p>
+                  <button
+                    onClick={() => {
+                      setIsCreateSosMode(true);
+                      setIsCreateOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md transition active:scale-95"
+                  >
+                    <Flame className="w-3.5 h-3.5 fill-current" />
+                    <span>Phát Tín Hiệu Cứu Kèo Khẩn Cấp Ngay</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -1583,7 +1619,11 @@ export default function HanoiMatchmakingPlatform() {
       {/* Modal Đăng Kèo Mới */}
       <CreateMatchModal
         isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
+        onClose={() => {
+          setIsCreateOpen(false);
+          setIsCreateSosMode(false);
+        }}
+        initialIsSos={isCreateSosMode}
         onCreateMatch={handleCreateNewMatch}
         verifiedTeam={team}
         verifiedProfile={profile}

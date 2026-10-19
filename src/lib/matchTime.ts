@@ -274,27 +274,30 @@ export function getMatchExpiresDate(
     matchDateIso?: string;
     startTime?: string;
     createdAt?: string;
+    isSOS?: boolean;
   },
   graceMinutes = 15
 ): Date {
+  const effectiveGrace = match.isSOS ? Math.max(90, graceMinutes) : graceMinutes;
+
   // 1. Nếu có sẵn expiresAt chuẩn ISO (VD: từ kèo test mô phỏng 5s hoặc từ DB)
   if (match.expiresAt) {
     const parsed = new Date(match.expiresAt);
     if (!isNaN(parsed.getTime())) return parsed;
   }
 
-  // 2. Tính từ Ngày thi đấu (ưu tiên matchDateIso YYYY-MM-DD) + Giờ bắt đầu + 15 phút
+  // 2. Tính từ Ngày thi đấu (ưu tiên matchDateIso YYYY-MM-DD) + Giờ bắt đầu + graceMinutes
   const kickoff = getMatchKickoffDate(
     match.matchDateIso || match.matchDate || "Hôm nay",
     match.startTime || "19:00",
     match.kickoffTime
   );
 
-  return new Date(kickoff.getTime() + graceMinutes * 60 * 1000);
+  return new Date(kickoff.getTime() + effectiveGrace * 60 * 1000);
 }
 
 /**
- * Kiểm tra xem kèo mở có bị quá hạn (>15 phút sau giờ bóng lăn của ĐÚNG NGÀY ĐÓ) hay không
+ * Kiểm tra xem kèo mở có bị quá hạn (>15 phút sau giờ bóng lăn của ĐÚNG NGÀY ĐÓ, hoặc >90 phút đối với Kèo SOS) hay không
  */
 export function isMatchExpired(
   match: {
@@ -305,6 +308,7 @@ export function isMatchExpired(
     matchDateIso?: string;
     startTime?: string;
     createdAt?: string;
+    isSOS?: boolean;
   },
   graceMinutesOrNow: number | Date = 15,
   currentTimestamp: number | Date = Date.now()
@@ -321,16 +325,18 @@ export function isMatchExpired(
     return false;
   }
 
-  let graceMinutes = 15;
+  let graceMinutes = match.isSOS ? 90 : 15;
   let nowMs = Date.now();
 
   if (graceMinutesOrNow instanceof Date) {
     nowMs = graceMinutesOrNow.getTime();
-    graceMinutes = typeof currentTimestamp === "number" && currentTimestamp < 1000 ? currentTimestamp : 15;
+    graceMinutes = typeof currentTimestamp === "number" && currentTimestamp < 1000
+      ? currentTimestamp
+      : (match.isSOS ? 90 : 15);
   } else if (typeof graceMinutesOrNow === "number" && graceMinutesOrNow > 100000) {
     nowMs = graceMinutesOrNow;
   } else {
-    graceMinutes = graceMinutesOrNow;
+    graceMinutes = match.isSOS ? Math.max(90, graceMinutesOrNow) : graceMinutesOrNow;
     nowMs =
       currentTimestamp instanceof Date
         ? currentTimestamp.getTime()

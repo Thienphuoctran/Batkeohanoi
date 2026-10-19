@@ -115,8 +115,24 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
   }
   const matchDateLabel = formatMatchDateDisplay(matchDateIso);
 
+  let parsedMeta: any = null;
+  if (row.notes && row.notes.includes("meta:{")) {
+    try {
+      const idx = row.notes.indexOf("meta:{");
+      parsedMeta = JSON.parse(row.notes.slice(idx + 5));
+    } catch {}
+  }
+
+  const isSosResolved = Boolean(
+    row.is_sos ||
+    parsedMeta?.isSos ||
+    row.status === "sos" ||
+    row.status === "SOS"
+  );
+
   const resolvedExpiresAt =
     row.expires_at ||
+    parsedMeta?.expiresAt ||
     getMatchExpiresDate(
       {
         matchDate: matchDateIso,
@@ -124,7 +140,7 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
         startTime: startTime || "19:00",
         kickoffTime: row.kickoff_time,
       },
-      15
+      isSosResolved ? 90 : 15
     ).toISOString();
 
   return {
@@ -148,13 +164,7 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
     district,
     pitchName: row.pitch_custom_name || "Sân Thành Phát",
     pitchAddress: (() => {
-      if (row.notes && row.notes.includes("meta:{")) {
-        try {
-          const idx = row.notes.indexOf("meta:{");
-          const meta = JSON.parse(row.notes.slice(idx + 5));
-          if (meta.address) return meta.address;
-        } catch {}
-      }
+      if (parsedMeta?.address) return parsedMeta.address;
       return (
         (row as any).pitch_address ||
         (row as any).pitchAddress ||
@@ -162,23 +172,11 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
       );
     })(),
     gmapsUrl: (() => {
-      if (row.notes && row.notes.includes("meta:{")) {
-        try {
-          const idx = row.notes.indexOf("meta:{");
-          const meta = JSON.parse(row.notes.slice(idx + 5));
-          if (meta.gmapsUrl) return meta.gmapsUrl;
-        } catch {}
-      }
+      if (parsedMeta?.gmapsUrl) return parsedMeta.gmapsUrl;
       return (row as any).gmaps_url || undefined;
     })(),
     isGmapsIntegrated: (() => {
-      if (row.notes && row.notes.includes("meta:{")) {
-        try {
-          const idx = row.notes.indexOf("meta:{");
-          const meta = JSON.parse(row.notes.slice(idx + 5));
-          if (typeof meta.isGmapsIntegrated === "boolean") return meta.isGmapsIntegrated;
-        } catch {}
-      }
+      if (typeof parsedMeta?.isGmapsIntegrated === "boolean") return parsedMeta.isGmapsIntegrated;
       return (row as any).is_gmaps_integrated ?? Boolean((row as any).gmaps_url);
     })(),
     matchDate: matchDateLabel,
@@ -199,23 +197,20 @@ export function mapDbMatchToFeedItem(row: MatchItem): MatchFeedItem {
         ? "DISPUTED"
         : row.status === "expired"
         ? "EXPIRED"
-        : row.is_sos
+        : isSosResolved
         ? "SOS"
         : row.status === "completed"
         ? "FINISHED"
         : row.status === "cancelled"
         ? "CANCELLED"
         : "OPEN",
-    isSOS: Boolean(row.is_sos),
-    sosCountdownSeconds: row.is_sos ? 3600 : undefined,
+    isSOS: isSosResolved,
+    sosCountdownSeconds: isSosResolved ? 3600 : undefined,
     notes: (() => {
+      if (parsedMeta?.rawNotes) return parsedMeta.rawNotes;
       if (row.notes && row.notes.includes("meta:{")) {
-        try {
-          const idx = row.notes.indexOf("meta:{");
-          const meta = JSON.parse(row.notes.slice(idx + 5));
-          if (meta.rawNotes) return meta.rawNotes;
-          return row.notes.slice(0, idx).replace(/\|\s*$/, "").trim() || undefined;
-        } catch {}
+        const idx = row.notes.indexOf("meta:{");
+        return row.notes.slice(0, idx).replace(/\|\s*$/, "").trim() || undefined;
       }
       return row.notes || undefined;
     })(),
@@ -408,6 +403,19 @@ export function useRealtimeMatchFeed(
               setMatches((prev) => prev.filter((m) => m.id !== updated.id));
               return;
             }
+            let parsedMeta: any = null;
+            if (updated.notes && updated.notes.includes("meta:{")) {
+              try {
+                const idx = updated.notes.indexOf("meta:{");
+                parsedMeta = JSON.parse(updated.notes.slice(idx + 5));
+              } catch {}
+            }
+            const isSosUpdated = Boolean(
+              updated.is_sos ||
+              parsedMeta?.isSos ||
+              updated.status === "sos" ||
+              updated.status === "SOS"
+            );
             setMatches((prev) =>
               prev.map((m) =>
                 m.id === updated.id
@@ -416,10 +424,10 @@ export function useRealtimeMatchFeed(
                       status:
                         updated.status === "matched"
                           ? "MATCHED"
-                          : updated.is_sos
+                          : isSosUpdated
                           ? "SOS"
                           : m.status,
-                      isSOS: Boolean(updated.is_sos),
+                      isSOS: isSosUpdated,
                     }
                   : m
               )
