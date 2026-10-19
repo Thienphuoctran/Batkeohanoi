@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useAuthTeam } from "@/hooks/useAuthTeam";
 import {
   UserPlus,
   Phone,
@@ -98,6 +99,96 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     broadcastSubPostCreated,
     broadcastSubPostDeleted,
   } = useRealtimeMarket();
+
+  const { team, profile } = useAuthTeam();
+
+  // 🛡️ QUẢN LÝ QUYỀN CHÍNH CHỦ (OWNERSHIP):
+  // Chỉ tài khoản hoặc thiết bị đăng bài mới có quyền Sửa / Xóa bài của chính họ
+  const [ownedAgentIds, setOwnedAgentIds] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("batkeo7_my_owned_agent_ids");
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return [];
+  });
+
+  const [ownedSubPostIds, setOwnedSubPostIds] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("batkeo7_my_owned_sub_post_ids");
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return [];
+  });
+
+  const [savedPhones, setSavedPhones] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("batkeo7_my_phones");
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return [];
+  });
+
+  // Tự động sao lưu quyền sở hữu sang localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("batkeo7_my_owned_agent_ids", JSON.stringify(ownedAgentIds));
+      } catch {}
+    }
+  }, [ownedAgentIds]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("batkeo7_my_owned_sub_post_ids", JSON.stringify(ownedSubPostIds));
+      } catch {}
+    }
+  }, [ownedSubPostIds]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("batkeo7_my_phones", JSON.stringify(savedPhones));
+      } catch {}
+    }
+  }, [savedPhones]);
+
+  // Kiểm tra quyền chính chủ cho hồ sơ Cầu Thủ Tìm Đội
+  const isAgentOwner = useCallback(
+    (agent: FreeAgentScoutCard): boolean => {
+      if (agent.isCreatedByCurrentUser) return true;
+      if (ownedAgentIds.includes(agent.id)) return true;
+      const cleanPhone = normalizeVietnamPhone(agent.phone);
+      if (profile?.phone && normalizeVietnamPhone(profile.phone) === cleanPhone) return true;
+      if (team?.captain_phone && normalizeVietnamPhone(team.captain_phone) === cleanPhone) return true;
+      if (savedPhones.some((p) => normalizeVietnamPhone(p) === cleanPhone)) return true;
+      // Nhận diện theo tên tài khoản nếu tên trùng khớp
+      if (profile?.full_name && agent.playerName.trim().toLowerCase() === profile.full_name.trim().toLowerCase()) return true;
+      return false;
+    },
+    [ownedAgentIds, profile, team, savedPhones]
+  );
+
+  // Kiểm tra quyền chính chủ cho tin Đội Tuyển Thêm Người
+  const isSubPostOwner = useCallback(
+    (post: SubPlayerPost): boolean => {
+      if (post.isCreatedByCurrentUser) return true;
+      if (ownedSubPostIds.includes(post.id)) return true;
+      const cleanContactPhone = normalizeVietnamPhone(post.contactPhone);
+      if (profile?.phone && normalizeVietnamPhone(profile.phone) === cleanContactPhone) return true;
+      if (team?.captain_phone && normalizeVietnamPhone(team.captain_phone) === cleanContactPhone) return true;
+      if (team?.team_name && team.team_name.trim().toLowerCase() === post.teamName.trim().toLowerCase()) return true;
+      if (savedPhones.some((p) => normalizeVietnamPhone(p) === cleanContactPhone)) return true;
+      return false;
+    },
+    [ownedSubPostIds, profile, team, savedPhones]
+  );
 
   // 🛡️ LỚP 1: Khóa nút bấm chống spam & gửi đúp
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -240,22 +331,22 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     });
   }, [subPosts, posFilter, districtFilter, tierFilter, onlyGkHotline]);
 
-  // Mở modal tạo mới
+  // Mở modal tạo mới (Tự động điền thông tin chính chủ nếu đã có)
   const handleOpenCreateModal = (mode: "free-agents" | "team-recruit") => {
     setEditingAgentId(null);
     setEditingSubId(null);
     setFormMode(mode);
-    setPlayerName("");
+    setPlayerName(profile?.full_name || "");
     setPlayerAge(26);
     setPreferredFoot("Chân phải");
     setPositionCode("MF");
-    setSkillTier(2);
-    setDistrict("Cầu Giấy");
+    setSkillTier(team?.skill_tier || 2);
+    setDistrict((team?.home_district === "NamTuLiem" ? "Nam Từ Liêm" : "Cầu Giấy") as District);
     setMatchDateIso(getTodayIsoDate());
     setTimeSlot("19:00 - 20:30");
-    setPhone("");
+    setPhone(profile?.phone || team?.captain_phone || (savedPhones[0] || ""));
     setBioOrNotes("");
-    setTeamName("");
+    setTeamName(team?.team_name || "");
     setPitchName("Sân Thành Phát");
     setQuantity(1);
     setIsPostModalOpen(true);
@@ -297,21 +388,31 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     setIsPostModalOpen(true);
   };
 
-  // 🛡️ Xóa hồ sơ Cầu thủ tự do (Database-First)
-  const handleDeleteAgent = async (id: string) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa hồ sơ cầu thủ này?")) {
-      await deleteMarketPostAction(id, "free-agents");
-      setFreeAgents((prev) => prev.filter((a) => a.id !== id));
-      await broadcastFreeAgentDeleted(id);
+  // 🛡️ Xóa hồ sơ Cầu thủ tự do (Chỉ chính chủ mới có quyền xóa)
+  const handleDeleteAgent = async (agent: FreeAgentScoutCard) => {
+    if (!isAgentOwner(agent)) {
+      alert("⚠️ Bạn không có quyền xóa bài đăng này. Chỉ người đăng chính chủ mới có thể xóa!");
+      return;
+    }
+    if (window.confirm(`Bạn có chắc chắn muốn xóa bài đăng tìm đội của "${agent.playerName}"? Thao tác này sẽ gỡ bài khỏi toàn bộ hệ thống.`)) {
+      await deleteMarketPostAction(agent.id, "free-agents");
+      setFreeAgents((prev) => prev.filter((a) => a.id !== agent.id));
+      setOwnedAgentIds((prev) => prev.filter((id) => id !== agent.id));
+      await broadcastFreeAgentDeleted(agent.id);
     }
   };
 
-  // 🛡️ Xóa tin Đội tuyển người (Database-First)
-  const handleDeleteSubPost = async (id: string) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa tin tuyển cầu thủ này?")) {
-      await deleteMarketPostAction(id, "team-recruit");
-      setSubPosts((prev) => prev.filter((p) => p.id !== id));
-      await broadcastSubPostDeleted(id);
+  // 🛡️ Xóa tin Đội tuyển người (Chỉ chính chủ mới có quyền xóa)
+  const handleDeleteSubPost = async (post: SubPlayerPost) => {
+    if (!isSubPostOwner(post)) {
+      alert("⚠️ Bạn không có quyền xóa bài đăng này. Chỉ đội trưởng đăng tin mới có thể xóa!");
+      return;
+    }
+    if (window.confirm(`Bạn có chắc chắn muốn xóa tin tuyển quân của đội "${post.teamName}"? Thao tác này sẽ gỡ bài khỏi toàn bộ hệ thống.`)) {
+      await deleteMarketPostAction(post.id, "team-recruit");
+      setSubPosts((prev) => prev.filter((p) => p.id !== post.id));
+      setOwnedSubPostIds((prev) => prev.filter((id) => id !== post.id));
+      await broadcastSubPostDeleted(post.id);
     }
   };
 
@@ -375,6 +476,13 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
         }
 
         const officialCard = dbRes.post || newCard;
+
+        // Lưu quyền sở hữu chính chủ vào State và localStorage
+        setOwnedAgentIds((prev) => Array.from(new Set([officialCard.id, ...prev])));
+        const cleanP = normalizeVietnamPhone(phone.trim());
+        if (cleanP) {
+          setSavedPhones((prev) => Array.from(new Set([cleanP, ...prev])));
+        }
 
         // 🛡️ BƯỚC 2: Cập nhật State máy A
         if (editingAgentId) {
@@ -441,6 +549,13 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
         }
 
         const officialPost = dbRes.post || newPost;
+
+        // Lưu quyền sở hữu chính chủ vào State và localStorage
+        setOwnedSubPostIds((prev) => Array.from(new Set([officialPost.id, ...prev])));
+        const cleanP = normalizeVietnamPhone(phone.trim());
+        if (cleanP) {
+          setSavedPhones((prev) => Array.from(new Set([cleanP, ...prev])));
+        }
 
         // 🛡️ BƯỚC 2: Cập nhật State máy A
         if (editingSubId) {
@@ -726,6 +841,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               const isGK = agent.position === "GK";
               const isHighTrust = agent.trustRating >= 4.8;
               const tierInfo = SKILL_TIERS_CONFIG[agent.skillTier];
+              const isOwner = isAgentOwner(agent);
 
               return (
                 <SpotlightCard
@@ -762,9 +878,9 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                           Tier {agent.skillTier}: {tierInfo.name}
                         </span>
 
-                        {agent.isCreatedByCurrentUser && (
-                          <span className="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black">
-                            Hồ sơ của bạn
+                        {isOwner && (
+                          <span className="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                            ★ BÀI ĐĂNG CỦA BẠN
                           </span>
                         )}
                       </div>
@@ -837,7 +953,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
 
                   {/* Footer Nút Hành Động 1-Chạm */}
                   <div className="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-white/[0.06]">
-                    {agent.isCreatedByCurrentUser ? (
+                    {isOwner ? (
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
@@ -849,11 +965,12 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleDeleteAgent(agent.id)}
-                          className="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center gap-1 transition"
+                          onClick={() => handleDeleteAgent(agent)}
+                          className="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center gap-1 transition active:scale-95"
+                          title="Chỉ người đăng bài mới có quyền xóa"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                          <span>Xóa</span>
+                          <span>Xóa hồ sơ</span>
                         </button>
                       </div>
                     ) : (
@@ -924,6 +1041,8 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
           {filteredSubPosts.length > 0 ? (
             filteredSubPosts.map((post) => {
               const isGK = post.positionNeeded.includes("GK");
+              const isOwner = isSubPostOwner(post);
+
               return (
                 <div
                   key={post.id}
@@ -962,9 +1081,9 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                           </span>
                         )}
                       </span>
-                      {post.isCreatedByCurrentUser && (
-                        <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black">
-                          Tin của đội bạn
+                      {isOwner && (
+                        <span className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                          ★ TIN CỦA ĐỘI BẠN
                         </span>
                       )}
                     </div>
@@ -986,7 +1105,7 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 shrink-0">
-                    {post.isCreatedByCurrentUser && (
+                    {isOwner && (
                       <>
                         <button
                           type="button"
@@ -998,11 +1117,12 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleDeleteSubPost(post.id)}
-                          className="h-9 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 text-xs font-bold inline-flex items-center gap-1 transition"
+                          onClick={() => handleDeleteSubPost(post)}
+                          className="h-9 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95"
+                          title="Chỉ đội trưởng đăng bài mới có quyền xóa"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                          <span>Xóa</span>
+                          <span>Xóa tin</span>
                         </button>
                       </>
                     )}
