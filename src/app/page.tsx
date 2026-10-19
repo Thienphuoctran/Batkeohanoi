@@ -1093,18 +1093,81 @@ export default function HanoiMatchmakingPlatform() {
   };
 
   return (
-    <div className="min-h-screen bg-stadium-multi text-slate-100 flex flex-col pb-16 relative overflow-x-hidden">
-      {/* 🏟️ LAYER 0: CẢNH NỀN SÂN ĐÈN CAO ÁP ĐÊM (Vignette + Dark overlay 85%) */}
-      <StadiumNightScenery />
+    <div className="min-h-screen bg-kraft-newspaper text-stone-900 flex flex-col pb-16 relative overflow-x-hidden selection:bg-amber-300 selection:text-stone-900">
+      {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI RÌA TRÁI (DESKTOP VINTAGE SCRAPBOOK) */}
+      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "hidden" : "xl:flex"} flex-col gap-5 fixed left-4 top-24 w-56 pointer-events-none opacity-80 z-0`}>
+        <div className="card-retro-paper p-3 rounded-xl border border-stone-300 shadow-md rotate-[-2deg] relative">
+          <div className="washi-tape -top-2 left-6" />
+          <div className="flex items-center justify-between border-b border-stone-300 pb-1.5 mb-2">
+            <span className="text-[10px] font-black uppercase text-red-700 tracking-wider">TIN PHỦI HÀ NỘI</span>
+            <span className="text-[9px] font-mono text-stone-500">SỐ 2026</span>
+          </div>
+          <div className="space-y-1.5">
+            <div className="text-[11px] font-black text-stone-900 leading-tight">
+              Khung giờ vàng 19h00: Cụm sân Cầu Giấy kín lịch đối đầu
+            </div>
+            <p className="text-[10px] text-stone-600 line-clamp-3 leading-relaxed">
+              Các đội bóng phủi Thủ đô đang tích cực ghép kèo giao hữu sân 7. Hệ thống cọc 200k giúp triệt tiêu 100% tình trạng bùng kèo sát giờ.
+            </p>
+          </div>
+          <div className="mt-2.5 pt-2 border-t border-stone-200 flex items-center justify-between">
+            <span className="rubber-stamp text-[8px] py-0.5 px-1.5">KÈO UY TÍN</span>
+            <span className="text-[9px] text-stone-500 font-bold">GiaoHuu.vn</span>
+          </div>
+        </div>
 
-      {/* 🎨 LAYER 1: LỚP STICKER & HOẠ TIẾT TRANG TRÍ PHỦI (3-Layer Rule) */}
+        <div className="card-retro-paper p-3 rounded-xl border border-stone-300 shadow-md rotate-[1.5deg] relative">
+          <div className="washi-tape -top-2 right-6" />
+          <div className="text-[10px] font-black text-stone-800 uppercase border-b border-stone-300 pb-1 mb-1.5 flex items-center gap-1">
+            <span>🛡️ BẢO CHỨNG SỐ</span>
+          </div>
+          <p className="text-[10px] text-stone-600 leading-relaxed">
+            Hủy sát giờ &lt;1h đền 100% tiền sân. Bắt tay OTP 4 số trực tiếp tại cổng sân bóng.
+          </p>
+        </div>
+      </aside>
+
+      {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI RÌA PHẢI (DESKTOP VINTAGE SCRAPBOOK) */}
+      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "hidden" : "xl:flex"} flex-col gap-5 fixed right-4 top-24 w-56 pointer-events-none opacity-80 z-0`}>
+        <div className="card-retro-paper p-3 rounded-xl border border-stone-300 shadow-md rotate-[2deg] relative">
+          <div className="washi-tape -top-2 right-6" />
+          <div className="flex items-center justify-between border-b border-stone-300 pb-1.5 mb-2">
+            <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">TIÊU ĐIỂM SÂN CỎ</span>
+            <span className="text-[9px] font-mono text-stone-500">26°C TF</span>
+          </div>
+          <div className="space-y-1.5">
+            <div className="text-[11px] font-black text-stone-900 leading-tight">
+              Thời tiết tối nay toàn Hà Nội: Cỏ khô ráo, gió mát lý tưởng
+            </div>
+            <p className="text-[10px] text-stone-600 line-clamp-3 leading-relaxed">
+              Mặt sân cỏ nhân tạo đạt độ bám tối đa, thích hợp thi đấu tốc độ cao và sút xa uy lực.
+            </p>
+          </div>
+          <div className="mt-2.5 pt-2 border-t border-stone-200 flex items-center justify-between">
+            <span className="rubber-stamp text-[8px] py-0.5 px-1.5 border-emerald-700 text-emerald-800">HÀ NỘI 7v7</span>
+            <span className="text-[9px] text-stone-500 font-bold">V2.0</span>
+          </div>
+        </div>
+
+        <div className="card-retro-paper p-3 rounded-xl border border-stone-300 shadow-md rotate-[-1.5deg] relative">
+          <div className="washi-tape -top-2 left-6" />
+          <div className="text-[10px] font-black text-stone-800 uppercase border-b border-stone-300 pb-1 mb-1.5 flex items-center gap-1">
+            <span>🤝 MÃ BẮT TAY OTP</span>
+          </div>
+          <p className="text-[10px] text-stone-600 leading-relaxed">
+            Hai đội trưởng gặp nhau tại sân nhập mã 4 số nhận ngay +10 điểm uy tín vào thẻ căn cước bóng đá.
+          </p>
+        </div>
+      </aside>
+
+      {/* 🎨 LAYER 1: LỚP STICKER & HOẠ TIẾT TRANG TRÍ PHỦI */}
       <PhuiStickerCanvas />
 
       <div
         className={`w-full mx-auto transition-all duration-300 relative z-10 ${
           isWideLayout
             ? "max-w-6xl"
-            : "max-w-md border-x border-emerald-950/60 shadow-2xl"
+            : "max-w-md border-x border-stone-300 shadow-2xl bg-[#fbf9f4]/95"
         }`}
       >
         {/* Thanh Header + Marquee + Radar Thời Tiết Sân */}
@@ -1144,22 +1207,22 @@ export default function HanoiMatchmakingPlatform() {
           onOpenRules={() => setIsRulesOpen(true)}
         />
 
-        {/* Banner Phát Sóng Khẩn Cấp Từ BQT (/admin - Đề xuất 5) */}
+        {/* Banner Phát Sóng Khẩn Cấp Từ BQT (/admin) */}
         {latestBroadcast && (
-          <div className="mx-3 mt-3 p-3 rounded-2xl bg-gradient-to-r from-purple-950/90 via-indigo-950/90 to-slate-900/90 border border-purple-500/40 flex items-start justify-between gap-3 shadow-lg">
+          <div className="mx-3 mt-3 p-3 rounded-2xl bg-stone-900 border border-stone-700 flex items-start justify-between gap-3 shadow-lg">
             <div className="space-y-0.5 text-xs">
-              <div className="font-black text-purple-300 flex items-center gap-1.5">
+              <div className="font-black text-amber-300 flex items-center gap-1.5">
                 <span>📢 THÔNG BÁO TỪ BAN QUẢN TRỊ:</span>
                 <span className="text-white">{latestBroadcast.title}</span>
               </div>
-              <p className="text-[11px] text-slate-200 leading-relaxed">
+              <p className="text-[11px] text-stone-300 leading-relaxed">
                 {latestBroadcast.message}
               </p>
             </div>
             <button
               type="button"
               onClick={() => setLatestBroadcast(null)}
-              className="p-1 rounded-lg bg-slate-800/80 text-slate-400 hover:text-white shrink-0"
+              className="p-1 rounded-lg bg-stone-800 text-stone-400 hover:text-white shrink-0"
               title="Đóng thông báo"
             >
               <X className="w-3.5 h-3.5" />
@@ -1172,51 +1235,45 @@ export default function HanoiMatchmakingPlatform() {
           {/* WORKSPACE 1: BẢNG TIN KÈO ĐẤU */}
           {activeTab === "feed" && (
             <div className="space-y-4">
-              {/* 🏟️ STADIUM NIGHTS HERO & TELEMETRY BANNER (Concept 2 + Dấu Ấn Phủi) */}
-              <div className="relative rounded-3xl overflow-hidden border border-emerald-500/30 bg-[#061e13]/85 p-3.5 sm:p-5 shadow-2xl backdrop-blur-xl">
-                {/* Ambient Floodlight Beam Glow */}
-                <div className="pointer-events-none absolute -top-12 -right-12 w-48 h-48 rounded-full bg-amber-400/15 blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-emerald-500/20 blur-3xl" />
+              {/* 🏟️ HERO BANNER: PHONG CÁCH BẢN TIN BÁO GIẤY & RETRO SCRAPBOOK */}
+              <div className="card-retro-paper relative rounded-3xl overflow-hidden border border-stone-300 p-4 sm:p-5 shadow-lg">
+                {/* Washi Tape dán góc trang trí */}
+                <div className="washi-tape -top-2.5 left-8 rotate-[-3deg]" />
+                <div className="washi-tape -top-2.5 right-8 rotate-[2deg]" />
 
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
                   <div>
                     <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[9px] sm:text-[10px] font-black text-emerald-300 uppercase tracking-wider">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                        SÂN ĐÈN CAO ÁP 1000W
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-100 border border-red-300 text-[9px] sm:text-[10px] font-black text-red-700 uppercase tracking-wider">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping" />
+                        BẢN TIN NÓNG SÂN 7 HÀ NỘI
                       </span>
-                      <span className="text-[10px] sm:text-[11px] text-slate-300">• Ghép Đối Tốc Hành 5 Phút</span>
-                      <PhuiStamp variant="san-da-dat" size="sm" angle={-4} className="hidden sm:inline-flex" />
+                      <span className="text-[10px] sm:text-[11px] text-stone-600 font-bold">• Ghép Đối Tốc Hành 5 Phút</span>
+                      <span className="rubber-stamp hidden sm:inline-flex text-[9px] py-0.5 px-2">KÈO UY TÍN</span>
                     </div>
-                    <h2 className="text-base sm:text-xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap">
+                    <h2 className="text-base sm:text-2xl font-black text-stone-900 tracking-tight flex items-center gap-2 flex-wrap">
                       <span>SÀN BẮT ĐỐI SÂN 7</span>
-                      <ShinyText text="CHỐNG BÙNG KÈO" speed={3} className="text-emerald-400" />
+                      <span className="text-red-700 underline decoration-stone-400">CHỐNG BÙNG KÈO</span>
                       <PhuiSticker variant="chong-bung-keo" size={135} angle={-2} className="hidden md:inline-block ml-1" />
                     </h2>
-                    <p className="text-[11px] sm:text-xs text-slate-300/80 mt-0.5 sm:mt-1 max-w-xl leading-relaxed">
+                    <p className="text-[11px] sm:text-xs text-stone-600 mt-0.5 sm:mt-1 max-w-xl leading-relaxed font-medium">
                       Cọc bảo chứng 200k • Hủy sát giờ &lt; 1h đền 100% tiền sân • Xác thực mã bắt tay OTP 4 số tại cổng sân.
                     </p>
                   </div>
 
-                  {/* Rolling Telemetry Odometer + Phủi Ribbon */}
-                  <div className="relative">
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-3 bg-[#020d07]/90 border border-amber-500/35 rounded-2xl p-2 sm:p-3 shrink-0 shadow-inner relative overflow-hidden">
-                      <div className="text-center px-1">
-                        <div className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase">Cọc Bảo Chứng</div>
-                        <div className="text-xs sm:text-base font-black text-emerald-400">
+                  {/* 2 Cột Thống Kê Chuẩn (ĐÃ XÓA Ô 1.450+ THEO ĐÚNG YÊU CẦU NGƯỜI DÙNG) */}
+                  <div className="relative shrink-0">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-4 bg-[#ede8dc] border border-stone-300 rounded-2xl p-2.5 sm:p-3.5 shrink-0 shadow-inner relative overflow-hidden">
+                      <div className="text-center px-2">
+                        <div className="text-[9px] sm:text-[10px] text-stone-600 font-bold uppercase">Cọc Bảo Chứng</div>
+                        <div className="text-sm sm:text-base font-black text-emerald-800">
                           <CountUpNumber end={200000} duration={1200} suffix="đ" />
                         </div>
                       </div>
-                      <div className="text-center px-1 border-x border-emerald-500/20">
-                        <div className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase">Uy Tín Chuẩn</div>
-                        <div className="text-xs sm:text-base font-black text-amber-300">
+                      <div className="text-center px-2 border-l border-stone-300">
+                        <div className="text-[9px] sm:text-[10px] text-stone-600 font-bold uppercase">Uy Tín Chuẩn</div>
+                        <div className="text-sm sm:text-base font-black text-amber-800">
                           <CountUpNumber end={100} duration={1500} suffix="/100" />
-                        </div>
-                      </div>
-                      <div className="text-center px-1">
-                        <div className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase">Trận Đã Ghép</div>
-                        <div className="text-xs sm:text-base font-black text-sky-400">
-                          <CountUpNumber end={1450} duration={1400} suffix="+" />
                         </div>
                       </div>
                     </div>
@@ -1243,26 +1300,26 @@ export default function HanoiMatchmakingPlatform() {
                 isSimulatingCleanup={isSimulatingCleanup}
               />
 
-              {/* Thanh Tìm Kiếm + Chọn Ca Giờ + Quận + 3 Tier (Deep Emerald Glass) */}
-              <section id="matches-feed-anchor" className="rounded-2xl border border-emerald-500/25 bg-[#061e13]/90 backdrop-blur-xl p-3.5 space-y-3 shadow-xl">
+              {/* Thanh Tìm Kiếm + Chọn Ca Giờ + Quận + 3 Tier (Vintage Newspaper Style) */}
+              <section id="matches-feed-anchor" className="card-retro-paper rounded-2xl border border-stone-300 p-3.5 space-y-3 shadow-md">
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="relative flex-1">
-                    <Search className="w-4 h-4 text-emerald-400 absolute left-3 top-2.5" />
+                    <Search className="w-4 h-4 text-stone-600 absolute left-3 top-2.5" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Tìm theo tên sân (Thành Phát, Mễ Trì, Đình Thôn...), tên FC, đội trưởng..."
-                      className="w-full h-9 pl-9 pr-3 rounded-xl bg-[#020d07]/90 border border-emerald-500/20 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-400"
+                      className="w-full h-9 pl-9 pr-3 rounded-xl bg-[#f4f0e6] border border-stone-300 text-xs text-stone-900 placeholder-stone-500 font-medium focus:outline-none focus:border-stone-600"
                     />
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0 hidden sm:inline" />
+                    <Clock className="w-3.5 h-3.5 text-stone-600 shrink-0 hidden sm:inline" />
                     <select
                       value={selectedTimeSlot}
                       onChange={(e) => setSelectedTimeSlot(e.target.value)}
                       aria-label="Lọc theo khung giờ"
-                      className="h-9 px-3 rounded-xl bg-[#020d07]/90 border border-emerald-500/20 text-xs font-bold text-slate-200 focus:outline-none focus:border-emerald-400 cursor-pointer"
+                      className="h-9 px-3 rounded-xl bg-[#f4f0e6] border border-stone-300 text-xs font-bold text-stone-900 focus:outline-none focus:border-stone-600 cursor-pointer"
                     >
                       <option value="ALL">⏰ Mọi khung giờ</option>
                       <option value="17:30">Ca 17:30</option>
@@ -1273,11 +1330,11 @@ export default function HanoiMatchmakingPlatform() {
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pt-1 border-t border-emerald-500/15">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pt-1 border-t border-stone-200">
                   {/* Khu vực Toàn Hà Nội (Pill Buttons) */}
                   <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-1.5 pb-1 sm:pb-0">
-                    <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1 mr-1 shrink-0">
-                      <MapPin className="w-3 h-3 text-emerald-400" />
+                    <span className="text-[11px] font-bold text-stone-700 flex items-center gap-1 mr-1 shrink-0">
+                      <MapPin className="w-3 h-3 text-red-600" />
                       Khu vực:
                     </span>
                     {[
@@ -1296,8 +1353,8 @@ export default function HanoiMatchmakingPlatform() {
                         onClick={() => setSelectedDistrict(dist as any)}
                         className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all active:scale-95 shrink-0 whitespace-nowrap ${
                           selectedDistrict === dist
-                            ? "bg-emerald-500 text-slate-950 font-black border border-emerald-400 shadow-md shadow-emerald-500/20 ring-1 ring-emerald-400"
-                            : "bg-[#020d07]/80 text-slate-300 hover:text-white border border-emerald-500/20"
+                            ? "bg-stone-900 text-white font-black border border-stone-900 shadow-sm"
+                            : "bg-[#ede8dc] text-stone-700 hover:text-stone-900 hover:bg-stone-200 border border-stone-300"
                         }`}
                       >
                         {dist === "ALL" ? "Tất cả Hà Nội" : dist}
@@ -1307,16 +1364,16 @@ export default function HanoiMatchmakingPlatform() {
 
                   {/* 3 Tier (Pill Buttons) */}
                   <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-1.5 pb-1 sm:pb-0">
-                    <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1 mr-1 shrink-0">
-                      <Shield className="w-3 h-3 text-emerald-400" />
+                    <span className="text-[11px] font-bold text-stone-700 flex items-center gap-1 mr-1 shrink-0">
+                      <Shield className="w-3 h-3 text-amber-700" />
                       Tier:
                     </span>
                     <button
                       onClick={() => setSelectedTier("ALL")}
                       className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all shrink-0 whitespace-nowrap ${
                         selectedTier === "ALL"
-                          ? "bg-slate-200 text-slate-950 font-black shadow-sm"
-                          : "bg-[#020d07]/80 text-slate-300 hover:text-white border border-emerald-500/20"
+                          ? "bg-stone-900 text-white font-black shadow-sm"
+                          : "bg-[#ede8dc] text-stone-700 hover:text-stone-900 hover:bg-stone-200 border border-stone-300"
                       }`}
                     >
                       Mọi Tier
@@ -1330,11 +1387,11 @@ export default function HanoiMatchmakingPlatform() {
                           className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border transition-all active:scale-95 ${
                             active
                               ? t === 1
-                                ? "bg-[#1d4ed8] text-white border-blue-300 shadow-md ring-1 ring-blue-400"
+                                ? "bg-blue-800 text-white border-blue-900 shadow-sm"
                                 : t === 2
-                                ? "bg-[#15803d] text-white border-emerald-300 shadow-md ring-1 ring-emerald-400"
-                                : "bg-[#9a3412] text-white border-orange-300 shadow-md ring-1 ring-orange-400"
-                              : "bg-[#020d07]/80 border-emerald-500/20 text-slate-300 hover:text-slate-100"
+                                ? "bg-emerald-800 text-white border-emerald-900 shadow-sm"
+                                : "bg-red-800 text-white border-red-900 shadow-sm"
+                              : "bg-[#ede8dc] border-stone-300 text-stone-700 hover:text-stone-900 hover:bg-stone-200"
                           }`}
                         >
                           {t === 1 ? "Tier 1: Dưỡng sinh" : t === 2 ? "Tier 2: Phong trào" : "Tier 3: Phủi chiến"}
@@ -1368,21 +1425,21 @@ export default function HanoiMatchmakingPlatform() {
 
               {/* Danh sách Kèo Thường / Khối Ghép Trận Phủi */}
               {isLoadingMatches ? (
-                <div className="relative rounded-3xl border border-emerald-500/30 bg-[#061e13]/90 backdrop-blur-xl p-8 sm:p-12 text-center space-y-4 shadow-2xl overflow-hidden">
+                <div className="card-retro-paper relative rounded-3xl border border-stone-300 p-8 sm:p-12 text-center space-y-4 shadow-lg overflow-hidden">
                   <div className="py-2">
                     <RollingFootballPitch statusText="Đang kết nối Realtime & đồng bộ dữ liệu sân phủi..." />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs font-bold text-emerald-400 animate-pulse">
+                    <p className="text-xs font-bold text-stone-800 animate-pulse">
                       Đang tải danh sách kèo đấu trực tuyến từ máy chủ...
                     </p>
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[11px] text-stone-500">
                       Tự động cập nhật tức thì mọi thay đổi mà không cần tải lại trang
                     </p>
                   </div>
                 </div>
               ) : filteredMatches.length === 0 ? (
-                <div className="relative rounded-3xl border border-emerald-500/25 bg-[#061e13]/90 backdrop-blur-xl p-8 sm:p-10 text-center space-y-4 shadow-2xl overflow-hidden">
+                <div className="card-retro-paper relative rounded-3xl border border-stone-300 p-8 sm:p-10 text-center space-y-4 shadow-lg overflow-hidden">
                   {/* Watermark Stamps Phủi */}
                   <div className="absolute top-4 right-4 hidden sm:block">
                     <PhuiStamp variant="keo-uy-tin" size="sm" angle={8} />
@@ -1392,25 +1449,25 @@ export default function HanoiMatchmakingPlatform() {
                   </div>
 
                   <div className="space-y-1.5 relative z-10">
-                    <h3 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center justify-center gap-2 flex-wrap">
-                      <span>HỆ THỐNG GHÉP TRẬN HÔM NAY -</span>
-                      <ShinyText text="HÀ NỘI" speed={2.5} className="text-emerald-400" />
+                    <h3 className="text-base sm:text-xl font-black text-red-800 tracking-tight flex items-center justify-center gap-2 flex-wrap">
+                      <span>BẢN TIN GHÉP TRẬN HÔM NAY -</span>
+                      <span className="text-stone-900 underline decoration-red-600">HÀ NỘI</span>
                     </h3>
-                    <p className="text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
+                    <p className="text-xs text-stone-600 max-w-sm mx-auto leading-relaxed">
                       Chưa có đội nào mở kèo tại khu vực hoặc khung giờ này. Hãy là đội tiên phong mở bát để nhận đối thủ ngay trong 5 phút!
                     </p>
                   </div>
 
-                  {/* ⚽ 2D MINI PITCH ROLLING FOOTBALL RADAR ANIMATION (Đề xuất 3) */}
+                  {/* ⚽ 2D MINI PITCH ROLLING FOOTBALL RADAR ANIMATION */}
                   <div className="py-1 relative z-10">
                     <RollingFootballPitch statusText="Quét các cụm sân Cầu Giấy, Nam Từ Liêm, Thanh Xuân, Đống Đa..." />
                   </div>
 
                   <div className="relative z-10 pt-1">
-                    <ClickSpark sparkColor={["#10b981", "#84cc16", "#ffffff"]}>
+                    <ClickSpark sparkColor={["#f97316", "#fbbf24", "#ef4444"]}>
                       <button
                         onClick={() => setIsCreateOpen(true)}
-                        className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-xs shadow-lg shadow-emerald-400/30 transition active:scale-95"
+                        className="ticket-stub inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-xs shadow-md shadow-orange-900/20 transition active:scale-95"
                       >
                         <Plus className="w-4 h-4 stroke-[3]" />
                         <span>Mở Kèo Mới Ngay</span>
@@ -1584,39 +1641,34 @@ export default function HanoiMatchmakingPlatform() {
           )}
         </main>
 
-        {/* Footer kín đáo & liên kết Quản trị ẩn */}
-        <footer className="mt-12 pb-8 border-t border-emerald-950/60 pt-6 text-center text-xs text-slate-400 space-y-3">
+        {/* Footer báo giấy & liên kết Quản trị ẩn */}
+        <footer className="mt-12 pb-8 border-t border-stone-300 pt-6 text-center text-xs text-stone-600 space-y-3">
           <div className="flex items-center justify-center gap-2">
-            <img
-              src="/api/logo"
-              alt="GiaoHuu.vn Logo"
-              className="w-7 h-7 object-contain opacity-90"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
-            <span className="font-extrabold text-white text-sm tracking-tight">
-              GiaoHuu<span className="text-emerald-400">.vn</span>
+            <span className="w-6 h-6 rounded bg-[#15803d] text-white font-black text-[10px] flex items-center justify-center shadow-xs">
+              7v7
+            </span>
+            <span className="font-black text-stone-900 text-sm tracking-tight">
+              GiaoHuu<span className="text-[#15803d]">.vn</span>
             </span>
           </div>
-          <p className="font-medium text-slate-300">
+          <p className="font-semibold text-stone-700">
             © 2026 GiaoHuu.vn Hà Nội • Nền tảng Ghép Trận Sân 7 &amp; Chống Bùng Kèo
           </p>
-          <div className="flex items-center justify-center gap-3 text-[11px] text-slate-400 flex-wrap">
+          <div className="flex items-center justify-center gap-3 text-[11px] text-stone-600 flex-wrap">
             <button
               onClick={() => setIsRulesOpen(true)}
-              className="text-amber-400/90 hover:text-amber-300 transition-colors inline-flex items-center gap-1 font-semibold"
-              title="Bảng Nội Quy & Quy Chế Kỷ Luật BắtKèo7"
+              className="text-stone-800 hover:text-red-700 transition-colors inline-flex items-center gap-1 font-bold"
+              title="Bảng Nội Quy & Quy Chế Kỷ Luật GiaoHuu.vn"
             >
-              <Scale className="w-3 h-3 text-amber-400" />
+              <Scale className="w-3 h-3 text-amber-700" />
               <span>Bảng Nội Quy &amp; Kỷ Luật</span>
             </button>
             <span>•</span>
             <button
               onClick={() => setIsGuideOpen(true)}
-              className="text-slate-400 hover:text-emerald-400 transition-colors inline-flex items-center gap-1"
+              className="text-stone-800 hover:text-emerald-700 transition-colors inline-flex items-center gap-1 font-semibold"
             >
-              <BookOpen className="w-2.5 h-2.5 text-sky-400" />
+              <BookOpen className="w-2.5 h-2.5 text-stone-600" />
               <span>Hướng dẫn sử dụng</span>
             </button>
             <span>•</span>
@@ -1626,7 +1678,7 @@ export default function HanoiMatchmakingPlatform() {
             <span>•</span>
             <Link
               href="/admin"
-              className="text-slate-500 hover:text-slate-300 transition-colors inline-flex items-center gap-1 opacity-70 hover:opacity-100"
+              className="text-stone-500 hover:text-stone-900 transition-colors inline-flex items-center gap-1 opacity-70 hover:opacity-100 font-medium"
               title="Quản trị hệ thống (Khóa PIN)"
             >
               <Lock className="w-2.5 h-2.5" />

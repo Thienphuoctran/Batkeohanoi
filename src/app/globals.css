@@ -303,4 +303,72 @@
   animation: stampSlamKeyframes 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
+/* ==========================================================================
+   RETRO NEWSPAPER & FOOTBALL SCRAPBOOK AESTHETIC (BẢN TIN BÓNG ĐÁ PHỦI HÀ NỘI)
+   ========================================================================== */
+.bg-kraft-newspaper {
+  background-color: #ede8dc;
+  background-image: 
+    radial-gradient(#cfc5b3 1px, transparent 1px),
+    linear-gradient(to right, rgba(90, 75, 55, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(90, 75, 55, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px, 48px 48px, 48px 48px;
+}
+
+/* Thẻ giấy gập nếp kem sáng (Creased Paper Card) */
+.card-retro-paper {
+  background: #fbf9f4;
+  border: 1px solid rgba(168, 150, 128, 0.45);
+  box-shadow: 0 4px 20px -2px rgba(60, 50, 35, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Cuống vé xem bóng đá có răng cưa & lỗ bấm tròn (Perforated Match Ticket Stub) */
+.ticket-stub {
+  position: relative;
+  overflow: hidden;
+}
+.ticket-stub::before,
+.ticket-stub::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background-color: #ede8dc;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+.ticket-stub::before {
+  left: -6px;
+}
+.ticket-stub::after {
+  right: -6px;
+}
+
+/* Con dấu mộc đỏ cao su (Rubber Red Ink Stamp) */
+.rubber-stamp {
+  border: 2.5px dashed #dc2626;
+  color: #dc2626;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.2);
+}
+
+/* Băng dính giấy dán góc (Washi Tape) */
+.washi-tape {
+  position: absolute;
+  width: 56px;
+  height: 16px;
+  background: rgba(245, 230, 195, 0.78);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(215, 195, 155, 0.65);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+  z-index: 20;
+}
+
+
 

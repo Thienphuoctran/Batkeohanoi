@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const viewport: Viewport = {
-  themeColor: "#16a34a",
+  themeColor: "#ede8dc",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "GiaoHuu.vn",
   },
   icons: {
@@ -33,8 +33,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className="dark">
-      <body className="min-h-screen bg-[#060911] text-slate-100 antialiased">
+    <html lang="vi">
+      <body className="min-h-screen bg-kraft-newspaper text-stone-900 antialiased font-sans">
         {children}
         <script
           dangerouslySetInnerHTML={{
