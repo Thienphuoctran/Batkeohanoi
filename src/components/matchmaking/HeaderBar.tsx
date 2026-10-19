@@ -421,7 +421,6 @@ export function HeaderBar({
           </button>
         </div>
       </div>
-      </div>
     </header>
   );
 }
