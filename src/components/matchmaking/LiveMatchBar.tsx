@@ -78,15 +78,15 @@ export function LiveMatchBar({
       </div>
 
       {/* KHỐI PHẢI: NÚT GIẢI CỨU KÈO 📣 + ĐÁNH GIÁ KÈO + TẠO KÈO */}
-      <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+      <div className="flex items-center gap-1.5 sm:gap-2 w-full md:w-auto justify-between sm:justify-end">
         {/* Nút Giải Cứu Kèo Ngay 📣 */}
         <ClickSpark sparkColor={["#ef4444", "#f97316", "#fbbf24"]} sparkCount={8}>
           <button
             onClick={() => onSwitchTab("sos")}
-            className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 hover:brightness-110 text-white font-black text-xs shadow-lg shadow-red-600/30 active:scale-95 transition-all inline-flex items-center gap-1.5 animate-pulse"
+            className="flex-1 sm:flex-initial h-9 px-2.5 sm:px-3.5 rounded-xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 hover:brightness-110 text-white font-black text-xs shadow-lg shadow-red-600/30 active:scale-95 transition-all inline-flex items-center justify-center gap-1 sm:gap-1.5 animate-pulse whitespace-nowrap"
           >
-            <span>Giải Cứu Kèo Ngay</span>
-            <span>📣</span>
+            <span className="sm:hidden">Cứu Kèo 📣</span>
+            <span className="hidden sm:inline">Giải Cứu Kèo Ngay 📣</span>
             {sosCount > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-white text-red-600 font-black">
                 {sosCount}
@@ -98,9 +98,9 @@ export function LiveMatchBar({
         {/* Nút Đánh giá kèo (Vàng dạ quang) */}
         <button
           onClick={() => onSwitchTab("trust-profile")}
-          className="h-9 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 animate-amber-glow transition active:scale-95"
+          className="flex-1 sm:flex-initial h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 animate-amber-glow transition active:scale-95 whitespace-nowrap text-center"
         >
-          Đánh giá kèo
+          Đánh giá
         </button>
 
         {/* Nút Test Mô Phỏng 1-Chạm Xóa Kèo Quá 15 Phút (Bản Kế Hoạch Mục V) */}
@@ -109,7 +109,7 @@ export function LiveMatchBar({
             type="button"
             onClick={onSimulateExpiredCleanup}
             disabled={isSimulatingCleanup}
-            className={`h-9 px-2.5 rounded-xl border text-[11px] font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95 ${
+            className={`hidden sm:flex h-9 px-2.5 rounded-xl border text-[11px] font-bold transition items-center gap-1.5 shadow-sm active:scale-95 ${
               isSimulatingCleanup
                 ? "bg-amber-500/20 text-amber-300 border-amber-400 animate-pulse"
                 : "bg-[#020d07]/90 text-slate-300 border-emerald-500/30 hover:border-emerald-400 hover:text-white"
@@ -125,7 +125,7 @@ export function LiveMatchBar({
         <ClickSpark sparkColor={["#f97316", "#fbbf24", "#38bdf8", "#ffffff"]} sparkCount={10}>
           <button
             onClick={onOpenCreateModal}
-            className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-black text-xs shadow-lg shadow-orange-500/30 active:scale-95 transition-all flex items-center gap-1"
+            className="flex-1 sm:flex-initial h-9 px-3 sm:px-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-black text-xs shadow-lg shadow-orange-500/30 active:scale-95 transition-all flex items-center justify-center gap-1 whitespace-nowrap"
           >
             <Plus className="w-3.5 h-3.5 stroke-[3]" />
             <span>Tạo Kèo</span>

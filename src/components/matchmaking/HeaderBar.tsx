@@ -184,13 +184,13 @@ export function HeaderBar({
                   Hà Nội v2.0
                 </span>
               </div>
-              <p className="text-[11px] text-slate-300 font-medium">
+              <p className="text-[11px] text-slate-300 font-medium hidden sm:block">
                 Sân Ghép Trận Sân 7 &amp; Chống Bùng Kèo
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             <button
               onClick={onToggleWideLayout}
               title="Chuyển đổi khung nhìn Mobile / Bento Dashboard"
@@ -206,9 +206,9 @@ export function HeaderBar({
             <button
               onClick={onOpenBotDrawer}
               title="Telegram Bot Webhook Logs (@GiaohuuHanoi_bot)"
-              className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-slate-200 border border-emerald-500/25 transition"
+              className="relative inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-slate-200 border border-emerald-500/25 transition shrink-0"
             >
-              <Bell className="w-4 h-4 text-sky-400" />
+              <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400" />
               {unreadBotCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center">
                   {unreadBotCount}
@@ -220,7 +220,7 @@ export function HeaderBar({
               <button
                 onClick={onOpenRules}
                 title="Bảng Nội Quy & Quy Chế Kỷ Luật BắtKèo7"
-                className="inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-[#1c1917]/90 hover:bg-[#292524] text-amber-300 border border-amber-500/35 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shadow-amber-500/10"
+                className="inline-flex items-center justify-center w-8 h-8 sm:w-auto px-0 sm:px-2.5 h-8 sm:h-9 rounded-xl bg-[#1c1917]/90 hover:bg-[#292524] text-amber-300 border border-amber-500/35 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shadow-amber-500/10 shrink-0"
               >
                 <Scale className="w-3.5 h-3.5 text-amber-400" />
                 <span className="hidden sm:inline">Nội Quy</span>
@@ -231,7 +231,7 @@ export function HeaderBar({
               <button
                 onClick={onOpenGuide}
                 title="Cẩm Nang Hướng Dẫn Sử Dụng GiaoHuu.vn"
-                className="inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-slate-200 border border-emerald-500/25 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm"
+                className="inline-flex items-center justify-center w-8 h-8 sm:w-auto px-0 sm:px-2.5 h-8 sm:h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-slate-200 border border-emerald-500/25 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shrink-0"
               >
                 <BookOpen className="w-3.5 h-3.5 text-sky-400" />
                 <span className="hidden sm:inline">Hướng Dẫn</span>
@@ -242,30 +242,32 @@ export function HeaderBar({
               <button
                 onClick={onOpenSupport}
                 title="Tư Vấn Khách Hàng & AI Trợ Lý GiaoHuu.vn"
-                className="relative inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/35 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shadow-emerald-500/10"
+                className="relative inline-flex items-center justify-center w-8 h-8 sm:w-auto px-0 sm:px-2.5 h-8 sm:h-9 rounded-xl bg-[#0a2318]/90 hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/35 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shadow-emerald-500/10 shrink-0"
               >
-                <Bot className="w-4 h-4 text-emerald-400" />
+                <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
                 <span className="hidden sm:inline">Tư Vấn</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse" />
               </button>
             )}
 
             {!isAuthenticated ? (
               <button
                 onClick={onOpenAuthModal}
-                className="h-9 px-3 rounded-xl bg-[#0a2318] hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition"
+                className="h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl bg-[#0a2318] hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1 sm:gap-1.5 transition whitespace-nowrap shrink-0"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Đăng nhập / Tạo Đội</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span className="sm:hidden">Đăng nhập</span>
+                <span className="hidden sm:inline">Đăng nhập / Tạo Đội</span>
               </button>
             ) : !hasTeam ? (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 <button
                   onClick={onOpenTeamOnboarding}
-                  className="h-9 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition animate-pulse"
+                  className="h-8 sm:h-9 px-2 sm:px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-extrabold text-xs inline-flex items-center gap-1 sm:gap-1.5 transition animate-pulse whitespace-nowrap shrink-0"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Hoàn tất Tạo Đội</span>
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="sm:hidden">Tạo Đội</span>
+                  <span className="hidden sm:inline">Hoàn tất Tạo Đội</span>
                 </button>
                 {onSignOut && (
                   <button
@@ -276,7 +278,7 @@ export function HeaderBar({
                       }
                     }}
                     title="Đăng xuất tài khoản"
-                    className="h-9 px-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 border border-rose-500/30 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95"
+                    className="h-8 sm:h-9 w-8 sm:w-auto px-0 sm:px-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 border border-rose-500/30 text-xs font-bold inline-flex items-center justify-center gap-1 transition active:scale-95 shrink-0"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Đăng xuất</span>
@@ -284,10 +286,10 @@ export function HeaderBar({
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 <button
                   onClick={() => setActiveTab("trust-profile")}
-                  className="h-9 px-3 rounded-xl bg-[#0a2318] hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1.5 transition max-w-[140px]"
+                  className="h-8 sm:h-9 px-2 sm:px-3 rounded-xl bg-[#0a2318] hover:bg-[#0e2f20] text-emerald-300 border border-emerald-500/40 font-extrabold text-xs inline-flex items-center gap-1 sm:gap-1.5 transition max-w-[110px] sm:max-w-[140px]"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span className="truncate">{currentTeamName}</span>
@@ -301,7 +303,7 @@ export function HeaderBar({
                       }
                     }}
                     title="Đăng xuất tài khoản"
-                    className="h-9 px-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 border border-rose-500/30 text-xs font-bold inline-flex items-center gap-1 transition active:scale-95"
+                    className="h-8 sm:h-9 w-8 sm:w-auto px-0 sm:px-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 border border-rose-500/30 text-xs font-bold inline-flex items-center justify-center gap-1 transition active:scale-95 shrink-0"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Đăng xuất</span>
@@ -341,15 +343,15 @@ export function HeaderBar({
         </div>
 
         {/* 3. Hyper-Local Pitch Weather Radar Selector */}
-        <div className="rounded-xl bg-[#061e13]/90 border border-emerald-500/25 px-3 py-2 flex flex-col gap-1.5">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <CloudSun className="w-4 h-4 text-amber-400 shrink-0" />
+        <div className="rounded-xl bg-[#061e13]/90 border border-emerald-500/25 px-2.5 sm:px-3 py-1.5 sm:py-2 flex flex-col gap-1 sm:gap-1.5">
+          <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+              <CloudSun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0" />
               <select
                 value={selectedPitch}
                 onChange={(e) => setSelectedPitch(e.target.value)}
                 aria-label="Chọn cụm sân xem thời tiết"
-                className="bg-transparent text-[11px] font-bold text-slate-200 focus:outline-none cursor-pointer truncate"
+                className="bg-transparent text-[11px] font-bold text-slate-200 focus:outline-none cursor-pointer truncate max-w-[130px] sm:max-w-none"
               >
                 {Object.keys(PITCH_WEATHER_DATA).map((pitch) => (
                   <option key={pitch} value={pitch} className="bg-slate-900 text-white">
@@ -358,16 +360,23 @@ export function HeaderBar({
                 ))}
               </select>
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+              <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 whitespace-nowrap">
                 {weather.status}
               </span>
-              <span className="text-[11px] font-extrabold text-amber-300 tabular-nums">
-                {weather.temp} • {weather.humidity}
+              <span className="text-[10px] sm:text-[11px] font-extrabold text-amber-300 tabular-nums whitespace-nowrap">
+                {weather.temp}
               </span>
+              <button
+                onClick={() => setActiveTab("trust-profile")}
+                className="sm:hidden ml-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20"
+                title="Điểm tín nhiệm đội của bạn"
+              >
+                ★{myTrustScore}đ
+              </button>
             </div>
           </div>
-          <div className="flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-800/80 pt-1">
+          <div className="hidden sm:flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-800/80 pt-1">
             <span className="truncate">{weather.tip}</span>
             <button
               onClick={() => setActiveTab("trust-profile")}
@@ -380,14 +389,14 @@ export function HeaderBar({
         </div>
 
         {/* 4. 5-Tab Navigation Bar + Trust Profile Pill */}
-        <div className="grid grid-cols-5 gap-1.5 bg-[#061e13]/90 p-1.5 rounded-xl border border-emerald-500/20 text-[11px] font-semibold backdrop-blur-md">
+        <div className="flex overflow-x-auto no-scrollbar sm:grid sm:grid-cols-5 gap-1 sm:gap-1.5 bg-[#061e13]/90 p-1 sm:p-1.5 rounded-xl border border-emerald-500/20 text-[11px] font-semibold backdrop-blur-md">
           {navTabs.map((tab) => {
             const active = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-2 px-1 rounded-lg flex items-center justify-center gap-1 transition-all ${
+                className={`py-1.5 sm:py-2 px-2.5 sm:px-1 rounded-lg flex items-center justify-center gap-1 transition-all flex-shrink-0 min-w-fit sm:min-w-0 ${
                   active
                     ? "bg-emerald-500 text-slate-950 font-extrabold shadow-md shadow-emerald-500/20"
                     : tab.isSos
@@ -396,7 +405,7 @@ export function HeaderBar({
                 }`}
               >
                 {tab.icon}
-                <span className="truncate">{tab.label}</span>
+                <span className="whitespace-nowrap">{tab.label}</span>
                 {tab.badge !== undefined && tab.badge > 0 && (
                   <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-rose-500 text-white font-black">
                     {tab.badge}
@@ -407,14 +416,14 @@ export function HeaderBar({
           })}
           <button
             onClick={() => setActiveTab("trust-profile")}
-            className={`py-2 px-1 rounded-lg flex items-center justify-center gap-1 transition-all ${
+            className={`py-1.5 sm:py-2 px-2.5 sm:px-1 rounded-lg flex items-center justify-center gap-1 transition-all flex-shrink-0 min-w-fit sm:min-w-0 ${
               activeTab === "trust-profile"
                 ? "bg-emerald-500 text-slate-950 font-extrabold shadow-md shadow-emerald-500/20"
                 : "text-slate-300 hover:text-white hover:bg-[#0a2318]"
             }`}
           >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span className="truncate">Đội Tôi</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="whitespace-nowrap">Đội Tôi</span>
           </button>
         </div>
       </div>

@@ -1170,49 +1170,49 @@ export default function HanoiMatchmakingPlatform() {
           {activeTab === "feed" && (
             <div className="space-y-4">
               {/* 🏟️ STADIUM NIGHTS HERO & TELEMETRY BANNER (Concept 2 + Dấu Ấn Phủi) */}
-              <div className="relative rounded-3xl overflow-hidden border border-emerald-500/30 bg-[#061e13]/85 p-4 sm:p-5 shadow-2xl backdrop-blur-xl">
+              <div className="relative rounded-3xl overflow-hidden border border-emerald-500/30 bg-[#061e13]/85 p-3.5 sm:p-5 shadow-2xl backdrop-blur-xl">
                 {/* Ambient Floodlight Beam Glow */}
                 <div className="pointer-events-none absolute -top-12 -right-12 w-48 h-48 rounded-full bg-amber-400/15 blur-3xl" />
                 <div className="pointer-events-none absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-emerald-500/20 blur-3xl" />
 
-                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
                   <div>
-                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[10px] font-black text-emerald-300 uppercase tracking-wider">
+                    <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-[9px] sm:text-[10px] font-black text-emerald-300 uppercase tracking-wider">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
                         SÂN ĐÈN CAO ÁP 1000W
                       </span>
-                      <span className="text-[11px] text-slate-300">• Ghép Đối Tốc Hành 5 Phút</span>
+                      <span className="text-[10px] sm:text-[11px] text-slate-300">• Ghép Đối Tốc Hành 5 Phút</span>
                       <PhuiStamp variant="san-da-dat" size="sm" angle={-4} className="hidden sm:inline-flex" />
                     </div>
-                    <h2 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap">
+                    <h2 className="text-base sm:text-xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap">
                       <span>SÀN BẮT ĐỐI SÂN 7</span>
                       <ShinyText text="CHỐNG BÙNG KÈO" speed={3} className="text-emerald-400" />
                       <PhuiSticker variant="chong-bung-keo" size={135} angle={-2} className="hidden md:inline-block ml-1" />
                     </h2>
-                    <p className="text-xs text-slate-300/80 mt-1 max-w-xl leading-relaxed">
+                    <p className="text-[11px] sm:text-xs text-slate-300/80 mt-0.5 sm:mt-1 max-w-xl leading-relaxed">
                       Cọc bảo chứng 200k • Hủy sát giờ &lt; 1h đền 100% tiền sân • Xác thực mã bắt tay OTP 4 số tại cổng sân.
                     </p>
                   </div>
 
                   {/* Rolling Telemetry Odometer + Phủi Ribbon */}
                   <div className="relative">
-                    <div className="grid grid-cols-3 gap-2 sm:gap-3 bg-[#020d07]/90 border border-amber-500/35 rounded-2xl p-2.5 sm:p-3 shrink-0 shadow-inner relative overflow-hidden">
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-3 bg-[#020d07]/90 border border-amber-500/35 rounded-2xl p-2 sm:p-3 shrink-0 shadow-inner relative overflow-hidden">
                       <div className="text-center px-1">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase">Cọc Bảo Chứng</div>
-                        <div className="text-sm sm:text-base font-black text-emerald-400">
+                        <div className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase">Cọc Bảo Chứng</div>
+                        <div className="text-xs sm:text-base font-black text-emerald-400">
                           <CountUpNumber end={200000} duration={1200} suffix="đ" />
                         </div>
                       </div>
                       <div className="text-center px-1 border-x border-emerald-500/20">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase">Uy Tín Chuẩn</div>
-                        <div className="text-sm sm:text-base font-black text-amber-300">
+                        <div className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase">Uy Tín Chuẩn</div>
+                        <div className="text-xs sm:text-base font-black text-amber-300">
                           <CountUpNumber end={100} duration={1500} suffix="/100" />
                         </div>
                       </div>
                       <div className="text-center px-1">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase">Trận Đã Ghép</div>
-                        <div className="text-sm sm:text-base font-black text-sky-400">
+                        <div className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase">Trận Đã Ghép</div>
+                        <div className="text-xs sm:text-base font-black text-sky-400">
                           <CountUpNumber end={1450} duration={1400} suffix="+" />
                         </div>
                       </div>
@@ -1272,8 +1272,8 @@ export default function HanoiMatchmakingPlatform() {
 
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pt-1 border-t border-emerald-500/15">
                   {/* Khu vực Toàn Hà Nội (Pill Buttons) */}
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1 mr-1">
+                  <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-1.5 pb-1 sm:pb-0">
+                    <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1 mr-1 shrink-0">
                       <MapPin className="w-3 h-3 text-emerald-400" />
                       Khu vực:
                     </span>
@@ -1291,7 +1291,7 @@ export default function HanoiMatchmakingPlatform() {
                       <button
                         key={dist}
                         onClick={() => setSelectedDistrict(dist as any)}
-                        className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all active:scale-95 ${
+                        className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all active:scale-95 shrink-0 whitespace-nowrap ${
                           selectedDistrict === dist
                             ? "bg-emerald-500 text-slate-950 font-black border border-emerald-400 shadow-md shadow-emerald-500/20 ring-1 ring-emerald-400"
                             : "bg-[#020d07]/80 text-slate-300 hover:text-white border border-emerald-500/20"
@@ -1303,14 +1303,14 @@ export default function HanoiMatchmakingPlatform() {
                   </div>
 
                   {/* 3 Tier (Pill Buttons) */}
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1 mr-1">
+                  <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-1.5 pb-1 sm:pb-0">
+                    <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1 mr-1 shrink-0">
                       <Shield className="w-3 h-3 text-emerald-400" />
                       Tier:
                     </span>
                     <button
                       onClick={() => setSelectedTier("ALL")}
-                      className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all ${
+                      className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all shrink-0 whitespace-nowrap ${
                         selectedTier === "ALL"
                           ? "bg-slate-200 text-slate-950 font-black shadow-sm"
                           : "bg-[#020d07]/80 text-slate-300 hover:text-white border border-emerald-500/20"
@@ -1858,11 +1858,24 @@ export default function HanoiMatchmakingPlatform() {
       )}
 
       {/* Nút Nổi Tư Vấn Khách Hàng (AI Agent & Zalo BQT) */}
-      <div className="fixed bottom-6 right-5 sm:right-7 z-50">
+      <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-7 z-50">
+        {/* Bản Mobile: Nút tròn 48px tinh gọn, chống che lấp nội dung */}
         <button
           type="button"
           onClick={() => setIsSupportOpen(true)}
-          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-slate-950 font-black text-xs sm:text-sm shadow-2xl shadow-emerald-500/40 hover:shadow-emerald-500/60 hover:scale-105 active:scale-95 transition-all duration-200 border-2 border-emerald-300/60 cursor-pointer"
+          className="sm:hidden w-12 h-12 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-slate-950 shadow-2xl shadow-emerald-500/50 flex items-center justify-center relative border-2 border-emerald-300 active:scale-95 transition-transform"
+          title="Tư vấn khách hàng & Trợ lý AI GiaoHuu.vn"
+        >
+          <Bot className="w-6 h-6 fill-current" />
+          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-rose-500 animate-ping" />
+          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-rose-500 border-2 border-slate-950" />
+        </button>
+
+        {/* Bản Desktop / Máy tính: Giữ nguyên 100% giao diện nút to chữ nhật */}
+        <button
+          type="button"
+          onClick={() => setIsSupportOpen(true)}
+          className="hidden sm:flex group relative items-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-slate-950 font-black text-sm shadow-2xl shadow-emerald-500/40 hover:shadow-emerald-500/60 hover:scale-105 active:scale-95 transition-all duration-200 border-2 border-emerald-300/60 cursor-pointer"
           title="Tư vấn khách hàng & Trợ lý AI GiaoHuu.vn"
         >
           <div className="relative">
@@ -1872,7 +1885,7 @@ export default function HanoiMatchmakingPlatform() {
           </div>
           <div className="flex flex-col items-start leading-tight text-left">
             <span className="tracking-tight text-slate-950 font-black">Tư Vấn Khách Hàng</span>
-            <span className="text-[10px] text-slate-900/80 font-bold hidden sm:inline">
+            <span className="text-[10px] text-slate-900/80 font-bold">
               AI Trợ Lý &amp; Zalo BQT
             </span>
           </div>
