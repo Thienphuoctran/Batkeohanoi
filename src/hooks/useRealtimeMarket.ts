@@ -4,11 +4,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { FreeAgentScoutCard, SubPlayerPost } from "@/types/matchmaking";
 import { MOCK_FREE_AGENTS, MOCK_SUB_PLAYERS } from "@/constants/mockMatchmaking";
-import {
-  getMarketPostsFromDatabaseAction,
-  mapDbToFreeAgent,
-  mapDbToSubPost,
-} from "@/actions/market";
+import { getMarketPostsFromDatabaseAction } from "@/actions/market";
+import { mapDbToFreeAgent, mapDbToSubPost } from "@/lib/marketUtils";
 import { playNotificationChime } from "@/lib/zalo";
 
 const FREE_AGENTS_STORAGE_KEY = "batkeo7_market_free_agents_v2";
