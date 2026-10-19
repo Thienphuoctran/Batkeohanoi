@@ -52,6 +52,7 @@ interface HeaderBarProps {
   onOpenEscrowModal?: () => void;
   onOpenSupport?: () => void;
   onOpenGuide?: () => void;
+  onOpenRules?: () => void;
 }
 
 const PITCH_WEATHER_DATA: Record<
@@ -111,6 +112,7 @@ export function HeaderBar({
   onOpenEscrowModal,
   onOpenSupport,
   onOpenGuide,
+  onOpenRules,
 }: HeaderBarProps) {
   const [selectedPitch, setSelectedPitch] = useState(
     "Trung Kính Hạ (Cầu Giấy)"
@@ -213,6 +215,17 @@ export function HeaderBar({
                 </span>
               )}
             </button>
+
+            {onOpenRules && (
+              <button
+                onClick={onOpenRules}
+                title="Bảng Nội Quy & Quy Chế Kỷ Luật BắtKèo7"
+                className="inline-flex items-center justify-center px-2.5 h-9 rounded-xl bg-[#1c1917]/90 hover:bg-[#292524] text-amber-300 border border-amber-500/35 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shadow-amber-500/10"
+              >
+                <Scale className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden sm:inline">Nội Quy</span>
+              </button>
+            )}
 
             {onOpenGuide && (
               <button
