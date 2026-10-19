@@ -395,7 +395,11 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
       return;
     }
     if (window.confirm(`Bạn có chắc chắn muốn xóa bài đăng tìm đội của "${agent.playerName}"? Thao tác này sẽ gỡ bài khỏi toàn bộ hệ thống.`)) {
-      await deleteMarketPostAction(agent.id, "free-agents", agent.phone);
+      const res = await deleteMarketPostAction(agent.id, "free-agents", agent.phone);
+      if (res && !res.success) {
+        alert(`⚠️ ${res.error || "Không thể xóa bài đăng. Vui lòng thử lại!"}`);
+        return;
+      }
       setFreeAgents((prev) => prev.filter((a) => a.id !== agent.id));
       setOwnedAgentIds((prev) => prev.filter((id) => id !== agent.id));
       await broadcastFreeAgentDeleted(agent.id);
@@ -409,7 +413,11 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
       return;
     }
     if (window.confirm(`Bạn có chắc chắn muốn xóa tin tuyển quân của đội "${post.teamName}"? Thao tác này sẽ gỡ bài khỏi toàn bộ hệ thống.`)) {
-      await deleteMarketPostAction(post.id, "team-recruit", post.contactPhone);
+      const res = await deleteMarketPostAction(post.id, "team-recruit", post.contactPhone);
+      if (res && !res.success) {
+        alert(`⚠️ ${res.error || "Không thể xóa bài đăng. Vui lòng thử lại!"}`);
+        return;
+      }
       setSubPosts((prev) => prev.filter((p) => p.id !== post.id));
       setOwnedSubPostIds((prev) => prev.filter((id) => id !== post.id));
       await broadcastSubPostDeleted(post.id);

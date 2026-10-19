@@ -121,10 +121,10 @@ export function CancelMatchAppealModal({
       return {
         level: 3,
         penaltyPoints: 25,
-        compensationVnd: 200000,
+        compensationVnd: 0,
         badgeColor: 'bg-orange-500/20 text-orange-300 border-orange-500/40',
         title: 'Cấp 3: Sát giờ nguy hiểm (1h - 2h)',
-        description: 'Báo hủy khi chỉ còn 1h - 2h là bóng lăn. Đội chủ nhà bị phạt -25 điểm Uy Tín và bồi thường 200.000đ cọc cho đối thủ.',
+        description: 'Báo hủy khi chỉ còn 1h - 2h là bóng lăn. Đội chủ nhà bị phạt -25 điểm Uy Tín (Không áp dụng phạt tiền).',
       };
     }
     return {
