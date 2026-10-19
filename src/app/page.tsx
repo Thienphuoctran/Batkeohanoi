@@ -868,7 +868,10 @@ export default function HanoiMatchmakingPlatform() {
     setCancellingMatch(null);
 
     // 🛡️ BƯỚC 1: XÓA TRỰC TIẾP TRONG CSDL SUPABASE TRƯỚC (Database as Single Source of Truth)
-    const dbRes = await deleteOrCancelMatchAction(matchId);
+    const dbRes = await deleteOrCancelMatchAction(
+      matchId,
+      team?.id || team?.team_name || target?.hostTeam?.name
+    );
 
     if (!dbRes?.success) {
       console.error("❌ deleteOrCancelMatchAction failed:", dbRes?.error);

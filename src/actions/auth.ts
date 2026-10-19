@@ -246,12 +246,14 @@ export async function signUpWithEmailAction(formData: FormData) {
       password,
     });
 
+    const isProduction = process.env.NODE_ENV === "production";
     const cookieStore = await cookies();
     if (signInData?.session?.access_token) {
       cookieStore.set("bk7_access_token", signInData.session.access_token, {
         path: "/",
         httpOnly: true,
         sameSite: "lax",
+        secure: isProduction,
         maxAge: 60 * 60 * 24 * 30,
       });
     }
@@ -259,6 +261,7 @@ export async function signUpWithEmailAction(formData: FormData) {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
+      secure: isProduction,
       maxAge: 60 * 60 * 24 * 30,
     });
 
@@ -334,12 +337,14 @@ export async function signInWithEmailAction(formData: FormData) {
       };
     }
 
+    const isProduction = process.env.NODE_ENV === "production";
     const cookieStore = await cookies();
     if (data?.session?.access_token) {
       cookieStore.set("bk7_access_token", data.session.access_token, {
         path: "/",
         httpOnly: true,
         sameSite: "lax",
+        secure: isProduction,
         maxAge: 60 * 60 * 24 * 30,
       });
     }
@@ -348,6 +353,7 @@ export async function signInWithEmailAction(formData: FormData) {
         path: "/",
         httpOnly: true,
         sameSite: "lax",
+        secure: isProduction,
         maxAge: 60 * 60 * 24 * 30,
       });
     }
@@ -420,11 +426,13 @@ export async function signInAsDemoCaptainAction() {
         });
       }
 
+      const isProduction = process.env.NODE_ENV === "production";
       const cookieStore = await cookies();
       cookieStore.set("bk7_user_id", userId, {
         path: "/",
         httpOnly: true,
         sameSite: "lax",
+        secure: isProduction,
         maxAge: 60 * 60 * 24 * 30,
       });
 
@@ -484,12 +492,14 @@ export async function syncClientSessionAction(
   userId: string
 ) {
   try {
+    const isProduction = process.env.NODE_ENV === "production";
     const cookieStore = await cookies();
     if (accessToken) {
       cookieStore.set("bk7_access_token", accessToken, {
         path: "/",
         httpOnly: true,
         sameSite: "lax",
+        secure: isProduction,
         maxAge: 60 * 60 * 24 * 30,
       });
     }
@@ -498,6 +508,7 @@ export async function syncClientSessionAction(
         path: "/",
         httpOnly: true,
         sameSite: "lax",
+        secure: isProduction,
         maxAge: 60 * 60 * 24 * 30,
       });
     }
@@ -1217,8 +1228,11 @@ export async function sendEmergencyBroadcastAction(payload: {
   }
 }
 
-// 9. Xóa hoặc Hủy Kèo Đấu Trực Tiếp Trong Database Supabase (Chống Tái Xuất Hiện Khi F5)
-export async function deleteOrCancelMatchAction(matchId: string) {
+// 9. Xóa hoặc Hủy Kèo Đấu Trực Tiếp Trong Database Supabase (Chống Tái Xuất Hiện Khi F5 & Chống IDOR)
+export async function deleteOrCancelMatchAction(
+  matchId: string,
+  callerTeamIdOrName?: string
+) {
   try {
     if (!matchId) {
       return { success: false, error: "Thiếu ID trận đấu cần xóa." };
@@ -1233,7 +1247,7 @@ export async function deleteOrCancelMatchAction(matchId: string) {
       // Nếu client gửi ID tạm (match-new-...), tìm kiếm trận đấu có notes chứa ID này
       const { data: matchedRows } = await adminClient
         .from("matches")
-        .select("id")
+        .select("id, host_team_id, notes")
         .ilike("notes", `%${matchId}%`)
         .limit(1);
 
@@ -1243,6 +1257,38 @@ export async function deleteOrCancelMatchAction(matchId: string) {
         // Nếu không tìm thấy trong DB thì bản ghi không tồn tại trong DB, coi như đã sạch
         revalidatePath("/");
         return { success: true, message: "Kèo chưa từng lưu DB hoặc đã được dọn sạch." };
+      }
+    }
+
+    // 🛡️ BẢO MẬT MỤC 8: Khóa quyền truy cập Record (Chống tấn công IDOR)
+    if (callerTeamIdOrName) {
+      const { data: checkRow } = await adminClient
+        .from("matches")
+        .select("id, host_team_id, notes")
+        .eq("id", targetDbId)
+        .maybeSingle();
+
+      if (checkRow && checkRow.host_team_id) {
+        // Kiểm tra xem caller có phải là chủ nhà sở hữu kèo này không
+        const isOwner =
+          checkRow.host_team_id === callerTeamIdOrName ||
+          (checkRow.notes && checkRow.notes.includes(callerTeamIdOrName));
+        if (!isOwner) {
+          // Kiểm tra thêm theo team_name nếu callerTeamIdOrName là tên đội
+          const { data: hostTeam } = await adminClient
+            .from("teams")
+            .select("team_name")
+            .eq("id", checkRow.host_team_id)
+            .maybeSingle();
+
+          if (hostTeam && hostTeam.team_name !== callerTeamIdOrName) {
+            console.warn(`[deleteOrCancelMatchAction IDOR Blocked] Đội ${callerTeamIdOrName} không sở hữu kèo #${targetDbId}`);
+            return {
+              success: false,
+              error: "Từ chối truy cập: Bạn không phải chủ nhân của kèo đấu này!",
+            };
+          }
+        }
       }
     }
 

@@ -286,7 +286,8 @@ export async function createOrUpdateSubPostAction(payload: SubPlayerPost) {
  */
 export async function deleteMarketPostAction(
   postId: string,
-  type: "free-agents" | "team-recruit"
+  type: "free-agents" | "team-recruit",
+  callerPhone?: string
 ) {
   try {
     const adminClient = getAdminClient();
@@ -295,6 +296,27 @@ export async function deleteMarketPostAction(
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(postId);
 
     if (isUuid) {
+      // 🛡️ BẢO MẬT MỤC 8: Khóa quyền truy cập Record (Chống tấn công IDOR)
+      const { data: targetRecord } = await adminClient
+        .from(tableName)
+        .select("phone, contact_phone")
+        .eq("id", postId)
+        .maybeSingle();
+
+      if (targetRecord) {
+        const recordPhone = normalizeVietnamPhone(targetRecord.phone || targetRecord.contact_phone || "");
+        const inputPhone = normalizeVietnamPhone(callerPhone || "");
+
+        // Nếu bản ghi có SĐT và người gọi có SĐT nhưng không trùng khớp -> Chặn ngay lập tức
+        if (recordPhone && inputPhone && recordPhone !== inputPhone) {
+          console.warn(`[deleteMarketPostAction IDOR Blocked] SĐT yêu cầu (${inputPhone}) không khớp SĐT bài đăng (${recordPhone})`);
+          return {
+            success: false,
+            error: "Từ chối truy cập: Bạn không phải người đăng chính chủ của bài viết này!",
+          };
+        }
+      }
+
       // 1. Soft delete
       await adminClient
         .from(tableName)
