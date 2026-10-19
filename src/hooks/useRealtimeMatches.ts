@@ -357,17 +357,25 @@ export function useRealtimeMatchFeed(
             const mapped = mapDbMatchToFeedItem(newRow as MatchItem);
             if (mapped.status === "CANCELLED" || mapped.status === "EXPIRED") return;
             setMatches((prev) => {
-              if (prev.some((item) => item.id === mapped.id)) return prev;
+              // 🛡️ LỚP 2: KHỬ TRÙNG LẶP THEO CẢ ID LẪN NỘI DUNG (Deduplication)
+              const isDuplicate = prev.some(
+                (item) =>
+                  item.id === mapped.id ||
+                  (item.pitchName.trim().toLowerCase() === mapped.pitchName.trim().toLowerCase() &&
+                   item.startTime.trim() === mapped.startTime.trim() &&
+                   (item.matchDateIso === mapped.matchDateIso || item.matchDate === mapped.matchDate) &&
+                   item.hostTeam.name.trim().toLowerCase() === mapped.hostTeam.name.trim().toLowerCase())
+              );
 
-              // 🛡️ CHỐNG TỰ SINH 2 KÈO (Deduplicate Optimistic vs DB UUID):
+              if (isDuplicate) return prev;
+
               // Thay thế kèo tạm thời do client tạo bằng bản ghi chuẩn từ CSDL với UUID chính xác
               const tempMatchIdx = prev.findIndex(
                 (item) =>
-                  item.id === mapped.id ||
-                  ((item.id.startsWith("match-new-") || item.id.startsWith("m-") || item.isCreatedByCurrentUser) &&
-                   item.pitchName.trim().toLowerCase() === mapped.pitchName.trim().toLowerCase() &&
-                   item.startTime.trim() === mapped.startTime.trim() &&
-                   (item.matchDateIso === mapped.matchDateIso || item.matchDate === mapped.matchDate))
+                  (item.id.startsWith("match-new-") || item.id.startsWith("m-") || item.isCreatedByCurrentUser) &&
+                  item.pitchName.trim().toLowerCase() === mapped.pitchName.trim().toLowerCase() &&
+                  item.startTime.trim() === mapped.startTime.trim() &&
+                  (item.matchDateIso === mapped.matchDateIso || item.matchDate === mapped.matchDate)
               );
 
               if (tempMatchIdx !== -1) {
@@ -427,7 +435,18 @@ export function useRealtimeMatchFeed(
         const incoming = payload as MatchFeedItem;
         if (!incoming?.id) return;
         setMatches((prev) => {
-          if (prev.some((item) => item.id === incoming.id)) return prev;
+          // 🛡️ LỚP 2: KHỬ TRÙNG LẶP THEO CẢ ID LẪN NỘI DUNG (Deduplication)
+          const isDuplicate = prev.some(
+            (item) =>
+              item.id === incoming.id ||
+              (item.pitchName.trim().toLowerCase() === incoming.pitchName.trim().toLowerCase() &&
+               item.startTime.trim() === incoming.startTime.trim() &&
+               (item.matchDateIso === incoming.matchDateIso || item.matchDate === incoming.matchDate) &&
+               item.hostTeam.name.trim().toLowerCase() === incoming.hostTeam.name.trim().toLowerCase())
+          );
+
+          if (isDuplicate) return prev;
+
           const tempMatchIdx = prev.findIndex(
             (item) =>
               (item.id.startsWith("match-new-") || item.id.startsWith("m-") || item.isCreatedByCurrentUser) &&

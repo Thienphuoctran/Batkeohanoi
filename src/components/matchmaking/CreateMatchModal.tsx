@@ -70,7 +70,7 @@ export const GOLDEN_TIME_SLOTS = [
 interface CreateMatchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateMatch: (newMatch: MatchFeedItem) => void;
+  onCreateMatch: (newMatch: MatchFeedItem) => void | Promise<any>;
   verifiedTeam?: AuthenticatedTeamProfile | null;
   verifiedProfile?: UserProfile | null;
   onRequireAuth?: () => void;
@@ -133,6 +133,14 @@ export function CreateMatchModal({
   const [customGmapsUrl, setCustomGmapsUrl] = useState("");
   // Honeypot Chống Bot (Mục 13)
   const [botHoneypot, setBotHoneypot] = useState("");
+  // 🛡️ LỚP 1: Trạng thái khóa nút bấm chống gửi đúp (Double Submission)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setIsSubmitting(false);
+    }
+  }, [isOpen]);
 
   const quickDates = React.useMemo(() => getQuickDateOptions(4), [isOpen]);
 
@@ -235,86 +243,94 @@ export function CreateMatchModal({
   const isEscrowLocked =
     currentTrustScore < 70 && (!escrowWallet || escrowWallet.balance < 200000);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return; // 🛡️ Chặn ngay nếu đang gửi
     if (botHoneypot && botHoneypot.trim().length > 0) return; // Chặn bot âm thầm
     if (!isPhoneValid || !isZaloValid || isEscrowLocked || isSelectedTimeExpired) return;
 
-    const timeParts = timeSlot.includes("-")
-      ? timeSlot.split("-").map((t) => t.trim())
-      : [timeSlot.trim(), ""];
-    const startTime = timeParts[0] || "19:00";
-    const endTime = timeParts[1] || "20:30";
-    const normalizedCallPhone = formatDisplayPhone(captainPhone);
-    const normalizedZalo = normalizeVietnamPhone(effectiveZaloPhone);
+    setIsSubmitting(true);
+    try {
+      const timeParts = timeSlot.includes("-")
+        ? timeSlot.split("-").map((t) => t.trim())
+        : [timeSlot.trim(), ""];
+      const startTime = timeParts[0] || "19:00";
+      const endTime = timeParts[1] || "20:30";
+      const normalizedCallPhone = formatDisplayPhone(captainPhone);
+      const normalizedZalo = normalizeVietnamPhone(effectiveZaloPhone);
 
-    const finalPitchName = pitchName.trim() || "Sân Cỏ Nhân Tạo";
-    const finalPitchAddress =
-      pitchAddress.trim() || `Khu vực ${district.trim() || "Hà Nội"}`;
+      const finalPitchName = pitchName.trim() || "Sân Cỏ Nhân Tạo";
+      const finalPitchAddress =
+        pitchAddress.trim() || `Khu vực ${district.trim() || "Hà Nội"}`;
 
-    const formattedMatchDate = formatMatchDateDisplay(matchDateIso);
-    const kickoffDateObj = getMatchKickoffDate({
-      matchDate: matchDateIso,
-      matchDateIso,
-      startTime: startTime || "19:00",
-    });
-    const expiresDateObj = getMatchExpiresDate(
-      {
+      const formattedMatchDate = formatMatchDateDisplay(matchDateIso);
+      const kickoffDateObj = getMatchKickoffDate({
         matchDate: matchDateIso,
         matchDateIso,
         startTime: startTime || "19:00",
-      },
-      15
-    );
-
-    const newMatch: MatchFeedItem = {
-      id: `match-new-${Date.now()}`,
-      hostTeam: {
-        ...MOCK_TEAMS[0],
-        id: verifiedTeam?.id || MOCK_TEAMS[0].id,
-        name: hostTeamName.trim() || MOCK_TEAMS[0].name,
-        shortName: (hostTeamName.trim() || MOCK_TEAMS[0].shortName).slice(0, 12),
-        captainName: captainName.trim() || MOCK_TEAMS[0].captainName,
-        captainPhone: normalizedCallPhone,
-        captainZalo: normalizedZalo,
-        credit: {
-          ...MOCK_TEAMS[0].credit,
-          score: currentTrustScore,
+      });
+      const expiresDateObj = getMatchExpiresDate(
+        {
+          matchDate: matchDateIso,
+          matchDateIso,
+          startTime: startTime || "19:00",
         },
-      },
-      district,
-      pitchName: finalPitchName,
-      pitchAddress: finalPitchAddress,
-      matchDate: formattedMatchDate,
-      matchDateIso,
-      startTime: startTime || "19:00",
-      endTime: endTime || "20:30",
-      totalCostVnd: totalCost,
-      shareCostVnd: guestCost,
-      hostCostVnd: hostCost,
-      splitRatio: splitRatio,
-      splitRatioLabel: splitRatioLabel,
-      isCreatedByCurrentUser: true,
-      requiredTier: tier,
-      status: isSOS ? "SOS" : "OPEN",
-      isSOS,
-      sosCountdownSeconds: isSOS ? 3600 : undefined,
-      cancellationReason: isSOS
-        ? "Cần tìm đối thay thế khẩn cấp trước giờ bóng lăn"
-        : undefined,
-      notes,
-      createdAt: "Vừa xong",
-      kickoffTime: kickoffDateObj.toISOString(),
-      expiresAt: expiresDateObj.toISOString(),
-      handshakePin: Math.floor(1000 + Math.random() * 9000).toString(),
-      isHandshakeVerified: false,
-      escrowDepositTeamId: currentTrustScore < 70 ? (verifiedTeam?.id || "team-escrow") : undefined,
-      gmapsUrl: effectiveGmapsUrl,
-      isGmapsIntegrated: isGmapsIntegrated,
-    };
+        15
+      );
 
-    onCreateMatch(newMatch);
-    onClose();
+      const newMatch: MatchFeedItem = {
+        id: `match-new-${Date.now()}`,
+        hostTeam: {
+          ...MOCK_TEAMS[0],
+          id: verifiedTeam?.id || MOCK_TEAMS[0].id,
+          name: hostTeamName.trim() || MOCK_TEAMS[0].name,
+          shortName: (hostTeamName.trim() || MOCK_TEAMS[0].shortName).slice(0, 12),
+          captainName: captainName.trim() || MOCK_TEAMS[0].captainName,
+          captainPhone: normalizedCallPhone,
+          captainZalo: normalizedZalo,
+          credit: {
+            ...MOCK_TEAMS[0].credit,
+            score: currentTrustScore,
+          },
+        },
+        district,
+        pitchName: finalPitchName,
+        pitchAddress: finalPitchAddress,
+        matchDate: formattedMatchDate,
+        matchDateIso,
+        startTime: startTime || "19:00",
+        endTime: endTime || "20:30",
+        totalCostVnd: totalCost,
+        shareCostVnd: guestCost,
+        hostCostVnd: hostCost,
+        splitRatio: splitRatio,
+        splitRatioLabel: splitRatioLabel,
+        isCreatedByCurrentUser: true,
+        requiredTier: tier,
+        status: isSOS ? "SOS" : "OPEN",
+        isSOS,
+        sosCountdownSeconds: isSOS ? 3600 : undefined,
+        cancellationReason: isSOS
+          ? "Cần tìm đối thay thế khẩn cấp trước giờ bóng lăn"
+          : undefined,
+        notes,
+        createdAt: "Vừa xong",
+        kickoffTime: kickoffDateObj.toISOString(),
+        expiresAt: expiresDateObj.toISOString(),
+        handshakePin: Math.floor(1000 + Math.random() * 9000).toString(),
+        isHandshakeVerified: false,
+        escrowDepositTeamId: currentTrustScore < 70 ? (verifiedTeam?.id || "team-escrow") : undefined,
+        gmapsUrl: effectiveGmapsUrl,
+        isGmapsIntegrated: isGmapsIntegrated,
+      };
+
+      await onCreateMatch(newMatch);
+      onClose();
+    } catch (err) {
+      console.error("[handleSubmit Error]", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -950,15 +966,24 @@ export function CreateMatchModal({
           ) : (
             <Button
               type="submit"
-              disabled={!isPhoneValid || !isZaloValid || isSelectedTimeExpired}
+              disabled={isSubmitting || !isPhoneValid || !isZaloValid || isSelectedTimeExpired}
               className="w-full min-h-[46px] rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs gap-2 disabled:opacity-50"
             >
-              <PlusCircle className="w-4 h-4" />
-              <span>
-                {isSelectedTimeExpired
-                  ? "Khung Giờ Đã Qua — Vui Lòng Chọn Ngày Mai Hoặc Đổi Giờ"
-                  : `Đăng Kèo ${formatMatchDateDisplay(matchDateIso)} Lên Bảng Tin Ngay`}
-              </span>
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span>Đang Lưu Kèo Vào CSDL Supabase...</span>
+                </>
+              ) : (
+                <>
+                  <PlusCircle className="w-4 h-4" />
+                  <span>
+                    {isSelectedTimeExpired
+                      ? "Khung Giờ Đã Qua — Vui Lòng Chọn Ngày Mai Hoặc Đổi Giờ"
+                      : `Đăng Kèo ${formatMatchDateDisplay(matchDateIso)} Lên Bảng Tin Ngay`}
+                  </span>
+                </>
+              )}
             </Button>
           )}
         </form>

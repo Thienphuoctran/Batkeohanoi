@@ -622,86 +622,98 @@ export default function HanoiMatchmakingPlatform() {
     }
   };
 
+  const isCreatingMatchRef = React.useRef(false);
+
   const handleCreateNewMatch = async (newMatch: MatchFeedItem) => {
-    // Nếu đội có điểm uy tín < 70, tạm khóa 200.000đ trong ví ký quỹ
-    if (effectiveTrustScore < 70) {
-      setEscrowWallet((prev) => ({
-        ...prev,
-        lockedAmount: prev.lockedAmount + 200000,
-        availableBalance: Math.max(0, prev.balance - (prev.lockedAmount + 200000)),
-      }));
-    }
-
-    // 🛡️ BƯỚC 1: LƯU VÀO CSDL SUPABASE TRƯỚC TIÊN (Database as Single Source of Truth)
-    const hostTeamIdToSave = team?.id || "team-cg-01";
-    const dbRes = await createMatchInDatabaseAction({
-      hostTeamId: hostTeamIdToSave,
-      hostTeamName: newMatch.hostTeam.name,
-      captainName: newMatch.hostTeam.captainName,
-      captainPhone: newMatch.hostTeam.captainPhone,
-      captainZalo: newMatch.hostTeam.captainZalo,
-      skillTier: newMatch.requiredTier,
-      pitchCustomName: newMatch.pitchName,
-      district: newMatch.district,
-      timeSlotLabel: `${newMatch.startTime} - ${newMatch.endTime}`,
-      kickoffTimeIso: newMatch.kickoffTime,
-      expiresAtIso: newMatch.expiresAt,
-      totalFee: newMatch.totalCostVnd,
-      splitFee: newMatch.shareCostVnd,
-      isSos: newMatch.isSOS,
-      notes: newMatch.notes,
-      gmapsUrl: newMatch.gmapsUrl,
-      isGmapsIntegrated: newMatch.isGmapsIntegrated,
-      pitchAddress: newMatch.pitchAddress,
-    });
-
-    if (!dbRes?.success || !dbRes.match?.id) {
-      console.error("❌ createMatchInDatabaseAction failed:", dbRes?.error);
-      pushBotLog(
-        "❌ Lỗi Khi Lưu Kèo Vào CSDL",
-        `Không thể lưu bài đăng kèo vào máy chủ Supabase: ${dbRes?.error || "Lỗi không xác định"}. Vui lòng thử lại!`,
-        "Lỗi Lưu Kèo"
-      );
-      alert(`⚠️ Không thể lưu kèo đấu vào CSDL: ${dbRes?.error || "Lỗi kết nối. Vui lòng thử lại!"}`);
+    if (isCreatingMatchRef.current) {
+      console.warn("🛡️ [Anti-Double-Submit] Đang xử lý tạo kèo, bỏ qua yêu cầu đúp.");
       return;
     }
-
-    // 🛡️ BƯỚC 2: CSDL ĐÃ XÁC NHẬN THÀNH CÔNG -> Tạo đối tượng chính thức với UUID từ PostgreSQL
-    const officialId = dbRes.match.id;
-    const officialMatch: MatchFeedItem = {
-      ...newMatch,
-      id: officialId,
-      isCreatedByCurrentUser: true,
-      pitchAddress: newMatch.pitchAddress,
-      gmapsUrl: newMatch.gmapsUrl,
-      isGmapsIntegrated: newMatch.isGmapsIntegrated,
-    };
-
-    // 🛡️ BƯỚC 3: Cập nhật State và chuyển Tab
-    setMatches((prev) => [officialMatch, ...prev.filter((m) => m.id !== officialId)]);
-    setActiveTab(officialMatch.isSOS ? "sos" : "feed");
-
-    // 🛡️ BƯỚC 4: Phát sóng WebSocket Realtime kèm UUID chính thức tới toàn bộ thiết bị
-    await broadcastNewMatch(officialMatch);
-
-    pushBotLog(
-      officialMatch.isSOS
-        ? "🚨 Đã Phát Tín Hiệu Cứu Hộ SOS"
-        : "⚽ Đã Đăng Kèo Mới Lên Bảng Tin",
-      `${officialMatch.hostTeam.name} tìm đối tại ${officialMatch.pitchName} (${officialMatch.startTime} - ${officialMatch.matchDate}). Kèo đã lưu thành công vào CSDL.`,
-      officialMatch.isSOS ? "SOS < 1h" : "Kèo Mới",
-      officialMatch.hostTeam.captainZalo || officialMatch.hostTeam.captainPhone,
-      `${officialMatch.hostTeam.captainName} (${officialMatch.hostTeam.shortName})`
-    );
+    isCreatingMatchRef.current = true;
 
     try {
-      await fetch("/api/matches", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(officialMatch),
+      // Nếu đội có điểm uy tín < 70, tạm khóa 200.000đ trong ví ký quỹ
+      if (effectiveTrustScore < 70) {
+        setEscrowWallet((prev) => ({
+          ...prev,
+          lockedAmount: prev.lockedAmount + 200000,
+          availableBalance: Math.max(0, prev.balance - (prev.lockedAmount + 200000)),
+        }));
+      }
+
+      // 🛡️ BƯỚC 1: LƯU VÀO CSDL SUPABASE TRƯỚC TIÊN (Database as Single Source of Truth)
+      const hostTeamIdToSave = team?.id || "team-cg-01";
+      const dbRes = await createMatchInDatabaseAction({
+        hostTeamId: hostTeamIdToSave,
+        hostTeamName: newMatch.hostTeam.name,
+        captainName: newMatch.hostTeam.captainName,
+        captainPhone: newMatch.hostTeam.captainPhone,
+        captainZalo: newMatch.hostTeam.captainZalo,
+        skillTier: newMatch.requiredTier,
+        pitchCustomName: newMatch.pitchName,
+        district: newMatch.district,
+        timeSlotLabel: `${newMatch.startTime} - ${newMatch.endTime}`,
+        kickoffTimeIso: newMatch.kickoffTime,
+        expiresAtIso: newMatch.expiresAt,
+        totalFee: newMatch.totalCostVnd,
+        splitFee: newMatch.shareCostVnd,
+        isSos: newMatch.isSOS,
+        notes: newMatch.notes,
+        gmapsUrl: newMatch.gmapsUrl,
+        isGmapsIntegrated: newMatch.isGmapsIntegrated,
+        pitchAddress: newMatch.pitchAddress,
       });
-    } catch (err) {
-      console.log("Local match synchronized");
+
+      if (!dbRes?.success || !dbRes.match?.id) {
+        console.error("❌ createMatchInDatabaseAction failed:", dbRes?.error);
+        pushBotLog(
+          "❌ Lỗi Khi Lưu Kèo Vào CSDL",
+          `Không thể lưu bài đăng kèo vào máy chủ Supabase: ${dbRes?.error || "Lỗi không xác định"}. Vui lòng thử lại!`,
+          "Lỗi Lưu Kèo"
+        );
+        alert(`⚠️ Không thể lưu kèo đấu vào CSDL: ${dbRes?.error || "Lỗi kết nối. Vui lòng thử lại!"}`);
+        throw new Error(dbRes?.error || "Lỗi lưu CSDL");
+      }
+
+      // 🛡️ BƯỚC 2: CSDL ĐÃ XÁC NHẬN THÀNH CÔNG -> Tạo đối tượng chính thức với UUID từ PostgreSQL
+      const officialId = dbRes.match.id;
+      const officialMatch: MatchFeedItem = {
+        ...newMatch,
+        id: officialId,
+        isCreatedByCurrentUser: true,
+        pitchAddress: newMatch.pitchAddress,
+        gmapsUrl: newMatch.gmapsUrl,
+        isGmapsIntegrated: newMatch.isGmapsIntegrated,
+      };
+
+      // 🛡️ BƯỚC 3: Cập nhật State và chuyển Tab
+      setMatches((prev) => [officialMatch, ...prev.filter((m) => m.id !== officialId)]);
+      setActiveTab(officialMatch.isSOS ? "sos" : "feed");
+
+      // 🛡️ BƯỚC 4: Phát sóng WebSocket Realtime kèm UUID chính thức tới toàn bộ thiết bị
+      await broadcastNewMatch(officialMatch);
+
+      pushBotLog(
+        officialMatch.isSOS
+          ? "🚨 Đã Phát Tín Hiệu Cứu Hộ SOS"
+          : "⚽ Đã Đăng Kèo Mới Lên Bảng Tin",
+        `${officialMatch.hostTeam.name} tìm đối tại ${officialMatch.pitchName} (${officialMatch.startTime} - ${officialMatch.matchDate}). Kèo đã lưu thành công vào CSDL.`,
+        officialMatch.isSOS ? "SOS < 1h" : "Kèo Mới",
+        officialMatch.hostTeam.captainZalo || officialMatch.hostTeam.captainPhone,
+        `${officialMatch.hostTeam.captainName} (${officialMatch.hostTeam.shortName})`
+      );
+
+      try {
+        await fetch("/api/matches", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(officialMatch),
+        });
+      } catch (err) {
+        console.log("Local match synchronized");
+      }
+    } finally {
+      isCreatingMatchRef.current = false;
     }
   };
 

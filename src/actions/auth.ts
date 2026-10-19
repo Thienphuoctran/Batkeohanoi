@@ -798,6 +798,39 @@ export async function createMatchInDatabaseAction(payload: {
       status: "open",
     };
 
+    // LỚP 3 (CHỐT CHẶN AN TOÀN TẠI TẦNG SERVER):
+    // Idempotency Check chống Double Submission trong 30s:
+    // Nếu cùng host_team_id vừa tạo 1 kèo cùng sân và khung giờ trong 30s qua, trả về ngay bản ghi đó
+    const thirtySecondsAgo = new Date(Date.now() - 30 * 1000).toISOString();
+    const { data: existingDuplicate } = await adminClient
+      .from("matches")
+      .select("*")
+      .eq("host_team_id", hostTeamId)
+      .eq("pitch_custom_name", insertObj.pitch_custom_name)
+      .eq("time_slot_label", insertObj.time_slot_label)
+      .eq("status", "open")
+      .gte("created_at", thirtySecondsAgo)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (existingDuplicate) {
+      console.log("[createMatchInDatabaseAction] Phát hiện Double Submission -> Trả về bản ghi sẵn có ID:", existingDuplicate.id);
+      let duplicateMatch = existingDuplicate;
+      if (payload.hostTeamName) {
+        duplicateMatch.teams = {
+          team_name: payload.hostTeamName,
+          captain_name: payload.captainName || "Đội trưởng",
+          captain_phone: payload.captainPhone || "",
+          captain_zalo: payload.captainZalo || payload.captainPhone || "",
+          trust_score: 100,
+          skill_tier: payload.skillTier || 2,
+          has_warning_badge: false,
+        };
+      }
+      return { success: true, match: duplicateMatch };
+    }
+
     let { data, error } = await adminClient
       .from("matches")
       .insert(insertObj)
@@ -805,6 +838,22 @@ export async function createMatchInDatabaseAction(payload: {
       .single();
 
     if (error) {
+      // Nếu dính ràng buộc Unique Constraint (idx_unique_active_match) trên CSDL PostgreSQL
+      if (error.code === "23505" || error.message?.includes("idx_unique") || error.message?.includes("duplicate key")) {
+        console.warn("[createMatchInDatabaseAction] Dính Unique Index trên Supabase -> Kéo bản ghi đã tạo");
+        const { data: existingRecord } = await adminClient
+          .from("matches")
+          .select("*")
+          .eq("host_team_id", hostTeamId)
+          .eq("pitch_custom_name", insertObj.pitch_custom_name)
+          .eq("status", "open")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (existingRecord) {
+          return { success: true, match: existingRecord };
+        }
+      }
       console.error("[createMatchInDatabaseAction Error]", error);
       return { success: false, error: error.message };
     }
