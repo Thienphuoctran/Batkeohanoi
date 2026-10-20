@@ -100,25 +100,25 @@ export function HandshakeModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/85 backdrop-blur-sm p-0 sm:p-4">
-      <div className="w-full max-w-md rounded-t-3xl sm:rounded-2xl bg-[#0f172a] border border-white/[0.1] shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <div className="modal-spring-enter w-full max-w-md rounded-t-3xl sm:rounded-2xl bg-[#0f172a] border border-white/[0.1] shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.08] bg-slate-950/80">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-2xs">
               <Handshake className="w-4 h-4" />
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
                 Xác Thực Có Mặt Tại Sân
               </span>
-              <h3 className="text-sm font-extrabold text-white">
+              <h3 className="font-headline text-sm font-extrabold text-white">
                 Mã Bắt Tay Trên Sân (Chống Bùng)
               </h3>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] flex items-center justify-center text-slate-400 hover:text-white"
+            className="w-8 h-8 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] flex items-center justify-center text-slate-400 hover:text-white transition-all duration-160 ease-spring active:scale-95"
           >
             <X className="w-4 h-4" />
           </button>

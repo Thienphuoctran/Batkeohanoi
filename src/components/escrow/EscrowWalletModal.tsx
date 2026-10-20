@@ -176,25 +176,25 @@ export function EscrowWalletModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4">
-      <div className="w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[#0f172a] border border-white/[0.1] shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <div className="modal-spring-enter w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[#0f172a] border border-white/[0.1] shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.08] bg-slate-950/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-2xs">
               <Wallet className="w-5 h-5" />
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
                 Tài Chính &amp; Bảo Chứng Thi Đấu
               </span>
-              <h3 className="text-base font-extrabold text-white mt-0.5">
+              <h3 className="font-headline text-base font-extrabold text-white mt-0.5">
                 Ví Ký Quỹ Nội Bộ (In-App Escrow)
               </h3>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"
+            className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-160 ease-spring active:scale-95"
           >
             <X className="w-4 h-4" />
           </button>

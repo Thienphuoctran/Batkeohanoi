@@ -176,20 +176,20 @@ export function MatchChallengeModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-0 sm:p-4">
-      <div className="w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[#101624] border border-white/[0.1] shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <div className="modal-spring-enter w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[#101624] border border-white/[0.1] shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
         {/* Modal Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07] bg-slate-950/60">
           <div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
               {match.isSOS ? "⚡ Cứu Hộ Kèo Khẩn Cấp" : "Khớp Kèo Trực Tiếp"}
             </span>
-            <h3 className="text-base font-extrabold text-white mt-0.5">
+            <h3 className="font-headline text-base font-extrabold text-white mt-0.5">
               {match.pitchName}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+            className="w-9 h-9 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] flex items-center justify-center text-slate-400 hover:text-white transition-all duration-160 ease-spring active:scale-95"
           >
             <X className="w-4 h-4" />
           </button>
