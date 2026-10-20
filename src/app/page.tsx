@@ -23,6 +23,11 @@ import {
 import { MOCK_MATCH_FEEDS, MOCK_TEAMS } from "@/constants/mockMatchmaking";
 import { District, MatchFeedItem, SkillTier, EscrowWallet, BankWithdrawInfo } from "@/types/matchmaking";
 import { HeaderBar, ActiveTab } from "@/components/matchmaking/HeaderBar";
+import { DesktopScrapbookSidebars } from "@/components/layout/DesktopScrapbookSidebars";
+import { HeroScrapbookBanner } from "@/components/matchmaking/HeroScrapbookBanner";
+import { FeedFilterBar } from "@/components/matchmaking/FeedFilterBar";
+import { EmptyFeedState } from "@/components/matchmaking/EmptyFeedState";
+import { SosWorkspace } from "@/components/matchmaking/SosWorkspace";
 import { SosAlertCard } from "@/components/matchmaking/SosAlertCard";
 import { MatchFeedCard } from "@/components/matchmaking/MatchFeedCard";
 import { MatchChallengeModal } from "@/components/matchmaking/MatchChallengeModal";
@@ -1097,141 +1102,8 @@ export default function HanoiMatchmakingPlatform() {
 
   return (
     <div className="min-h-screen bg-kraft-newspaper text-stone-900 flex flex-col pb-16 relative overflow-x-hidden selection:bg-amber-300 selection:text-stone-900">
-      {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI RÌA TRÁI (DESKTOP VINTAGE SCRAPBOOK) */}
-      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "2xl:flex" : "xl:flex"} flex-col gap-4 fixed left-2 2xl:left-5 top-20 w-56 2xl:w-64 pointer-events-auto opacity-100 z-10`}>
-        {/* 1. TỜ BÁO PHỦI IN CHÍNH THỨC CÓ ẢNH TƯ LIỆU */}
-        <div className="card-retro-paper p-3 rounded-2xl border border-stone-300 shadow-md rotate-[-2deg] relative overflow-hidden pointer-events-auto">
-          <div className="washi-tape -top-2 left-6 rotate-[-2deg]" />
-          <div className="flex items-center justify-between border-b border-stone-300 pb-1.5 mb-2">
-            <span className="text-[10px] font-black uppercase text-red-700 tracking-wider flex items-center gap-1">
-              <span>📰 BẢN TIN PHỦI</span>
-            </span>
-            <span className="text-[9px] font-mono text-stone-500 font-bold">SỐ 2026</span>
-          </div>
-
-          <VintageScrapbookAsset
-            asset="newspaper-headline"
-            tape="none"
-            className="w-full mb-2"
-          />
-
-          <div className="space-y-1">
-            <div className="text-[11px] font-black text-stone-900 leading-tight">
-              Khung giờ vàng 19h00: Cụm sân Cầu Giấy kín lịch đối đầu
-            </div>
-            <p className="text-[10px] text-stone-600 line-clamp-2 leading-relaxed">
-              Các đội bóng phủi Thủ đô đang tích cực ghép kèo giao hữu sân 7. Hệ thống cọc 200k giúp triệt tiêu 100% tình trạng bùng kèo.
-            </p>
-          </div>
-          <div className="mt-2 pt-1.5 border-t border-stone-200 flex items-center justify-between">
-            <span className="rubber-stamp text-[8px] py-0.5 px-1.5">KÈO UY TÍN</span>
-            <span className="text-[9px] text-stone-600 font-extrabold font-mono">GiaoHuu.vn</span>
-          </div>
-        </div>
-
-        {/* 2. ẢNH POLAROID: CẦU THỦ NÂNG CÚP / KỶ NIỆM SAU TRẬN */}
-        <div className="bg-white p-2 pb-3 rounded-xl border border-stone-300 shadow-md rotate-[2.5deg] relative pointer-events-auto">
-          <div className="washi-tape -top-2.5 right-6 rotate-[3deg]" />
-          <VintageScrapbookAsset
-            asset="polaroid-trophy"
-            tape="none"
-            className="w-full mb-1"
-          />
-          <div className="text-center mt-1">
-            <p className="text-[10px] font-bold text-stone-800 tracking-tight">
-              “Kỷ niệm sau trận giao hữu 7v7”
-            </p>
-            <span className="text-[8px] text-stone-500 font-medium">Bắt tay hữu nghị • Nâng cúp vàng</span>
-          </div>
-        </div>
-
-        {/* 3. TỜ SỔ TAY KẺ Ô: SA BÀN CHIẾN THUẬT 3-2-1 */}
-        <div className="card-retro-paper p-2.5 rounded-xl border border-stone-300 shadow-sm rotate-[-1.5deg] relative text-[10px] pointer-events-auto">
-          <div className="washi-tape -top-2 left-8 rotate-[-1deg]" />
-          <VintageScrapbookAsset
-            asset="tactical-board"
-            tape="none"
-            className="w-full mb-1.5"
-            caption="Sơ đồ chiến thuật 3-2-1 phủi"
-          />
-          <p className="text-[9px] text-stone-500 mt-1 italic text-center">
-            “Kỷ luật vị trí — Không ham dâng cao!”
-          </p>
-        </div>
-      </aside>
-
-      {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI RÌA PHẢI (DESKTOP VINTAGE SCRAPBOOK) */}
-      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "2xl:flex" : "xl:flex"} flex-col gap-4 fixed right-2 2xl:right-5 top-20 w-56 2xl:w-64 pointer-events-auto opacity-100 z-10`}>
-        {/* 1. TỜ BÁO TIÊU ĐIỂM SÂN CỎ */}
-        <div className="card-retro-paper p-3 rounded-2xl border border-stone-300 shadow-md rotate-[2deg] relative overflow-hidden pointer-events-auto">
-          <div className="washi-tape -top-2 right-6 rotate-[2deg]" />
-          <div className="flex items-center justify-between border-b border-stone-300 pb-1.5 mb-2">
-            <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider flex items-center gap-1">
-              <span>🌱 TIÊU ĐIỂM SÂN CỎ</span>
-            </span>
-            <span className="text-[9px] font-mono text-stone-600 font-bold">26°C TF</span>
-          </div>
-
-          <VintageScrapbookAsset
-            asset="polaroid-fairplay"
-            tape="none"
-            className="w-full mb-2"
-          />
-
-          <div className="space-y-1">
-            <div className="text-[11px] font-black text-stone-900 leading-tight">
-              Thời tiết tối nay toàn Hà Nội: Cỏ khô ráo, gió mát lý tưởng
-            </div>
-            <p className="text-[10px] text-stone-600 line-clamp-2 leading-relaxed">
-              Mặt sân cỏ nhân tạo đạt độ bám tối đa, thích hợp thi đấu tốc độ cao và sút xa uy lực.
-            </p>
-          </div>
-          <div className="mt-2 pt-1.5 border-t border-stone-200 flex items-center justify-between">
-            <span className="rubber-stamp text-[8px] py-0.5 px-1.5 border-emerald-700 text-emerald-800">HÀ NỘI 7v7</span>
-            <span className="text-[9px] text-stone-500 font-bold font-mono">Bản Tin Tối</span>
-          </div>
-        </div>
-
-        {/* 2. CUỐNG VÉ TRẬN ĐẤU RETRO (MATCH TICKET STUB) */}
-        <div className="ticket-stub p-3 bg-[#fbf9f4] rounded-xl border border-stone-300 shadow-md rotate-[-2deg] relative pointer-events-auto">
-          <div className="washi-tape -top-2 left-6 rotate-[-1deg]" />
-          <VintageScrapbookAsset
-            asset="ticket-stub"
-            tape="none"
-            className="w-full mb-1"
-          />
-          <div className="space-y-1 text-[10px] mt-2">
-            <div className="flex justify-between text-stone-800 font-bold">
-              <span>BẢO CHỨNG:</span>
-              <span className="text-emerald-800 font-black">200.000đ</span>
-            </div>
-            <div className="flex justify-between text-stone-600">
-              <span>QUY CHUẨN:</span>
-              <span className="font-bold text-stone-800">Sân 7 Phủi Hà Nội</span>
-            </div>
-            <div className="flex justify-between text-stone-600">
-              <span>HỦY SÁT GIỜ:</span>
-              <span className="font-bold text-red-700">Đền 100% tiền sân</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 3. POLAROID: TRÀ ĐÁ VÀ CHIẾN THUẬT */}
-        <div className="bg-white p-2 pb-3 rounded-xl border border-stone-300 shadow-md rotate-[1.5deg] relative pointer-events-auto">
-          <div className="washi-tape -top-2 right-8 rotate-[2deg]" />
-          <VintageScrapbookAsset
-            asset="tea-tactics"
-            tape="none"
-            className="w-full mb-1"
-          />
-          <div className="text-center mt-1">
-            <p className="text-[10px] font-bold text-stone-800">
-              “Uống Trà Đá - Bàn Chiến Thuật”
-            </p>
-            <span className="text-[8px] text-stone-500">Mã Bắt Tay OTP 4 Số Nhận +10 Uy Tín</span>
-          </div>
-        </div>
-      </aside>
+      {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI HAI BÊN (DESKTOP VINTAGE SCRAPBOOK) */}
+      <DesktopScrapbookSidebars isWideLayout={isWideLayout} />
 
       {/* 🎨 LAYER 1: LỚP STICKER & HOẠ TIẾT TRANG TRÍ PHỦI */}
       <PhuiStickerCanvas />
@@ -1309,74 +1181,7 @@ export default function HanoiMatchmakingPlatform() {
           {activeTab === "feed" && (
             <div className="space-y-4">
               {/* 🏟️ HERO BANNER: PHONG CÁCH BẢN TIN BÁO GIẤY & RETRO SCRAPBOOK */}
-              <div className="card-retro-paper relative rounded-3xl overflow-hidden border border-stone-300 p-4 sm:p-5 shadow-lg">
-                {/* Washi Tape dán góc trang trí */}
-                <div className="washi-tape -top-2.5 left-8 rotate-[-3deg]" />
-                <div className="washi-tape -top-2.5 right-8 rotate-[2deg]" />
-
-                {/* 📰 DẢI BÁO RÁCH NỔI BẬT: KÈO GAY CẤN TỐI NAY (ASSET 02 TỪ ẢNH NGƯỜI DÙNG) */}
-                <div className="mb-3">
-                  <VintageScrapbookAsset
-                    asset="torn-banner"
-                    tape="both"
-                    className="w-full max-w-xl mx-auto block"
-                  />
-                </div>
-
-                <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-100 border border-red-300 text-[9px] sm:text-[10px] font-black text-red-700 uppercase tracking-wider">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping" />
-                        BẢN TIN NÓNG SÂN 7 HÀ NỘI
-                      </span>
-                      <span className="text-[10px] sm:text-[11px] text-stone-600 font-bold">• Ghép Đối Tốc Hành 5 Phút</span>
-                      <span className="rubber-stamp hidden sm:inline-flex text-[9px] py-0.5 px-2">KÈO UY TÍN</span>
-                    </div>
-                    <h2 className="text-base sm:text-2xl font-black text-stone-900 tracking-tight flex items-center gap-2 flex-wrap">
-                      <span>SÀN BẮT ĐỐI SÂN 7</span>
-                      <span className="text-red-700 underline decoration-stone-400">CHỐNG BÙNG KÈO</span>
-                      <PhuiSticker variant="chong-bung-keo" size={110} angle={-2} className="hidden md:inline-block ml-1 align-middle" />
-                    </h2>
-                    <p className="text-[11px] sm:text-xs text-stone-600 mt-0.5 sm:mt-1 max-w-xl leading-relaxed font-medium">
-                      Cọc bảo chứng 200k • Hủy sát giờ &lt; 1h đền 100% tiền sân • Xác thực mã bắt tay OTP 4 số tại cổng sân.
-                    </p>
-                  </div>
-
-                  {/* 📰 TỜ BÁO NẾP GẤP TƯ LIỆU THỰC TẾ (ASSET 01 TỪ ẢNH NGƯỜI DÙNG) */}
-                  <div className="hidden sm:block shrink-0">
-                    <VintageScrapbookAsset
-                      asset="newspaper-headline"
-                      tape="right"
-                      tilt={1.5}
-                      className="w-44 lg:w-48 shadow-md"
-                      caption="Bản tin phủi GiaoHuu.vn"
-                    />
-                  </div>
-
-                  {/* 2 Cột Thống Kê Chuẩn (ĐÃ XÓA Ô 1.450+ THEO ĐÚNG YÊU CẦU NGƯỜI DÙNG) */}
-                  <div className="relative shrink-0">
-                    <div className="grid grid-cols-2 gap-2 sm:gap-4 bg-[#ede8dc] border border-stone-300 rounded-2xl p-2.5 sm:p-3.5 shrink-0 shadow-inner relative overflow-hidden">
-                      <div className="text-center px-2">
-                        <div className="text-[9px] sm:text-[10px] text-stone-600 font-bold uppercase">Cọc Bảo Chứng</div>
-                        <div className="text-sm sm:text-base font-black text-emerald-800">
-                          <CountUpNumber end={200000} duration={1200} suffix="đ" />
-                        </div>
-                      </div>
-                      <div className="text-center px-2 border-l border-stone-300">
-                        <div className="text-[9px] sm:text-[10px] text-stone-600 font-bold uppercase">Uy Tín Chuẩn</div>
-                        <div className="text-sm sm:text-base font-black text-amber-800">
-                          <CountUpNumber end={100} duration={1500} suffix="/100" />
-                        </div>
-                      </div>
-                    </div>
-                    {/* Dải Ruy Băng Sao Vàng Thể Thao Phủi */}
-                    <div className="absolute -bottom-2.5 -right-1 hidden sm:block">
-                      <StarRibbon starsCount={5} className="py-0.5 px-2 text-[10px] rotate-[-2deg]" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <HeroScrapbookBanner />
 
               {/* LIVE TELEMETRY STRIP (Đồng hồ đếm ngược + Thời tiết + Live HN + Sân 2D) */}
               <LiveMatchBar
@@ -1394,106 +1199,16 @@ export default function HanoiMatchmakingPlatform() {
               />
 
               {/* Thanh Tìm Kiếm + Chọn Ca Giờ + Quận + 3 Tier (Vintage Newspaper Style) */}
-              <section id="matches-feed-anchor" className="card-retro-paper rounded-2xl border border-stone-300 p-3.5 space-y-3 shadow-md">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="relative flex-1">
-                    <Search className="w-4 h-4 text-stone-600 absolute left-3 top-2.5" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Tìm theo tên sân (Thành Phát, Mễ Trì, Đình Thôn...), tên FC, đội trưởng..."
-                      className="w-full h-9 pl-9 pr-3 rounded-xl bg-[#f4f0e6] border border-stone-300 text-xs text-stone-900 placeholder-stone-500 font-medium focus:outline-none focus:border-stone-600"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-stone-600 shrink-0 hidden sm:inline" />
-                    <select
-                      value={selectedTimeSlot}
-                      onChange={(e) => setSelectedTimeSlot(e.target.value)}
-                      aria-label="Lọc theo khung giờ"
-                      className="h-9 px-3 rounded-xl bg-[#f4f0e6] border border-stone-300 text-xs font-bold text-stone-900 focus:outline-none focus:border-stone-600 cursor-pointer"
-                    >
-                      <option value="ALL">⏰ Mọi khung giờ</option>
-                      <option value="17:30">Ca 17:30</option>
-                      <option value="19:00">Ca 19:00</option>
-                      <option value="19:30">Ca 19:30</option>
-                      <option value="20:30">Ca 20:30</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pt-1 border-t border-stone-200">
-                  {/* Khu vực Toàn Hà Nội (Pill Buttons) */}
-                  <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-1.5 pb-1 sm:pb-0">
-                    <span className="text-[11px] font-bold text-stone-700 flex items-center gap-1 mr-1 shrink-0">
-                      <MapPin className="w-3 h-3 text-red-600" />
-                      Khu vực:
-                    </span>
-                    {[
-                      "ALL",
-                      "Cầu Giấy",
-                      "Nam Từ Liêm",
-                      "Thanh Xuân",
-                      "Đống Đa",
-                      "Hà Đông",
-                      "Bắc Từ Liêm",
-                      "Hoàng Mai",
-                      "Ba Đình",
-                    ].map((dist) => (
-                      <button
-                        key={dist}
-                        onClick={() => setSelectedDistrict(dist as any)}
-                        className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all active:scale-95 shrink-0 whitespace-nowrap ${
-                          selectedDistrict === dist
-                            ? "bg-stone-900 text-white font-black border border-stone-900 shadow-sm"
-                            : "bg-[#ede8dc] text-stone-700 hover:text-stone-900 hover:bg-stone-200 border border-stone-300"
-                        }`}
-                      >
-                        {dist === "ALL" ? "Tất cả Hà Nội" : dist}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* 3 Tier (Pill Buttons) */}
-                  <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-1.5 pb-1 sm:pb-0">
-                    <span className="text-[11px] font-bold text-stone-700 flex items-center gap-1 mr-1 shrink-0">
-                      <Shield className="w-3 h-3 text-amber-700" />
-                      Tier:
-                    </span>
-                    <button
-                      onClick={() => setSelectedTier("ALL")}
-                      className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all shrink-0 whitespace-nowrap ${
-                        selectedTier === "ALL"
-                          ? "bg-stone-900 text-white font-black shadow-sm"
-                          : "bg-[#ede8dc] text-stone-700 hover:text-stone-900 hover:bg-stone-200 border border-stone-300"
-                      }`}
-                    >
-                      Mọi Tier
-                    </button>
-                    {([1, 2, 3] as SkillTier[]).map((t) => {
-                      const active = selectedTier === t;
-                      return (
-                        <button
-                          key={t}
-                          onClick={() => setSelectedTier(t)}
-                          className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border transition-all active:scale-95 ${
-                            active
-                              ? t === 1
-                                ? "bg-blue-800 text-white border-blue-900 shadow-sm"
-                                : t === 2
-                                ? "bg-emerald-800 text-white border-emerald-900 shadow-sm"
-                                : "bg-red-800 text-white border-red-900 shadow-sm"
-                              : "bg-[#ede8dc] border-stone-300 text-stone-700 hover:text-stone-900 hover:bg-stone-200"
-                          }`}
-                        >
-                          {t === 1 ? "Tier 1: Dưỡng sinh" : t === 2 ? "Tier 2: Phong trào" : "Tier 3: Phủi chiến"}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </section>
+              <FeedFilterBar
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                selectedTimeSlot={selectedTimeSlot}
+                onTimeSlotChange={setSelectedTimeSlot}
+                selectedDistrict={selectedDistrict}
+                onDistrictChange={setSelectedDistrict}
+                selectedTier={selectedTier}
+                onTierChange={setSelectedTier}
+              />
 
               {/* Kèo SOS nổi bật trên đầu Bảng Kèo */}
               {sosMatches.length > 0 && (
@@ -1532,76 +1247,7 @@ export default function HanoiMatchmakingPlatform() {
                   </div>
                 </div>
               ) : filteredMatches.length === 0 ? (
-                <div className="card-retro-paper relative rounded-3xl border border-stone-300 p-6 sm:p-8 text-center space-y-4 shadow-lg overflow-hidden">
-                  {/* Watermark Stamps Phủi */}
-                  <div className="absolute top-4 right-4 hidden sm:block">
-                    <PhuiStamp variant="keo-uy-tin" size="sm" angle={8} />
-                  </div>
-                  <div className="absolute bottom-4 left-4 hidden sm:block">
-                    <PhuiStamp variant="san-7-ha-noi" size="sm" angle={-6} />
-                  </div>
-
-                  <div className="space-y-1.5 relative z-10">
-                    <h3 className="text-base sm:text-xl font-black text-red-800 tracking-tight flex items-center justify-center gap-2 flex-wrap">
-                      <span>BẢN TIN GHÉP TRẬN HÔM NAY -</span>
-                      <span className="text-stone-900 underline decoration-red-600">HÀ NỘI</span>
-                    </h3>
-                    <p className="text-xs text-stone-600 max-w-sm mx-auto leading-relaxed">
-                      Chưa có đội nào mở kèo tại khu vực hoặc khung giờ này. Hãy là đội tiên phong mở bát để nhận đối thủ ngay trong 5 phút!
-                    </p>
-                  </div>
-
-                  {/* 📰 BỘ ẢNH TƯ LIỆU BÁO CHÍ & SCRAPBOOK BÓNG ĐÁ PHỦI (ẢNH 2 TỪ NGƯỜI DÙNG) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-3 max-w-2xl mx-auto relative z-10">
-                    {/* ASSET 01: TỜ BÁO NẾP GẤP */}
-                    <div className="flex flex-col items-center">
-                      <VintageScrapbookAsset
-                        asset="newspaper-headline"
-                        tape="both"
-                        tilt={-2}
-                        className="w-full max-w-[210px] shadow-md"
-                        caption="Bản tin phủi GiaoHuu.vn"
-                      />
-                    </div>
-                    {/* ASSET 05: POLAROID CHƠI ĐẸP - FAIR PLAY */}
-                    <div className="flex flex-col items-center">
-                      <VintageScrapbookAsset
-                        asset="polaroid-fairplay"
-                        tape="both"
-                        tilt={2}
-                        className="w-full max-w-[175px] shadow-md"
-                        caption="CHƠI ĐẸP - FAIR PLAY"
-                      />
-                    </div>
-                    {/* ASSET 07: SA BÀN 3-2-1 TRÊN GIẤY KẺ Ô */}
-                    <div className="flex flex-col items-center">
-                      <VintageScrapbookAsset
-                        asset="tactical-board"
-                        tape="both"
-                        tilt={-1.5}
-                        className="w-full max-w-[185px] shadow-md"
-                        caption="Sơ đồ 3-2-1 Phủi"
-                      />
-                    </div>
-                  </div>
-
-                  {/* ⚽ 2D MINI PITCH ROLLING FOOTBALL RADAR ANIMATION */}
-                  <div className="py-1 relative z-10">
-                    <RollingFootballPitch statusText="Quét các cụm sân Cầu Giấy, Nam Từ Liêm, Thanh Xuân, Đống Đa..." />
-                  </div>
-
-                  <div className="relative z-10 pt-1">
-                    <ClickSpark sparkColor={["#f97316", "#fbbf24", "#ef4444"]}>
-                      <button
-                        onClick={() => setIsCreateOpen(true)}
-                        className="ticket-stub inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-xs shadow-md shadow-orange-900/20 transition active:scale-95"
-                      >
-                        <Plus className="w-4 h-4 stroke-[3]" />
-                        <span>Mở Kèo Mới Ngay</span>
-                      </button>
-                    </ClickSpark>
-                  </div>
-                </div>
+                <EmptyFeedState onOpenCreateModal={() => setIsCreateOpen(true)} />
               ) : (
                 <div
                   className={`grid grid-cols-1 ${
@@ -1634,112 +1280,17 @@ export default function HanoiMatchmakingPlatform() {
 
           {/* WORKSPACE 2: TAB CỨU HỘ SOS CHUYÊN BIỆT */}
           {activeTab === "sos" && (
-            <div className="space-y-4">
-              <div className="card-retro-paper relative rounded-3xl border-2 border-red-300 p-4 sm:p-5 shadow-lg overflow-hidden">
-                <div className="washi-tape -top-2.5 left-8 rotate-[-2deg]" />
-                <div className="washi-tape -top-2.5 right-8 rotate-[3deg]" />
-
-                {/* Dải ruy băng sọc cứu hộ khẩn cấp retro */}
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_10px,#fbbf24_10px,#fbbf24_20px)]" />
-
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10 pt-1">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-100 border border-red-300 text-[10px] font-black text-red-700 uppercase tracking-wider">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping" />
-                        TRẠM CỨU HỘ KÈO PHÚT CHÓT
-                      </span>
-                      <span className="rubber-stamp text-[9px] py-0.5 px-2 border-red-700 text-red-800">
-                        HỎA TỐC &lt; 1H
-                      </span>
-                    </div>
-                    <h2 className="text-base sm:text-lg font-black text-stone-900 flex items-center gap-2">
-                      <Flame className="w-5 h-5 text-red-600 fill-current animate-bounce" />
-                      <span>TRẠM CỨU HỘ KÈO PHÚT CHÓT HÀ NỘI</span>
-                    </h2>
-                    <p className="text-xs text-stone-600 mt-0.5 font-medium">
-                      Cứu kèo giúp sân không bị bỏ trống • Thưởng +8 điểm tín nhiệm &amp; Bảo chứng an toàn 100%
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end shrink-0">
-                    <PhuiSticker variant="the-phat" size={70} angle={6} className="hidden sm:inline-block shrink-0" />
-                    <button
-                      onClick={() => {
-                        setIsCreateSosMode(true);
-                        setIsCreateOpen(true);
-                      }}
-                      className="ticket-stub px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 shrink-0"
-                    >
-                      <Flame className="w-4 h-4 fill-current" />
-                      <span>Phát Tín Hiệu SOS</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {sosMatches.length > 0 ? (
-                <div className="space-y-3.5">
-                  {sosMatches.map((sos) => {
-                    const isOwner =
-                      Boolean(sos.isCreatedByCurrentUser) ||
-                      (Boolean(team?.team_name) && sos.hostTeam.name === team?.team_name);
-                    return (
-                      <SosAlertCard
-                        key={sos.id}
-                        match={sos}
-                        isOwner={isOwner}
-                        onSelectMatch={(m) => setActiveChallengeMatch(m)}
-                        onEditMatch={(m) => setEditingMatch(m)}
-                        onDeleteMatch={handleDeleteMatch}
-                      />
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="card-retro-paper rounded-3xl border border-stone-300 p-6 sm:p-8 text-center space-y-4 text-xs text-stone-600 shadow-md relative overflow-hidden">
-                  <div className="washi-tape -top-2 left-1/2 -translate-x-1/2" />
-                  
-                  {/* 📰 DẢI BÁO RÁCH KÈO GAY CẤN TỐI NAY */}
-                  <div className="max-w-md mx-auto mb-2">
-                    <VintageScrapbookAsset
-                      asset="torn-banner"
-                      tape="both"
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div className="w-12 h-12 rounded-full bg-red-100 border border-red-300 text-red-600 flex items-center justify-center mx-auto text-xl shadow-inner">
-                    <Flame className="w-6 h-6 fill-current animate-pulse" />
-                  </div>
-                  <p className="font-bold text-stone-900 text-sm">Hiện tại không có kèo SOS nào cần cứu hộ.</p>
-                  <p className="text-stone-600 max-w-sm mx-auto">
-                    Đội bạn đang bị đối thủ bùng kèo hoặc thiếu đối phút chót? Phát tín hiệu để các đội quanh khu vực hỗ trợ ngay!
-                  </p>
-
-                  {/* CUỐNG VÉ BẢO CHỨNG */}
-                  <div className="max-w-xs mx-auto">
-                    <VintageScrapbookAsset
-                      asset="ticket-stub"
-                      tape="left"
-                      tilt={-1}
-                      className="w-full"
-                      caption="Bảo chứng cọc 200k chống bùng"
-                    />
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setIsCreateSosMode(true);
-                      setIsCreateOpen(true);
-                    }}
-                    className="ticket-stub inline-flex items-center gap-1.5 px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md transition active:scale-95"
-                  >
-                    <Flame className="w-3.5 h-3.5 fill-current" />
-                    <span>Phát Tín Hiệu Cứu Kèo Khẩn Cấp Ngay</span>
-                  </button>
-                </div>
-              )}
-            </div>
+            <SosWorkspace
+              sosMatches={sosMatches}
+              currentTeamName={team?.team_name}
+              onSelectMatch={(m) => setActiveChallengeMatch(m)}
+              onEditMatch={(m) => setEditingMatch(m)}
+              onDeleteMatch={handleDeleteMatch}
+              onOpenCreateSos={() => {
+                setIsCreateSosMode(true);
+                setIsCreateOpen(true);
+              }}
+            />
           )}
 
           {/* WORKSPACE 3: CHỢ CẦU LẺ */}

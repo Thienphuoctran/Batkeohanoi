@@ -370,5 +370,11 @@
   z-index: 20;
 }
 
+/* Tối ưu hóa hiệu năng render danh sách & cuộn mượt 60fps trên di động */
+.match-card-content-visibility {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 320px;
+}
+
 
 

@@ -167,7 +167,7 @@ export function MatchFeedCard({
   return (
     <SpotlightCard
       spotlightColor="rgba(24, 24, 27, 0.08)"
-      className={`card-retro-paper rounded-2xl border p-4 transition-all flex flex-col justify-between relative overflow-hidden ${
+      className={`card-retro-paper match-card-content-visibility rounded-2xl border p-4 transition-all flex flex-col justify-between relative overflow-hidden ${
         isMatched
           ? "border-stone-300/80 bg-[#f4f0e6] shadow-sm"
           : "border-stone-300 bg-[#fbf9f4] hover:border-stone-400 hover:-translate-y-0.5 shadow-md hover:shadow-lg"
