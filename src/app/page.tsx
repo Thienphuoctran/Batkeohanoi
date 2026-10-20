@@ -1098,7 +1098,7 @@ export default function HanoiMatchmakingPlatform() {
   return (
     <div className="min-h-screen bg-kraft-newspaper text-stone-900 flex flex-col pb-16 relative overflow-x-hidden selection:bg-amber-300 selection:text-stone-900">
       {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI RÌA TRÁI (DESKTOP VINTAGE SCRAPBOOK) */}
-      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "2xl:flex" : "xl:flex"} flex-col gap-4 fixed left-2 2xl:left-5 top-20 w-56 2xl:w-64 pointer-events-auto opacity-95 z-0`}>
+      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "2xl:flex" : "xl:flex"} flex-col gap-4 fixed left-2 2xl:left-5 top-20 w-56 2xl:w-64 pointer-events-auto opacity-100 z-10`}>
         {/* 1. TỜ BÁO PHỦI IN CHÍNH THỨC CÓ ẢNH TƯ LIỆU */}
         <div className="card-retro-paper p-3 rounded-2xl border border-stone-300 shadow-md rotate-[-2deg] relative overflow-hidden pointer-events-auto">
           <div className="washi-tape -top-2 left-6 rotate-[-2deg]" />
@@ -1161,7 +1161,7 @@ export default function HanoiMatchmakingPlatform() {
       </aside>
 
       {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI RÌA PHẢI (DESKTOP VINTAGE SCRAPBOOK) */}
-      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "2xl:flex" : "xl:flex"} flex-col gap-4 fixed right-2 2xl:right-5 top-20 w-56 2xl:w-64 pointer-events-auto opacity-95 z-0`}>
+      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "2xl:flex" : "xl:flex"} flex-col gap-4 fixed right-2 2xl:right-5 top-20 w-56 2xl:w-64 pointer-events-auto opacity-100 z-10`}>
         {/* 1. TỜ BÁO TIÊU ĐIỂM SÂN CỎ */}
         <div className="card-retro-paper p-3 rounded-2xl border border-stone-300 shadow-md rotate-[2deg] relative overflow-hidden pointer-events-auto">
           <div className="washi-tape -top-2 right-6 rotate-[2deg]" />
@@ -1336,7 +1336,7 @@ export default function HanoiMatchmakingPlatform() {
                     <h2 className="text-base sm:text-2xl font-black text-stone-900 tracking-tight flex items-center gap-2 flex-wrap">
                       <span>SÀN BẮT ĐỐI SÂN 7</span>
                       <span className="text-red-700 underline decoration-stone-400">CHỐNG BÙNG KÈO</span>
-                      <PhuiSticker variant="chong-bung-keo" size={135} angle={-2} className="hidden md:inline-block ml-1" />
+                      <PhuiSticker variant="chong-bung-keo" size={110} angle={-2} className="hidden md:inline-block ml-1 align-middle" />
                     </h2>
                     <p className="text-[11px] sm:text-xs text-stone-600 mt-0.5 sm:mt-1 max-w-xl leading-relaxed font-medium">
                       Cọc bảo chứng 200k • Hủy sát giờ &lt; 1h đền 100% tiền sân • Xác thực mã bắt tay OTP 4 số tại cổng sân.
