@@ -62,6 +62,7 @@ import {
   PhuiSticker,
   PhuiStickerCanvas,
 } from "@/components/phui";
+import { VintageScrapbookAsset } from "@/components/common/VintageScrapbookAsset";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { TeamOnboardingModal } from "@/components/team/TeamOnboardingModal";
 import {
@@ -118,6 +119,8 @@ export default function HanoiMatchmakingPlatform() {
 
   // Modal & Trung tâm Chuông thông báo In-App + Zalo 1-Click
   const [activeChallengeMatch, setActiveChallengeMatch] =
+    useState<MatchFeedItem | null>(null);
+  const [pendingChallengeMatch, setPendingChallengeMatch] =
     useState<MatchFeedItem | null>(null);
   const [editingMatch, setEditingMatch] = useState<MatchFeedItem | null>(null);
   const [cancellingMatch, setCancellingMatch] = useState<MatchFeedItem | null>(null);
@@ -1095,7 +1098,7 @@ export default function HanoiMatchmakingPlatform() {
   return (
     <div className="min-h-screen bg-kraft-newspaper text-stone-900 flex flex-col pb-16 relative overflow-x-hidden selection:bg-amber-300 selection:text-stone-900">
       {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI RÌA TRÁI (DESKTOP VINTAGE SCRAPBOOK) */}
-      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "hidden" : "xl:flex"} flex-col gap-4 fixed left-3 2xl:left-6 top-20 w-60 2xl:w-64 pointer-events-none opacity-90 z-0`}>
+      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "2xl:flex" : "xl:flex"} flex-col gap-4 fixed left-2 2xl:left-5 top-20 w-56 2xl:w-64 pointer-events-auto opacity-95 z-0`}>
         {/* 1. TỜ BÁO PHỦI IN CHÍNH THỨC CÓ ẢNH TƯ LIỆU */}
         <div className="card-retro-paper p-3 rounded-2xl border border-stone-300 shadow-md rotate-[-2deg] relative overflow-hidden pointer-events-auto">
           <div className="washi-tape -top-2 left-6 rotate-[-2deg]" />
@@ -1106,28 +1109,11 @@ export default function HanoiMatchmakingPlatform() {
             <span className="text-[9px] font-mono text-stone-500 font-bold">SỐ 2026</span>
           </div>
 
-          {/* Khung ảnh tư liệu báo chí (Ảnh 2 từ người dùng) với Fallback thông minh */}
-          <div className="relative mb-2 rounded-lg overflow-hidden border border-stone-300 bg-stone-100 aspect-[16/10] shadow-inner group">
-            <img
-              src="/images/vintage-scrapbook.jpg"
-              alt="Bản tin bóng đá phủi giaohuu.vn"
-              className="w-full h-full object-cover filter contrast-105 sepia-[0.15] transition-transform duration-300 group-hover:scale-105"
-              onError={(e) => {
-                // Fallback nếu người dùng chưa kịp copy ảnh vào public/images/
-                e.currentTarget.style.display = "none";
-                const fallback = e.currentTarget.parentElement?.querySelector(".img-fallback");
-                if (fallback) (fallback as HTMLElement).style.display = "flex";
-              }}
-            />
-            <div className="img-fallback hidden w-full h-full flex-col items-center justify-center bg-[#ede8dc] text-stone-700 p-2 text-center">
-              <span className="text-xl mb-1">📰</span>
-              <span className="text-[10px] font-black uppercase tracking-tight text-stone-800">Bản Tin GiaoHuu.vn</span>
-              <span className="text-[9px] text-stone-500">Phóng sự bóng đá sân 7</span>
-            </div>
-            <div className="absolute bottom-1 right-1 bg-stone-900/80 backdrop-blur-xs text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
-              TƯ LIỆU PHỦI
-            </div>
-          </div>
+          <VintageScrapbookAsset
+            asset="newspaper-headline"
+            tape="none"
+            className="w-full mb-2"
+          />
 
           <div className="space-y-1">
             <div className="text-[11px] font-black text-stone-900 leading-tight">
@@ -1143,58 +1129,31 @@ export default function HanoiMatchmakingPlatform() {
           </div>
         </div>
 
-        {/* 2. ẢNH POLAROID: CẦU THỦ ĂN MỪNG "CHƠI ĐẸP - FAIR PLAY" */}
-        <div className="bg-white p-2 pb-3.5 rounded-xl border border-stone-300 shadow-md rotate-[2.5deg] relative pointer-events-auto">
+        {/* 2. ẢNH POLAROID: CẦU THỦ NÂNG CÚP / KỶ NIỆM SAU TRẬN */}
+        <div className="bg-white p-2 pb-3 rounded-xl border border-stone-300 shadow-md rotate-[2.5deg] relative pointer-events-auto">
           <div className="washi-tape -top-2.5 right-6 rotate-[3deg]" />
-          <div className="relative aspect-[4/3] rounded bg-stone-100 overflow-hidden border border-stone-200 mb-1.5">
-            <img
-              src="/images/vintage-scrapbook.jpg"
-              alt="Kỷ niệm sau trận giao hữu 7v7"
-              className="w-full h-full object-cover object-bottom filter contrast-105"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                const fallback = e.currentTarget.parentElement?.querySelector(".polaroid-fallback");
-                if (fallback) (fallback as HTMLElement).style.display = "flex";
-              }}
-            />
-            <div className="polaroid-fallback hidden w-full h-full flex-col items-center justify-center bg-[#f7f5ef] p-2 text-center">
-              <span className="text-2xl mb-1">🤝⚽</span>
-              <span className="text-[10px] font-black text-stone-800 uppercase">Fair Play 100/100</span>
-            </div>
-            <div className="absolute top-1 left-1 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded shadow">
-              FAIR PLAY
-            </div>
-          </div>
-          <div className="text-center">
+          <VintageScrapbookAsset
+            asset="polaroid-trophy"
+            tape="none"
+            className="w-full mb-1"
+          />
+          <div className="text-center mt-1">
             <p className="text-[10px] font-bold text-stone-800 tracking-tight">
               “Kỷ niệm sau trận giao hữu 7v7”
             </p>
-            <span className="text-[8px] text-stone-500 font-medium">Bắt tay hữu nghị • Sân Phòng Không</span>
+            <span className="text-[8px] text-stone-500 font-medium">Bắt tay hữu nghị • Nâng cúp vàng</span>
           </div>
         </div>
 
         {/* 3. TỜ SỔ TAY KẺ Ô: SA BÀN CHIẾN THUẬT 3-2-1 */}
         <div className="card-retro-paper p-2.5 rounded-xl border border-stone-300 shadow-sm rotate-[-1.5deg] relative text-[10px] pointer-events-auto">
           <div className="washi-tape -top-2 left-8 rotate-[-1deg]" />
-          <div className="flex items-center justify-between border-b border-stone-200 pb-1 mb-1.5">
-            <span className="font-black text-stone-800 flex items-center gap-1">
-              <span>📋 SƠ ĐỒ 3-2-1 PHỦI</span>
-            </span>
-            <span className="text-[8px] text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.2 rounded border border-emerald-300">CHUẨN SÂN 7</span>
-          </div>
-          <div className="bg-[#ede8dc] p-2 rounded border border-dashed border-stone-300 space-y-1 font-mono text-[9px] text-stone-700">
-            <div className="text-center font-bold text-red-700">⚡ [FW] Tiền Đạo Cắm</div>
-            <div className="flex justify-between px-2 font-bold text-blue-700">
-              <span>🎯 [LMF] Cánh Trái</span>
-              <span>🎯 [RMF] Cánh Phải</span>
-            </div>
-            <div className="flex justify-between px-1 font-bold text-emerald-800">
-              <span>🛡️ [LB]</span>
-              <span>🛡️ [CB] Thòng</span>
-              <span>🛡️ [RB]</span>
-            </div>
-            <div className="text-center font-bold text-amber-800">🧤 [GK] Thủ Môn</div>
-          </div>
+          <VintageScrapbookAsset
+            asset="tactical-board"
+            tape="none"
+            className="w-full mb-1.5"
+            caption="Sơ đồ chiến thuật 3-2-1 phủi"
+          />
           <p className="text-[9px] text-stone-500 mt-1 italic text-center">
             “Kỷ luật vị trí — Không ham dâng cao!”
           </p>
@@ -1202,8 +1161,8 @@ export default function HanoiMatchmakingPlatform() {
       </aside>
 
       {/* 📰 CỘT BÁO PHÓNG SỰ BÓNG ĐÁ PHỦI RÌA PHẢI (DESKTOP VINTAGE SCRAPBOOK) */}
-      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "hidden" : "xl:flex"} flex-col gap-4 fixed right-3 2xl:right-6 top-20 w-60 2xl:w-64 pointer-events-none opacity-90 z-0`}>
-        {/* 1. TỜ BÁO TIÊU ĐIỂM SÂN CỎ CÓ ẢNH TƯ LIỆU */}
+      <aside aria-hidden="true" className={`hidden ${isWideLayout ? "2xl:flex" : "xl:flex"} flex-col gap-4 fixed right-2 2xl:right-5 top-20 w-56 2xl:w-64 pointer-events-auto opacity-95 z-0`}>
+        {/* 1. TỜ BÁO TIÊU ĐIỂM SÂN CỎ */}
         <div className="card-retro-paper p-3 rounded-2xl border border-stone-300 shadow-md rotate-[2deg] relative overflow-hidden pointer-events-auto">
           <div className="washi-tape -top-2 right-6 rotate-[2deg]" />
           <div className="flex items-center justify-between border-b border-stone-300 pb-1.5 mb-2">
@@ -1213,27 +1172,11 @@ export default function HanoiMatchmakingPlatform() {
             <span className="text-[9px] font-mono text-stone-600 font-bold">26°C TF</span>
           </div>
 
-          {/* Khung ảnh tư liệu báo chí (Ảnh 2 từ người dùng) */}
-          <div className="relative mb-2 rounded-lg overflow-hidden border border-stone-300 bg-stone-100 aspect-[16/10] shadow-inner group">
-            <img
-              src="/images/vintage-scrapbook.jpg"
-              alt="Mặt cỏ sân 7 Hà Nội"
-              className="w-full h-full object-cover object-top filter contrast-105 sepia-[0.15] transition-transform duration-300 group-hover:scale-105"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                const fallback = e.currentTarget.parentElement?.querySelector(".img-fallback-right");
-                if (fallback) (fallback as HTMLElement).style.display = "flex";
-              }}
-            />
-            <div className="img-fallback-right hidden w-full h-full flex-col items-center justify-center bg-[#ede8dc] text-stone-700 p-2 text-center">
-              <span className="text-xl mb-1">🏟️</span>
-              <span className="text-[10px] font-black uppercase tracking-tight text-stone-800">Sân Cỏ Nhân Tạo Hà Nội</span>
-              <span className="text-[9px] text-stone-500">Mặt cỏ đay cao cấp 50mm</span>
-            </div>
-            <div className="absolute top-1 right-1 bg-emerald-700 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow">
-              CỎ KHÔ RÁO
-            </div>
-          </div>
+          <VintageScrapbookAsset
+            asset="polaroid-fairplay"
+            tape="none"
+            className="w-full mb-2"
+          />
 
           <div className="space-y-1">
             <div className="text-[11px] font-black text-stone-900 leading-tight">
@@ -1252,13 +1195,12 @@ export default function HanoiMatchmakingPlatform() {
         {/* 2. CUỐNG VÉ TRẬN ĐẤU RETRO (MATCH TICKET STUB) */}
         <div className="ticket-stub p-3 bg-[#fbf9f4] rounded-xl border border-stone-300 shadow-md rotate-[-2deg] relative pointer-events-auto">
           <div className="washi-tape -top-2 left-6 rotate-[-1deg]" />
-          <div className="flex items-center justify-between border-b border-dashed border-stone-300 pb-1.5 mb-2">
-            <span className="text-[9px] font-black uppercase text-amber-800 tracking-wider">
-              🎟️ CUỐNG VÉ THI ĐẤU
-            </span>
-            <span className="text-[8px] font-mono font-bold text-stone-500">NO. 88392</span>
-          </div>
-          <div className="space-y-1 text-[10px]">
+          <VintageScrapbookAsset
+            asset="ticket-stub"
+            tape="none"
+            className="w-full mb-1"
+          />
+          <div className="space-y-1 text-[10px] mt-2">
             <div className="flex justify-between text-stone-800 font-bold">
               <span>BẢO CHỨNG:</span>
               <span className="text-emerald-800 font-black">200.000đ</span>
@@ -1272,34 +1214,19 @@ export default function HanoiMatchmakingPlatform() {
               <span className="font-bold text-red-700">Đền 100% tiền sân</span>
             </div>
           </div>
-          <div className="mt-2 pt-1.5 border-t border-dashed border-stone-300 flex items-center justify-between">
-            <div className="font-mono text-[8px] tracking-widest text-stone-400">||||| | |||| |||</div>
-            <span className="rubber-stamp text-[8px] py-0.2 px-1 text-emerald-800 border-emerald-700">XÁC THỰC</span>
-          </div>
         </div>
 
-        {/* 3. POLAROID: TRÀ ĐÁ VỈA HÈ SAU TRẬN */}
+        {/* 3. POLAROID: TRÀ ĐÁ VÀ CHIẾN THUẬT */}
         <div className="bg-white p-2 pb-3 rounded-xl border border-stone-300 shadow-md rotate-[1.5deg] relative pointer-events-auto">
           <div className="washi-tape -top-2 right-8 rotate-[2deg]" />
-          <div className="relative aspect-[4/3] rounded bg-stone-100 overflow-hidden border border-stone-200 mb-1.5">
-            <img
-              src="/images/vintage-scrapbook.jpg"
-              alt="Văn hóa trà đá phủi sau trận"
-              className="w-full h-full object-cover object-center filter contrast-105"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                const fallback = e.currentTarget.parentElement?.querySelector(".polaroid-tea-fallback");
-                if (fallback) (fallback as HTMLElement).style.display = "flex";
-              }}
-            />
-            <div className="polaroid-tea-fallback hidden w-full h-full flex-col items-center justify-center bg-[#f7f5ef] p-2 text-center">
-              <span className="text-2xl mb-1">🍵🥜</span>
-              <span className="text-[10px] font-black text-stone-800 uppercase">Trà Đá Phủi FC</span>
-            </div>
-          </div>
-          <div className="text-center">
+          <VintageScrapbookAsset
+            asset="tea-tactics"
+            tape="none"
+            className="w-full mb-1"
+          />
+          <div className="text-center mt-1">
             <p className="text-[10px] font-bold text-stone-800">
-              “Văn hóa trà đá sau trận 19h”
+              “Uống Trà Đá - Bàn Chiến Thuật”
             </p>
             <span className="text-[8px] text-stone-500">Mã Bắt Tay OTP 4 Số Nhận +10 Uy Tín</span>
           </div>
@@ -1387,8 +1314,17 @@ export default function HanoiMatchmakingPlatform() {
                 <div className="washi-tape -top-2.5 left-8 rotate-[-3deg]" />
                 <div className="washi-tape -top-2.5 right-8 rotate-[2deg]" />
 
-                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
-                  <div>
+                {/* 📰 DẢI BÁO RÁCH NỔI BẬT: KÈO GAY CẤN TỐI NAY (ASSET 02 TỪ ẢNH NGƯỜI DÙNG) */}
+                <div className="mb-3">
+                  <VintageScrapbookAsset
+                    asset="torn-banner"
+                    tape="both"
+                    className="w-full max-w-xl mx-auto block"
+                  />
+                </div>
+
+                <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  <div className="flex-1">
                     <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-100 border border-red-300 text-[9px] sm:text-[10px] font-black text-red-700 uppercase tracking-wider">
                         <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping" />
@@ -1405,6 +1341,17 @@ export default function HanoiMatchmakingPlatform() {
                     <p className="text-[11px] sm:text-xs text-stone-600 mt-0.5 sm:mt-1 max-w-xl leading-relaxed font-medium">
                       Cọc bảo chứng 200k • Hủy sát giờ &lt; 1h đền 100% tiền sân • Xác thực mã bắt tay OTP 4 số tại cổng sân.
                     </p>
+                  </div>
+
+                  {/* 📰 TỜ BÁO NẾP GẤP TƯ LIỆU THỰC TẾ (ASSET 01 TỪ ẢNH NGƯỜI DÙNG) */}
+                  <div className="hidden sm:block shrink-0">
+                    <VintageScrapbookAsset
+                      asset="newspaper-headline"
+                      tape="right"
+                      tilt={1.5}
+                      className="w-44 lg:w-48 shadow-md"
+                      caption="Bản tin phủi GiaoHuu.vn"
+                    />
                   </div>
 
                   {/* 2 Cột Thống Kê Chuẩn (ĐÃ XÓA Ô 1.450+ THEO ĐÚNG YÊU CẦU NGƯỜI DÙNG) */}
@@ -1585,7 +1532,7 @@ export default function HanoiMatchmakingPlatform() {
                   </div>
                 </div>
               ) : filteredMatches.length === 0 ? (
-                <div className="card-retro-paper relative rounded-3xl border border-stone-300 p-8 sm:p-10 text-center space-y-4 shadow-lg overflow-hidden">
+                <div className="card-retro-paper relative rounded-3xl border border-stone-300 p-6 sm:p-8 text-center space-y-4 shadow-lg overflow-hidden">
                   {/* Watermark Stamps Phủi */}
                   <div className="absolute top-4 right-4 hidden sm:block">
                     <PhuiStamp variant="keo-uy-tin" size="sm" angle={8} />
@@ -1602,6 +1549,40 @@ export default function HanoiMatchmakingPlatform() {
                     <p className="text-xs text-stone-600 max-w-sm mx-auto leading-relaxed">
                       Chưa có đội nào mở kèo tại khu vực hoặc khung giờ này. Hãy là đội tiên phong mở bát để nhận đối thủ ngay trong 5 phút!
                     </p>
+                  </div>
+
+                  {/* 📰 BỘ ẢNH TƯ LIỆU BÁO CHÍ & SCRAPBOOK BÓNG ĐÁ PHỦI (ẢNH 2 TỪ NGƯỜI DÙNG) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-3 max-w-2xl mx-auto relative z-10">
+                    {/* ASSET 01: TỜ BÁO NẾP GẤP */}
+                    <div className="flex flex-col items-center">
+                      <VintageScrapbookAsset
+                        asset="newspaper-headline"
+                        tape="both"
+                        tilt={-2}
+                        className="w-full max-w-[210px] shadow-md"
+                        caption="Bản tin phủi GiaoHuu.vn"
+                      />
+                    </div>
+                    {/* ASSET 05: POLAROID CHƠI ĐẸP - FAIR PLAY */}
+                    <div className="flex flex-col items-center">
+                      <VintageScrapbookAsset
+                        asset="polaroid-fairplay"
+                        tape="both"
+                        tilt={2}
+                        className="w-full max-w-[175px] shadow-md"
+                        caption="CHƠI ĐẸP - FAIR PLAY"
+                      />
+                    </div>
+                    {/* ASSET 07: SA BÀN 3-2-1 TRÊN GIẤY KẺ Ô */}
+                    <div className="flex flex-col items-center">
+                      <VintageScrapbookAsset
+                        asset="tactical-board"
+                        tape="both"
+                        tilt={-1.5}
+                        className="w-full max-w-[185px] shadow-md"
+                        caption="Sơ đồ 3-2-1 Phủi"
+                      />
+                    </div>
                   </div>
 
                   {/* ⚽ 2D MINI PITCH ROLLING FOOTBALL RADAR ANIMATION */}
@@ -1715,8 +1696,18 @@ export default function HanoiMatchmakingPlatform() {
                   })}
                 </div>
               ) : (
-                <div className="card-retro-paper rounded-2xl border border-stone-300 p-8 text-center space-y-3 text-xs text-stone-600 shadow-sm relative overflow-hidden">
+                <div className="card-retro-paper rounded-3xl border border-stone-300 p-6 sm:p-8 text-center space-y-4 text-xs text-stone-600 shadow-md relative overflow-hidden">
                   <div className="washi-tape -top-2 left-1/2 -translate-x-1/2" />
+                  
+                  {/* 📰 DẢI BÁO RÁCH KÈO GAY CẤN TỐI NAY */}
+                  <div className="max-w-md mx-auto mb-2">
+                    <VintageScrapbookAsset
+                      asset="torn-banner"
+                      tape="both"
+                      className="w-full"
+                    />
+                  </div>
+
                   <div className="w-12 h-12 rounded-full bg-red-100 border border-red-300 text-red-600 flex items-center justify-center mx-auto text-xl shadow-inner">
                     <Flame className="w-6 h-6 fill-current animate-pulse" />
                   </div>
@@ -1724,12 +1715,24 @@ export default function HanoiMatchmakingPlatform() {
                   <p className="text-stone-600 max-w-sm mx-auto">
                     Đội bạn đang bị đối thủ bùng kèo hoặc thiếu đối phút chót? Phát tín hiệu để các đội quanh khu vực hỗ trợ ngay!
                   </p>
+
+                  {/* CUỐNG VÉ BẢO CHỨNG */}
+                  <div className="max-w-xs mx-auto">
+                    <VintageScrapbookAsset
+                      asset="ticket-stub"
+                      tape="left"
+                      tilt={-1}
+                      className="w-full"
+                      caption="Bảo chứng cọc 200k chống bùng"
+                    />
+                  </div>
+
                   <button
                     onClick={() => {
                       setIsCreateSosMode(true);
                       setIsCreateOpen(true);
                     }}
-                    className="ticket-stub inline-flex items-center gap-1.5 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md transition active:scale-95"
+                    className="ticket-stub inline-flex items-center gap-1.5 px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md transition active:scale-95"
                   >
                     <Flame className="w-3.5 h-3.5 fill-current" />
                     <span>Phát Tín Hiệu Cứu Kèo Khẩn Cấp Ngay</span>
@@ -1741,7 +1744,16 @@ export default function HanoiMatchmakingPlatform() {
 
           {/* WORKSPACE 3: CHỢ CẦU LẺ */}
           {activeTab === "sub-market" && (
-            <SubMarketAndRollCall viewMode="sub-market" />
+            <SubMarketAndRollCall
+              viewMode="sub-market"
+              onRequireAuth={() => {
+                if (!isAuthenticated) {
+                  setIsAuthModalOpen(true);
+                } else {
+                  setIsTeamOnboardingOpen(true);
+                }
+              }}
+            />
           )}
 
           {/* WORKSPACE 4: BẢN ĐỒ CỤM SÂN BÓNG ĐÁ HÀ NỘI & CHỈ ĐƯỜNG 1-CHẠM */}
@@ -1866,6 +1878,18 @@ export default function HanoiMatchmakingPlatform() {
         onConfirmMatch={handleConfirmChallenge}
         escrowWallet={escrowWallet}
         onOpenEscrowModal={() => setIsEscrowModalOpen(true)}
+        verifiedTeam={team}
+        verifiedProfile={profile}
+        isAuthenticated={isAuthenticated}
+        onRequireAuth={() => {
+          setPendingChallengeMatch(activeChallengeMatch);
+          setActiveChallengeMatch(null);
+          if (!isAuthenticated) {
+            setIsAuthModalOpen(true);
+          } else {
+            setIsTeamOnboardingOpen(true);
+          }
+        }}
       />
 
       {/* Modal Đăng Kèo Mới */}
@@ -1880,6 +1904,7 @@ export default function HanoiMatchmakingPlatform() {
         verifiedTeam={team}
         verifiedProfile={profile}
         onRequireAuth={() => {
+          setIsCreateOpen(false);
           if (!isAuthenticated) {
             setIsAuthModalOpen(true);
           } else {
@@ -1934,7 +1959,19 @@ export default function HanoiMatchmakingPlatform() {
         onClose={() => setIsAuthModalOpen(false)}
         onSuccess={async () => {
           await refreshAuth();
-          setIsTeamOnboardingOpen(true);
+          if (pendingChallengeMatch) {
+            setActiveChallengeMatch(pendingChallengeMatch);
+            setPendingChallengeMatch(null);
+          } else {
+            const hasDraft =
+              typeof window !== "undefined" &&
+              !!localStorage.getItem("batkeo7_pending_match_draft");
+            if (hasDraft) {
+              setIsCreateOpen(true);
+            } else if (!hasTeam) {
+              setIsTeamOnboardingOpen(true);
+            }
+          }
         }}
       />
 
@@ -1946,7 +1983,19 @@ export default function HanoiMatchmakingPlatform() {
         initialPhone={profile?.phone || ""}
         onSuccess={async (createdTeam) => {
           await refreshAuth();
-          setActiveTab("trust-profile");
+          if (pendingChallengeMatch) {
+            setActiveChallengeMatch(pendingChallengeMatch);
+            setPendingChallengeMatch(null);
+          } else {
+            const hasDraft =
+              typeof window !== "undefined" &&
+              !!localStorage.getItem("batkeo7_pending_match_draft");
+            if (hasDraft) {
+              setIsCreateOpen(true);
+            } else {
+              setActiveTab("trust-profile");
+            }
+          }
           pushBotLog(
             `🎉 Đã Cấp Thẻ Căn Cước Đội: ${createdTeam?.team_name || "Đội mới"}`,
             `Đội bóng đã được xác thực chính chủ với 100/100 điểm tín nhiệm (Miễn cọc tiền mặt).`,

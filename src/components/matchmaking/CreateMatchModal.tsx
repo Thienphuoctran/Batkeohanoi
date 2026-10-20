@@ -137,12 +137,38 @@ export function CreateMatchModal({
   const [botHoneypot, setBotHoneypot] = useState("");
   // 🛡️ LỚP 1: Trạng thái khóa nút bấm chống gửi đúp (Double Submission)
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // 🛡️ Khôi phục bản nháp thông minh khi đăng nhập lại
+  const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
 
   React.useEffect(() => {
     if (isOpen) {
       setIsSubmitting(false);
       if (typeof initialIsSos === "boolean") {
         setIsSOS(initialIsSos);
+      }
+      try {
+        const savedDraft = localStorage.getItem("batkeo7_pending_match_draft");
+        if (savedDraft) {
+          const parsed = JSON.parse(savedDraft);
+          if (parsed && typeof parsed === "object") {
+            if (parsed.pitchName) setPitchName(parsed.pitchName);
+            if (parsed.pitchAddress) setPitchAddress(parsed.pitchAddress);
+            if (parsed.district) setDistrict(parsed.district);
+            if (parsed.matchDateIso) setMatchDateIso(parsed.matchDateIso);
+            if (parsed.timeSlot) setTimeSlot(parsed.timeSlot);
+            if (typeof parsed.totalCost === "number") setTotalCost(parsed.totalCost);
+            if (parsed.splitRatio) setSplitRatio(parsed.splitRatio);
+            if (parsed.customRatioText) setCustomRatioText(parsed.customRatioText);
+            if (typeof parsed.isSOS === "boolean") setIsSOS(parsed.isSOS);
+            if (parsed.notes) setNotes(parsed.notes);
+            if (typeof parsed.isGmapsIntegrated === "boolean") setIsGmapsIntegrated(parsed.isGmapsIntegrated);
+            if (parsed.customGmapsUrl) setCustomGmapsUrl(parsed.customGmapsUrl);
+            if (parsed.tier) setTier(parsed.tier);
+            setHasRestoredDraft(true);
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to restore match draft", e);
       }
     }
   }, [isOpen, initialIsSos]);
@@ -252,7 +278,39 @@ export function CreateMatchModal({
     e.preventDefault();
     if (isSubmitting) return; // 🛡️ Chặn ngay nếu đang gửi
     if (botHoneypot && botHoneypot.trim().length > 0) return; // Chặn bot âm thầm
-    if (!isPhoneValid || !isZaloValid || isEscrowLocked || isSelectedTimeExpired) return;
+    if (isEscrowLocked || isSelectedTimeExpired) return;
+
+    // 🛡️ PHƯƠNG ÁN 4: NẾU CHƯA ĐĂNG NHẬP HOẶC CHƯA CÓ ĐỘI CHÍNH CHỦ
+    // Tự động lưu nháp toàn bộ thông tin form và chuyển sang xác thực 1-chạm
+    if (!verifiedTeam) {
+      try {
+        const draftData = {
+          district,
+          pitchName,
+          pitchAddress,
+          matchDateIso,
+          timeSlot,
+          totalCost,
+          splitRatio,
+          customRatioText,
+          isSOS,
+          notes,
+          isGmapsIntegrated,
+          customGmapsUrl,
+          tier,
+        };
+        localStorage.setItem("batkeo7_pending_match_draft", JSON.stringify(draftData));
+      } catch (err) {
+        console.warn("Could not save match draft", err);
+      }
+      onClose();
+      if (onRequireAuth) {
+        onRequireAuth();
+      }
+      return;
+    }
+
+    if (!isPhoneValid || !isZaloValid) return;
 
     setIsSubmitting(true);
     try {
@@ -330,6 +388,9 @@ export function CreateMatchModal({
       };
 
       await onCreateMatch(newMatch);
+      try {
+        localStorage.removeItem("batkeo7_pending_match_draft");
+      } catch {}
       onClose();
     } catch (err) {
       console.error("[handleSubmit Error]", err);
@@ -406,6 +467,28 @@ export function CreateMatchModal({
             </div>
           )}
 
+          {/* Banner Thông báo Khôi phục bản nháp nếu có */}
+          {hasRestoredDraft && (
+            <div className="rounded-xl bg-sky-500/15 border border-sky-500/40 p-2.5 flex items-center justify-between text-sky-300 text-[11px] font-bold">
+              <span className="flex items-center gap-1.5">
+                <span>⚡</span>
+                <span>Đã khôi phục bản nháp bạn vừa nhập trước khi đăng nhập!</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    localStorage.removeItem("batkeo7_pending_match_draft");
+                  } catch {}
+                  setHasRestoredDraft(false);
+                }}
+                className="text-slate-400 hover:text-white underline text-[10px]"
+              >
+                Xóa nháp
+              </button>
+            </div>
+          )}
+
           {/* Banner trạng thái Xác thực Đội trưởng chính chủ */}
           {verifiedTeam ? (
             <div className="rounded-xl bg-emerald-500/15 border border-emerald-500/40 p-3 flex items-center justify-between gap-2">
@@ -426,9 +509,9 @@ export function CreateMatchModal({
             </div>
           ) : (
             onRequireAuth && (
-              <div className="rounded-xl bg-amber-500/10 border border-amber-500/35 p-3 flex items-center justify-between gap-2">
+              <div className="rounded-xl bg-gradient-to-r from-amber-500/15 via-emerald-500/15 to-sky-500/15 border border-amber-500/40 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-sm">
                 <div className="text-[11px] text-amber-200 leading-snug">
-                  💡 <strong>Khuyên dùng:</strong> Đăng ký tài khoản Đội trưởng để gắn cố định 1 SĐT = 1 Đội và nhận Thẻ Căn Cước 100 điểm tín nhiệm!
+                  🛡️ <strong>Chế độ Bảo Vệ Kèo 100★:</strong> Bạn có thể điền thông tin sân và giờ đá trước. Khi bấm đăng kèo, hệ thống tự lưu nháp và yêu cầu đăng nhập Đội Trưởng 1-chạm để cấp <strong>Thẻ Căn Cước 100 Điểm Tín Nhiệm</strong> và mở kết nối Zalo.
                 </div>
                 <button
                   type="button"
@@ -436,9 +519,9 @@ export function CreateMatchModal({
                     onClose();
                     onRequireAuth();
                   }}
-                  className="px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[11px] shrink-0 transition"
+                  className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shrink-0 transition shadow-sm active:scale-95"
                 >
-                  Đăng ký Đội
+                  Đăng Nhập 1-Chạm
                 </button>
               </div>
             )
@@ -458,42 +541,66 @@ export function CreateMatchModal({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
-                <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                  Tên FC chủ nhà
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                  <span>Tên FC chủ nhà</span>
+                  {verifiedTeam && (
+                    <span className="text-[10px] text-emerald-400 font-bold">✓ Chính chủ</span>
+                  )}
                 </label>
                 <input
                   type="text"
                   required
+                  readOnly={!!verifiedTeam}
                   value={hostTeamName}
                   onChange={(e) => setHostTeamName(e.target.value)}
-                  className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white text-xs focus:outline-none focus:border-emerald-500"
+                  className={`w-full h-9 px-3 rounded-xl border text-xs focus:outline-none ${
+                    verifiedTeam
+                      ? "bg-slate-950/70 border-emerald-500/40 text-emerald-300 font-bold cursor-not-allowed"
+                      : "bg-slate-900 border-white/[0.1] text-white focus:border-emerald-500"
+                  }`}
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                  Tên Đội trưởng
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                  <span>Tên Đội trưởng</span>
+                  {verifiedProfile?.full_name && (
+                    <span className="text-[10px] text-emerald-400 font-bold">✓ Đã xác thực</span>
+                  )}
                 </label>
                 <input
                   type="text"
                   required
+                  readOnly={!!verifiedProfile?.full_name || !!verifiedTeam?.captain_name}
                   value={captainName}
                   onChange={(e) => setCaptainName(e.target.value)}
-                  className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white text-xs focus:outline-none focus:border-emerald-500"
+                  className={`w-full h-9 px-3 rounded-xl border text-xs focus:outline-none ${
+                    verifiedProfile?.full_name || verifiedTeam?.captain_name
+                      ? "bg-slate-950/70 border-emerald-500/40 text-emerald-300 font-bold cursor-not-allowed"
+                      : "bg-slate-900 border-white/[0.1] text-white focus:border-emerald-500"
+                  }`}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                Số điện thoại nghe gọi chính (10 số VN)
+              <label className="block text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                <span>Số điện thoại nghe gọi chính (10 số VN)</span>
+                {verifiedProfile?.phone && (
+                  <span className="text-[10px] text-emerald-400 font-bold">✓ SĐT 1 Đội</span>
+                )}
               </label>
               <input
                 type="tel"
                 required
+                readOnly={!!verifiedProfile?.phone || !!verifiedTeam?.captain_phone}
                 value={captainPhone}
                 onChange={(e) => setCaptainPhone(e.target.value)}
                 placeholder="VD: 0988.765.432 hoặc +84988765432"
-                className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
+                className={`w-full h-9 px-3 rounded-xl border font-mono text-xs focus:outline-none ${
+                  verifiedProfile?.phone || verifiedTeam?.captain_phone
+                    ? "bg-slate-950/70 border-emerald-500/40 text-emerald-300 font-bold cursor-not-allowed"
+                    : "bg-slate-900 border-white/[0.1] text-white focus:border-emerald-500"
+                }`}
               />
             </div>
 
@@ -967,6 +1074,14 @@ export function CreateMatchModal({
             >
               <Lock className="w-4 h-4" />
               <span>Nạp 200k Ký Quỹ Mở Khóa Tạo Kèo ({currentTrustScore}★)</span>
+            </Button>
+          ) : !verifiedTeam ? (
+            <Button
+              type="submit"
+              className="w-full min-h-[46px] rounded-xl bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-black text-xs gap-2 shadow-lg active:scale-95 transition-all"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Đăng Nhập 1-Chạm Để Xuất Bản Kèo (Bảo Lưu Dữ Liệu)</span>
             </Button>
           ) : (
             <Button

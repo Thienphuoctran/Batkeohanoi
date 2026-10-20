@@ -23,7 +23,7 @@ function getAnonAuthClient() {
   });
 }
 
-async function getAuthenticatedUser() {
+export async function getAuthenticatedUser() {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("bk7_access_token")?.value;
@@ -818,8 +818,28 @@ export async function createMatchInDatabaseAction(payload: {
         ? parsedExpires
         : new Date(kickoffDate.getTime() + 15 * 60 * 1000);
 
+    const user = await getAuthenticatedUser();
     let hostTeamId = payload.hostTeamId;
     let foundValidTeam = false;
+
+    // 🛡️ LỚP BẢO MẬT CHÍNH CHỦ: Ưu tiên lấy đúng đội thuộc về tài khoản đã đăng nhập
+    if (user?.id) {
+      const { data: userTeam } = await adminClient
+        .from("teams")
+        .select("id, team_name, captain_name, captain_phone, captain_zalo, trust_score, skill_tier")
+        .eq("captain_id", user.id)
+        .maybeSingle();
+
+      if (userTeam?.id) {
+        hostTeamId = userTeam.id;
+        foundValidTeam = true;
+        payload.hostTeamName = userTeam.team_name;
+        payload.captainName = userTeam.captain_name;
+        payload.captainPhone = userTeam.captain_phone;
+        payload.captainZalo = userTeam.captain_zalo || userTeam.captain_phone;
+        if (typeof userTeam.skill_tier === "number") payload.skillTier = userTeam.skill_tier;
+      }
+    }
 
     const isValidUuid =
       typeof hostTeamId === "string" &&
@@ -827,7 +847,7 @@ export async function createMatchInDatabaseAction(payload: {
         hostTeamId
       );
 
-    if (isValidUuid) {
+    if (!foundValidTeam && isValidUuid) {
       const { data: existingTeam } = await adminClient
         .from("teams")
         .select("id")
@@ -851,35 +871,32 @@ export async function createMatchInDatabaseAction(payload: {
     }
 
     if (!foundValidTeam) {
-      const { data: anyTeam } = await adminClient
+      if (!user) {
+        return {
+          success: false,
+          error: "Yêu cầu đăng nhập tài khoản Đội Trưởng để đăng kèo đấu chính chủ lên hệ thống.",
+        };
+      }
+      const teamName = payload.hostTeamName?.trim() || "FC Phủi Hà Nội";
+      const captainName = payload.captainName?.trim() || "Đội Trưởng";
+      const phone = payload.captainPhone?.trim() || "0988666888";
+      const { data: newTeam } = await adminClient
         .from("teams")
+        .insert({
+          captain_id: user.id,
+          team_name: teamName,
+          captain_name: captainName,
+          captain_phone: phone,
+          captain_zalo: payload.captainZalo?.trim() || phone,
+          home_district: "CauGiay",
+          skill_tier: payload.skillTier || 2,
+          trust_score: 100,
+        })
         .select("id")
-        .limit(1)
-        .maybeSingle();
-      if (anyTeam?.id) {
-        hostTeamId = anyTeam.id;
+        .single();
+      if (newTeam?.id) {
+        hostTeamId = newTeam.id;
         foundValidTeam = true;
-      } else {
-        const teamName = payload.hostTeamName?.trim() || "FC Phủi Hà Nội";
-        const captainName = payload.captainName?.trim() || "Đội Trưởng";
-        const phone = payload.captainPhone?.trim() || "0988666888";
-        const { data: newTeam } = await adminClient
-          .from("teams")
-          .insert({
-            team_name: teamName,
-            captain_name: captainName,
-            captain_phone: phone,
-            captain_zalo: payload.captainZalo?.trim() || phone,
-            home_district: "CauGiay",
-            skill_tier: payload.skillTier || 2,
-            trust_score: 100,
-          })
-          .select("id")
-          .single();
-        if (newTeam?.id) {
-          hostTeamId = newTeam.id;
-          foundValidTeam = true;
-        }
       }
     }
 
@@ -1534,12 +1551,34 @@ export async function confirmMatchChallengeAction(payload: {
 }) {
   try {
     const adminClient = getAdminClient();
+    const user = await getAuthenticatedUser();
+
+    let guestTeamId: string | null = null;
+    if (user?.id) {
+      const { data: userTeam } = await adminClient
+        .from("teams")
+        .select("id, team_name, captain_phone, captain_zalo, trust_score")
+        .eq("captain_id", user.id)
+        .maybeSingle();
+
+      if (userTeam) {
+        guestTeamId = userTeam.id;
+        payload.guestTeamName = userTeam.team_name;
+        payload.guestCaptainPhone = userTeam.captain_phone;
+        payload.guestCaptainZalo = userTeam.captain_zalo || userTeam.captain_phone;
+        payload.guestTrustScore = userTeam.trust_score;
+      }
+    }
 
     const updateObj: Record<string, any> = {
       status: "matched",
       is_sos: false,
       notes: `[Đã bắt kèo bởi ${payload.guestTeamName} - ${payload.guestCaptainPhone}]`,
     };
+
+    if (guestTeamId) {
+      updateObj.guest_team_id = guestTeamId;
+    }
 
     const { error } = await adminClient
       .from("matches")

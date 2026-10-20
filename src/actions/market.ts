@@ -4,6 +4,7 @@ import { getAdminClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { sendTelegramAlert } from "./telegram";
 import { normalizeVietnamPhone, isValidVietnamPhone } from "@/lib/zalo";
+import { getAuthenticatedUser } from "@/actions/auth";
 import {
   FreeAgentScoutCard,
   SubPlayerPost,
@@ -183,6 +184,24 @@ export async function createOrUpdateSubPostAction(payload: SubPlayerPost) {
   try {
     const adminClient = getAdminClient();
     const cleanPhone = normalizeVietnamPhone(payload.contactPhone);
+    const user = await getAuthenticatedUser();
+
+    let teamId = payload.teamId || "team-guest";
+    if (user?.id) {
+      const { data: userTeam } = await adminClient
+        .from("teams")
+        .select("id, team_name, captain_phone, captain_zalo, skill_tier")
+        .eq("captain_id", user.id)
+        .maybeSingle();
+
+      if (userTeam) {
+        teamId = userTeam.id;
+        payload.teamName = userTeam.team_name;
+        payload.contactPhone = userTeam.captain_phone;
+        payload.contactZalo = userTeam.captain_zalo || userTeam.captain_phone;
+        if (typeof userTeam.skill_tier === "number") payload.skillTier = userTeam.skill_tier;
+      }
+    }
 
     // LỚP 3: Idempotency Check (Chống Double Submission trong 30s)
     if (!payload.id || payload.id.startsWith("sub-")) {
@@ -208,7 +227,7 @@ export async function createOrUpdateSubPostAction(payload: SubPlayerPost) {
     }
 
     const insertObj: Record<string, any> = {
-      team_id: payload.teamId || "team-guest",
+      team_id: teamId,
       team_name: payload.teamName.trim() || "FC Anh Em Hà Nội",
       position_needed: payload.positionNeeded,
       position_code: payload.positionCode || "MF",

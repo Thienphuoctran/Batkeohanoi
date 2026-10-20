@@ -8,6 +8,7 @@ import {
   Compass, Search, Clock,
   ExternalLink, Check
 } from 'lucide-react';
+import { VintageScrapbookAsset } from "@/components/common/VintageScrapbookAsset";
 
 export interface PitchData {
   id: string;
@@ -874,8 +875,8 @@ export const PitchMapSection: React.FC = () => {
         <div className="washi-tape -top-2.5 left-8 rotate-[-2deg]" />
         <div className="washi-tape -top-2.5 right-8 rotate-[2deg]" />
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-3.5 relative z-10 pt-1">
-          <div className="flex items-center space-x-3">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-3.5 relative z-10 pt-1">
+          <div className="flex items-center space-x-3 flex-1">
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 shadow-inner font-black shrink-0">
               <MapPin className="w-6 h-6 stroke-[2.5]" />
             </div>
@@ -886,10 +887,28 @@ export const PitchMapSection: React.FC = () => {
                   {HANOI_PITCHES.length} Cụm Sân Tuyển Chọn
                 </span>
               </div>
-              <p className="text-xs text-stone-600 mt-0.5 font-medium">
+              <p className="text-xs text-stone-600 mt-0.5 font-medium max-w-md">
                 Bản đồ Google Maps tương tác trực tiếp • Chỉ đường bằng giọng nói 1-chạm • Bãi đỗ ô tô &amp; Hotline đặt sân
               </p>
             </div>
+          </div>
+
+          {/* 📰 TƯ LIỆU SA BÀN & CÚP PHỦI THỰC TẾ TỪ ẢNH 2 */}
+          <div className="hidden sm:flex items-center gap-3 shrink-0">
+            <VintageScrapbookAsset
+              asset="tactical-board"
+              tape="left"
+              tilt={-2}
+              className="w-24 lg:w-28 shadow-sm"
+              caption="Sa bàn 3-2-1"
+            />
+            <VintageScrapbookAsset
+              asset="trophy-badge"
+              tape="right"
+              tilt={1.5}
+              className="w-24 lg:w-28 shadow-sm"
+              caption="Hà Nội Phủi"
+            />
           </div>
 
           <div className="flex items-center gap-2 shrink-0">

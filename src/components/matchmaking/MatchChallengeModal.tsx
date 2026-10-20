@@ -32,6 +32,10 @@ import {
   getSmsDeepLink,
   playNotificationChime,
 } from "@/lib/zalo";
+import {
+  AuthenticatedTeamProfile,
+  UserProfile,
+} from "@/hooks/useAuthTeam";
 
 interface MatchChallengeModalProps {
   match: MatchFeedItem | null;
@@ -45,6 +49,10 @@ interface MatchChallengeModalProps {
   ) => void;
   escrowWallet?: EscrowWallet;
   onOpenEscrowModal?: () => void;
+  verifiedTeam?: AuthenticatedTeamProfile | null;
+  verifiedProfile?: UserProfile | null;
+  isAuthenticated?: boolean;
+  onRequireAuth?: () => void;
 }
 
 export function MatchChallengeModal({
@@ -54,9 +62,17 @@ export function MatchChallengeModal({
   onConfirmMatch,
   escrowWallet,
   onOpenEscrowModal,
+  verifiedTeam,
+  verifiedProfile,
+  isAuthenticated,
+  onRequireAuth,
 }: MatchChallengeModalProps) {
-  const [teamName, setTeamName] = useState("FC Anh Em Cầu Giấy");
-  const [phone, setPhone] = useState("0988.666.888");
+  const [teamName, setTeamName] = useState(
+    verifiedTeam?.team_name || "FC Anh Em Cầu Giấy"
+  );
+  const [phone, setPhone] = useState(
+    verifiedProfile?.phone || verifiedTeam?.captain_phone || "0988.666.888"
+  );
   const [sameZaloAsPhone, setSameZaloAsPhone] = useState(true);
   const [customZalo, setCustomZalo] = useState("");
   const [guestJersey, setGuestJersey] = useState("Trắng");
@@ -65,6 +81,15 @@ export function MatchChallengeModal({
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [copiedMsg, setCopiedMsg] = useState(false);
   const [showZaloQr, setShowZaloQr] = useState(false);
+
+  React.useEffect(() => {
+    if (verifiedTeam) {
+      setTeamName(verifiedTeam.team_name);
+      if (verifiedProfile?.phone || verifiedTeam.captain_phone) {
+        setPhone(verifiedProfile?.phone || verifiedTeam.captain_phone || "");
+      }
+    }
+  }, [verifiedTeam, verifiedProfile]);
 
   if (!match) return null;
 
@@ -120,6 +145,12 @@ export function MatchChallengeModal({
 
   const handleConfirm = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!verifiedTeam) {
+      onClose();
+      if (onRequireAuth) onRequireAuth();
+      return;
+    }
+
     if (
       !agreedRules ||
       !teamName.trim() ||
@@ -397,19 +428,56 @@ export function MatchChallengeModal({
                 </p>
               </div>
 
+              {/* Banner yêu cầu Xác thực Đội Trưởng nếu chưa đăng nhập */}
+              {!verifiedTeam && onRequireAuth && (
+                <div className="rounded-2xl bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-amber-500/15 border border-amber-500/40 p-3.5 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-amber-300 flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+                      Yêu Cầu Xác Thực Đội Trưởng Để Khóa Kèo
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">
+                      CHỐNG BÙNG KÈO ẢO
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Để bảo vệ quyền lợi 2 đội bóng và đảm bảo trận đấu diễn ra nghiêm túc, bạn cần đăng nhập tài khoản Đội Trưởng. Đội có uy tín (≥ 70★) được <strong>MIỄN CỌC 100%</strong> và mở Zalo trao đổi màu áo ngay lập tức!
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onRequireAuth();
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Đăng Nhập 1-Chạm Bằng Google / SĐT Đội Trưởng</span>
+                  </button>
+                </div>
+              )}
+
               {/* Challenger Info Inputs + Zalo Verification */}
               <div className="rounded-xl bg-slate-950/70 border border-white/[0.08] p-3.5 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <div className="sm:col-span-2">
-                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                      Tên đội của bạn
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                      <span>Tên đội của bạn</span>
+                      {verifiedTeam && (
+                        <span className="text-[10px] text-emerald-400 font-bold">✓ Chính chủ</span>
+                      )}
                     </label>
                     <input
                       type="text"
                       required
+                      readOnly={!!verifiedTeam}
                       value={teamName}
                       onChange={(e) => setTeamName(e.target.value)}
-                      className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white text-xs focus:outline-none focus:border-emerald-500"
+                      className={`w-full h-9 px-3 rounded-xl border text-xs focus:outline-none ${
+                        verifiedTeam
+                          ? "bg-slate-950/70 border-emerald-500/40 text-emerald-300 font-bold cursor-not-allowed"
+                          : "bg-slate-900 border-white/[0.1] text-white focus:border-emerald-500"
+                      }`}
                     />
                   </div>
                   <div>
@@ -432,16 +500,24 @@ export function MatchChallengeModal({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                    Số điện thoại Đội trưởng (10 số VN)
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                    <span>Số điện thoại Đội trưởng (10 số VN)</span>
+                    {verifiedProfile?.phone && (
+                      <span className="text-[10px] text-emerald-400 font-bold">✓ SĐT 1 Đội</span>
+                    )}
                   </label>
                   <input
                     type="tel"
                     required
+                    readOnly={!!verifiedProfile?.phone || !!verifiedTeam?.captain_phone}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="VD: 0988.666.888"
-                    className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white text-xs font-mono focus:outline-none focus:border-emerald-500"
+                    className={`w-full h-9 px-3 rounded-xl border text-xs font-mono focus:outline-none ${
+                      verifiedProfile?.phone || verifiedTeam?.captain_phone
+                        ? "bg-slate-950/70 border-emerald-500/40 text-emerald-300 font-bold cursor-not-allowed"
+                        : "bg-slate-900 border-white/[0.1] text-white focus:border-emerald-500"
+                    }`}
                   />
                 </div>
 
@@ -585,7 +661,19 @@ export function MatchChallengeModal({
                 </span>
               </label>
 
-              {isChallengeBlocked ? (
+              {!verifiedTeam ? (
+                <Button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onRequireAuth?.();
+                  }}
+                  className="w-full min-h-[46px] rounded-xl bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-black text-xs gap-2 shadow-lg active:scale-95 transition-all"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>Đăng Nhập Đội Trưởng Để Bắt Kèo ({match.shareCostVnd.toLocaleString("vi-VN")}đ)</span>
+                </Button>
+              ) : isChallengeBlocked ? (
                 <Button
                   type="button"
                   onClick={onOpenEscrowModal}

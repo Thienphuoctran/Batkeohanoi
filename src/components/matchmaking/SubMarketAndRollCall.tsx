@@ -44,6 +44,7 @@ import {
 import { FutCardModal } from "./FutCardModal";
 import { SpotlightCard } from "@/components/reactbits/SpotlightCard";
 import { ClickSpark } from "@/components/reactbits/ClickSpark";
+import { VintageScrapbookAsset } from "@/components/common/VintageScrapbookAsset";
 import { useRealtimeMarket } from "@/hooks/useRealtimeMarket";
 import {
   createOrUpdateFreeAgentAction,
@@ -55,6 +56,7 @@ interface SubMarketAndRollCallProps {
   viewMode?: "sub-market" | "roll-call" | "both";
   onSwitchToSubMarket?: () => void;
   onSyncToVietQr?: (goingCount: number) => void;
+  onRequireAuth?: () => void;
 }
 
 const HANOI_DISTRICTS_FILTER = [
@@ -81,7 +83,7 @@ const POSITION_OPTIONS: {
   { code: "FW", label: "Tiền Đạo (FW)", short: "FW", icon: "⚡" },
 ];
 
-export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
+export function SubMarketAndRollCall({ onRequireAuth }: SubMarketAndRollCallProps) {
   // Chế độ 2 chiều: "free-agents" (Cầu thủ tìm đội) | "team-recruit" (Đội tuyển thêm người)
   const [marketMode, setMarketMode] = useState<"free-agents" | "team-recruit">(
     "free-agents"
@@ -429,6 +431,12 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
     e.preventDefault();
     if (isSavingRef.current || isSubmitting) return;
 
+    if (formMode === "team-recruit" && !team) {
+      setIsPostModalOpen(false);
+      if (onRequireAuth) onRequireAuth();
+      return;
+    }
+
     isSavingRef.current = true;
     setIsSubmitting(true);
 
@@ -595,8 +603,8 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
         <div className="washi-tape -top-2.5 left-8 rotate-[-2deg]" />
         <div className="washi-tape -top-2.5 right-8 rotate-[2deg]" />
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10 pt-1">
-          <div>
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10 pt-1">
+          <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-[10px] font-black text-emerald-800 uppercase tracking-wider">
                 Chợ Cầu 2 Chiều • Toàn Hà Nội
@@ -609,9 +617,27 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
               <UserPlus className="w-5 h-5 text-emerald-800" />
               <span>Chợ Cầu Lẻ &amp; Cầu Thủ Tự Do Tìm Đội</span>
             </h2>
-            <p className="text-xs text-stone-600 mt-0.5 font-medium">
+            <p className="text-xs text-stone-600 mt-0.5 font-medium max-w-lg">
               Ghép cầu thủ tự do vào đội thiếu người sát giờ • Đánh giá uy tín cá nhân &amp; Xuất thẻ FUT Card
             </p>
+          </div>
+
+          {/* 📰 TƯ LIỆU BÁO CHÍ & VĂN HÓA TRÀ ĐÁ PHỦI */}
+          <div className="hidden sm:flex items-center gap-3 shrink-0">
+            <VintageScrapbookAsset
+              asset="tea-tactics"
+              tape="right"
+              tilt={2}
+              className="w-24 lg:w-28 shadow-sm"
+              caption="Trà đá phủi"
+            />
+            <VintageScrapbookAsset
+              asset="polaroid-fairplay"
+              tape="left"
+              tilt={-1.5}
+              className="w-24 lg:w-28 shadow-sm"
+              caption="Fair Play"
+            />
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
@@ -1249,6 +1275,25 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                 </div>
               )}
 
+              {/* Banner yêu cầu Đội Trưởng nếu đang ở chế độ tuyển người và chưa có đội */}
+              {formMode === "team-recruit" && !team && onRequireAuth && (
+                <div className="rounded-xl bg-amber-100 border border-amber-300 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-stone-900 shadow-xs">
+                  <div className="text-[11px] leading-snug">
+                    🛡️ <strong>Tin tuyển quân chính chủ:</strong> Bạn cần đăng nhập tài khoản Đội Trưởng để gắn tin đăng với hồ sơ đội và nhận liên hệ trực tiếp qua Zalo.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPostModalOpen(false);
+                      onRequireAuth();
+                    }}
+                    className="ticket-stub px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-stone-950 font-black text-xs shrink-0 active:scale-95 transition"
+                  >
+                    Đăng Nhập 1-Chạm
+                  </button>
+                </div>
+              )}
+
               {/* Nội dung riêng cho Cầu thủ tự do */}
               {formMode === "free-agents" ? (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -1499,24 +1544,37 @@ export function SubMarketAndRollCall({}: SubMarketAndRollCallProps) {
                 >
                   Hủy
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="ticket-stub h-9 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs disabled:opacity-50 flex items-center gap-1.5 shadow-sm"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Đang Lưu Lên Chợ Cầu...</span>
-                    </>
-                  ) : editingAgentId || editingSubId ? (
-                    "Lưu Thay Đổi"
-                  ) : formMode === "free-agents" ? (
-                    "Đăng Hồ Sơ & Xuất Thẻ FUT"
-                  ) : (
-                    "Đăng Tin Tuyển Người"
-                  )}
-                </Button>
+                {formMode === "team-recruit" && !team ? (
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setIsPostModalOpen(false);
+                      onRequireAuth?.();
+                    }}
+                    className="ticket-stub h-9 px-5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-black text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition"
+                  >
+                    🛡️ Đăng Nhập Đội Trưởng Để Đăng Tin
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="ticket-stub h-9 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs disabled:opacity-50 flex items-center gap-1.5 shadow-sm"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Đang Lưu Lên Chợ Cầu...</span>
+                      </>
+                    ) : editingAgentId || editingSubId ? (
+                      "Lưu Thay Đổi"
+                    ) : formMode === "free-agents" ? (
+                      "Đăng Hồ Sơ & Xuất Thẻ FUT"
+                    ) : (
+                      "Đăng Tin Tuyển Người"
+                    )}
+                  </Button>
+                )}
               </div>
             </form>
           </div>
