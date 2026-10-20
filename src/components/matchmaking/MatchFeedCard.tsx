@@ -166,11 +166,11 @@ export function MatchFeedCard({
 
   return (
     <SpotlightCard
-      spotlightColor="rgba(24, 24, 27, 0.08)"
-      className={`card-retro-paper match-card-content-visibility rounded-2xl border p-4 transition-all flex flex-col justify-between relative overflow-hidden ${
+      spotlightColor="rgba(24, 24, 27, 0.06)"
+      className={`card-retro-paper match-card-content-visibility rounded-2xl border p-4 sm:p-4.5 transition-all duration-220 ease-spring flex flex-col justify-between relative overflow-hidden ${
         isMatched
-          ? "border-stone-300/80 bg-[#f4f0e6] shadow-sm"
-          : "border-stone-300 bg-[#fbf9f4] hover:border-stone-400 hover:-translate-y-0.5 shadow-md hover:shadow-lg"
+          ? "border-stone-300/80 bg-[#f5f0e4] shadow-xs"
+          : "border-stone-300/90 bg-[#fbf9f4] hover:border-stone-400/90 hover:-translate-y-1 shadow-paper hover:shadow-paper-hover"
       }`}
     >
       {/* Phủi Stamp Watermark for Trust & Match Status */}
@@ -189,7 +189,7 @@ export function MatchFeedCard({
       <div>
         {/* Warning Banner for Red-Flagged Team */}
         {host.credit.warningBadge === "TUNG_BUNG_KEO" && (
-          <div className="mb-3 px-3 py-1.5 rounded-xl bg-red-100 border border-red-300 flex items-center justify-between text-[11px]">
+          <div className="mb-3 px-3 py-1.5 rounded-xl bg-red-100 border border-red-300/80 flex items-center justify-between text-[11px] shadow-2xs">
             <span className="text-red-800 font-bold flex items-center gap-1.5">
               <AlertOctagon className="w-3.5 h-3.5 text-red-600 shrink-0" />
               Nhãn cảnh báo: Từng bùng kèo sát giờ (&lt;1h)
@@ -198,35 +198,35 @@ export function MatchFeedCard({
           </div>
         )}
 
-        {/* Top Meta Row */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-200">
-          <div className="flex items-center gap-2">
+        {/* Top Meta Row - Taste Skill & Impeccable Design */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-200/90">
+          <div className="flex items-center gap-2.5">
             <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-xs shadow-inner shrink-0"
+              className="w-9.5 h-9.5 rounded-xl flex items-center justify-center text-white font-black text-xs shadow-inner shrink-0 tracking-wider"
               style={{ backgroundColor: host.jerseyColor }}
             >
               {host.shortName.slice(0, 3).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 className="font-black text-sm text-stone-900 leading-tight">
+                <h3 className="font-headline font-black text-sm sm:text-base text-stone-900 leading-tight">
                   {host.name}
                 </h3>
                 {isOwner && (
-                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-400">
+                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-400/80 shadow-2xs">
                     Kèo của bạn
                   </span>
                 )}
                 {host.totalMatches !== undefined && host.totalMatches < 3 ? (
                   <span
-                    className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-400 inline-flex items-center gap-0.5"
+                    className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-400/80 inline-flex items-center gap-0.5 shadow-2xs"
                     title="Đội bóng mới gia nhập hệ thống (Dưới 3 trận)"
                   >
                     <span>🌱 Đội Mới ({host.totalMatches} trận)</span>
                   </span>
                 ) : (
                   <span
-                    className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-stone-200 text-stone-800 border border-stone-400 inline-flex items-center gap-0.5"
+                    className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-[#ede8dc] text-stone-800 border border-stone-300/80 inline-flex items-center gap-0.5 shadow-2xs"
                     title="Đội bóng phong trào đã thi đấu xác thực"
                   >
                     <span>⭐ Đã Xác Thực ({host.totalMatches || 5} trận)</span>
@@ -239,10 +239,10 @@ export function MatchFeedCard({
               </div>
               <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
                 <span
-                  className={`inline-flex items-center gap-1 text-[10px] font-black px-1.5 py-0.5 rounded border tabular-nums ${
+                  className={`inline-flex items-center gap-1 text-[10px] font-black px-1.5 py-0.5 rounded border tabular-nums shadow-2xs ${
                     host.credit.score >= 80
-                      ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-                      : "bg-red-100 text-red-800 border-red-300"
+                      ? "bg-emerald-100 text-emerald-800 border-emerald-300/80"
+                      : "bg-red-100 text-red-800 border-red-300/80"
                   }`}
                 >
                   <ShieldCheck className="w-3 h-3" />
@@ -251,7 +251,7 @@ export function MatchFeedCard({
                 <span className="text-[10px] text-stone-600 font-medium">
                   • ĐT: {host.captainName}
                 </span>
-                <span className="text-[10px] font-mono font-bold text-stone-800 bg-stone-200/80 px-1.5 py-0.5 rounded border border-stone-300">
+                <span className="text-[10px] font-mono font-bold text-stone-800 bg-[#ede8dc] px-1.5 py-0.5 rounded border border-stone-300/80 shadow-2xs">
                   Zalo: {isMatched ? host.captainPhone : maskPhoneNumber(host.captainPhone)}
                 </span>
               </div>
@@ -259,7 +259,7 @@ export function MatchFeedCard({
           </div>
 
           <span
-            className={`px-3 py-1 rounded-full text-[10px] font-black border shadow-xs ${
+            className={`px-3 py-1 rounded-full text-[10px] font-black border shadow-2xs ${
               match.requiredTier === 1
                 ? "bg-blue-800 text-white border-blue-900"
                 : match.requiredTier === 2
@@ -308,14 +308,14 @@ export function MatchFeedCard({
           </div>
         )}
 
-        {/* Pitch & Time Box */}
-        <div className="mt-3 rounded-xl bg-[#ede8dc] border border-stone-300 p-3 space-y-2">
+        {/* Pitch & Time Box - Vintage Gazette Fixture Slip */}
+        <div className="mt-3 rounded-xl bg-[#ede8dc] border border-stone-300/90 p-3 space-y-2 shadow-2xs">
           <div className="flex items-center justify-between text-xs">
             <span className="text-stone-900 font-bold flex items-center gap-1.5 truncate">
               <MapPin className="w-3.5 h-3.5 text-red-600 shrink-0" />
-              <span className="truncate">{match.pitchName}</span>
+              <span className="truncate font-headline font-black">{match.pitchName}</span>
             </span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-stone-200 text-stone-800 border border-stone-300 shrink-0">
+            <span className="text-[10px] font-black px-2 py-0.5 rounded bg-stone-200 text-stone-800 border border-stone-300/80 shrink-0 shadow-2xs">
               {match.district}
             </span>
           </div>
@@ -335,7 +335,7 @@ export function MatchFeedCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-800 font-bold text-[10px] transition shrink-0 self-start sm:self-auto shadow-2xs"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-sky-100 hover:bg-sky-200 border border-sky-300/80 text-sky-800 font-bold text-[10px] transition-all duration-160 ease-spring shrink-0 self-start sm:self-auto shadow-2xs active:scale-95"
                 title="Mở Google Maps dẫn đường đến sân bóng"
               >
                 <Navigation className="w-2.5 h-2.5 text-sky-700" />
@@ -345,7 +345,7 @@ export function MatchFeedCard({
             )}
           </div>
 
-          <div className="flex items-center justify-between text-xs pt-1.5 border-t border-stone-300/70">
+          <div className="flex items-center justify-between text-xs pt-1.5 border-t border-stone-300/80">
             <span className="text-amber-900 font-black flex items-center gap-1.5 tabular-nums">
               <Clock className="w-3.5 h-3.5 text-stone-700" />
               {match.startTime} - {match.endTime} •{" "}
@@ -368,19 +368,19 @@ export function MatchFeedCard({
           </div>
 
           {/* Realtime Live Countdown Tracker */}
-          <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-stone-300/70">
+          <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-stone-300/80">
             <span className="text-stone-600 font-medium flex items-center gap-1.5">
               <span>{liveStatusPill.icon}</span>
               <span className="text-stone-700 font-semibold">Tiến độ trận:</span>
             </span>
-            <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] border flex items-center gap-1 tabular-nums ${liveStatusPill.className}`}>
+            <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] border flex items-center gap-1 tabular-nums shadow-2xs ${liveStatusPill.className}`}>
               {liveStatusPill.label}
             </span>
           </div>
 
           {/* Thanh Tiến Trình Thời Gian Thực (Live Time Progress Bar) */}
           {diffMinutes > 0 && diffMinutes <= 360 && (
-            <div className="w-full bg-stone-300 rounded-full h-1 overflow-hidden mt-0.5">
+            <div className="w-full bg-stone-300/80 rounded-full h-1 overflow-hidden mt-0.5 shadow-inner">
               <div
                 className={`h-full transition-all duration-1000 ${
                   diffMinutes <= 60
@@ -398,7 +398,7 @@ export function MatchFeedCard({
 
           {/* Hạn tự động dọn dẹp bài đăng nếu chưa có đối (Đúng ngày + giờ bóng lăn + 15p) */}
           {!isMatched && (
-            <div className="flex items-center justify-between text-[10.5px] text-stone-600 pt-1.5 border-t border-stone-300/50">
+            <div className="flex items-center justify-between text-[10.5px] text-stone-600 pt-1.5 border-t border-stone-300/60">
               <span className="flex items-center gap-1 text-emerald-800 font-medium">
                 <span>🧹 Tự đóng sau 15p bóng lăn</span>
               </span>
@@ -424,11 +424,11 @@ export function MatchFeedCard({
         )}
       </div>
 
-      {/* Bottom Footer */}
-      <div className="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-stone-200">
+      {/* Bottom Footer - Impeccable Design & Emil Kowalski Tactile Buttons */}
+      <div className="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-stone-200/90">
         <div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-black text-stone-900 px-2 py-0.5 rounded-lg bg-stone-200 border border-stone-300">
+            <span className="text-[11px] font-black text-stone-900 px-2 py-0.5 rounded-lg bg-stone-200 border border-stone-300/80 shadow-2xs">
               Chia {match.splitRatioLabel || "50/50"}
             </span>
             <span className="text-xs font-bold text-stone-800 tabular-nums">
@@ -437,10 +437,10 @@ export function MatchFeedCard({
           </div>
           <div className="mt-1 flex items-center gap-1.5">
             <span
-              className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+              className={`text-[10px] px-1.5 py-0.5 rounded font-bold shadow-2xs ${
                 host.credit.score < 70
-                  ? "bg-red-100 text-red-800 border border-red-300"
-                  : "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                  ? "bg-red-100 text-red-800 border border-red-300/80"
+                  : "bg-emerald-100 text-emerald-800 border border-emerald-300/80"
               }`}
             >
               {host.credit.score < 70 ? "Ký quỹ 200k" : "Miễn cọc 100%"}
@@ -450,7 +450,7 @@ export function MatchFeedCard({
 
         {isPlayingVerified ? (
           <div className="flex items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-bold">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-100 border border-emerald-300/80 text-emerald-800 text-xs font-bold shadow-2xs">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
               <span>Đã Bắt Tay &amp; Hoàn Cọc</span>
             </span>
@@ -461,7 +461,7 @@ export function MatchFeedCard({
                     onDeleteMatch(match.id);
                   }
                 }}
-                className="p-1.5 rounded-lg border border-red-300 bg-red-100 hover:bg-red-200 text-red-700 transition active:scale-95"
+                className="p-1.5 rounded-lg border border-red-300/80 bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-160 ease-spring active:scale-95 shadow-2xs"
                 title="Xóa kèo"
               >
                 <Trash2 className="w-3.5 h-3.5 text-red-600" />
@@ -470,7 +470,7 @@ export function MatchFeedCard({
             {onOpenBlindReview && (
               <button
                 onClick={() => onOpenBlindReview(host.name)}
-                className="ticket-stub px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-stone-950 text-xs font-black transition shadow-xs active:scale-95"
+                className="ticket-stub px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-stone-950 text-xs font-black transition-all duration-160 ease-spring shadow-paper active:scale-95"
               >
                 ★ Đánh giá
               </button>
@@ -481,7 +481,7 @@ export function MatchFeedCard({
             {isOwner && onEditMatch && (
               <button
                 onClick={() => onEditMatch(match)}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-stone-300 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold transition shadow-2xs active:scale-95"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-stone-300/80 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold transition-all duration-160 ease-spring shadow-2xs active:scale-95"
                 title="Chỉnh sửa thông tin kèo"
               >
                 <Edit3 className="w-3.5 h-3.5 text-stone-600" />
@@ -491,7 +491,7 @@ export function MatchFeedCard({
             {onOpenHandshake && (
               <button
                 onClick={() => onOpenHandshake(match)}
-                className="ticket-stub inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-black transition shadow-xs active:scale-95"
+                className="ticket-stub inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-black transition-all duration-160 ease-spring shadow-paper active:scale-95"
                 title="Nhập mã bắt tay 4 số tại sân để xác thực thi đấu & giải phóng cọc 200k"
               >
                 <Handshake className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -503,7 +503,7 @@ export function MatchFeedCard({
                 href={hostZaloUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ticket-stub inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-amber-400 bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-black transition shadow-2xs active:scale-95"
+                className="ticket-stub inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-amber-400/80 bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-black transition-all duration-160 ease-spring shadow-2xs active:scale-95"
                 title="Nhắn Zalo trực tiếp cho Đội trưởng chủ sân"
               >
                 <MessageSquare className="w-3.5 h-3.5 text-amber-700" />
@@ -513,7 +513,7 @@ export function MatchFeedCard({
             {!isOwner && onCancelGuestChallenge && (
               <button
                 onClick={() => onCancelGuestChallenge(match)}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-red-300 bg-red-100 hover:bg-red-200 text-red-800 text-xs font-black transition active:scale-95 shadow-2xs"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-red-300/80 bg-red-100 hover:bg-red-200 text-red-800 text-xs font-black transition-all duration-160 ease-spring active:scale-95 shadow-2xs"
                 title="Rút lui / Hủy không nhận kèo này nữa (vì lý do đột xuất)"
               >
                 <UserX className="w-3.5 h-3.5 text-red-600" />
@@ -523,7 +523,7 @@ export function MatchFeedCard({
             {isOwner && onDeleteMatch && (
               <button
                 onClick={() => onDeleteMatch(match.id)}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-red-300 bg-red-100 hover:bg-red-200 text-red-800 text-xs font-black transition active:scale-95"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-red-300/80 bg-red-100 hover:bg-red-200 text-red-800 text-xs font-black transition-all duration-160 ease-spring active:scale-95 shadow-2xs"
                 title="Hủy kèo & Gửi kháng cáo bất khả kháng"
               >
                 <Trash2 className="w-3.5 h-3.5 text-red-600" />
@@ -533,7 +533,7 @@ export function MatchFeedCard({
             {onOpenBlindReview && (
               <button
                 onClick={() => onOpenBlindReview(host.name)}
-                className="ticket-stub px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-stone-950 text-xs font-black transition shadow-xs active:scale-95"
+                className="ticket-stub px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-stone-950 text-xs font-black transition-all duration-160 ease-spring shadow-paper active:scale-95"
               >
                 ★ Đánh giá
               </button>
@@ -544,7 +544,7 @@ export function MatchFeedCard({
             {onEditMatch && (
               <button
                 onClick={() => onEditMatch(match)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-300 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-black transition shadow-2xs active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-300/80 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-black transition-all duration-160 ease-spring shadow-2xs active:scale-95"
                 title="Chỉnh sửa kèo đấu của bạn"
               >
                 <Edit3 className="w-3.5 h-3.5 text-stone-600" />
@@ -554,7 +554,7 @@ export function MatchFeedCard({
             {onDeleteMatch && (
               <button
                 onClick={() => onDeleteMatch(match.id)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-300 bg-red-100 hover:bg-red-200 text-red-800 text-xs font-black transition shadow-2xs active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-300/80 bg-red-100 hover:bg-red-200 text-red-800 text-xs font-black transition-all duration-160 ease-spring shadow-2xs active:scale-95"
                 title="Hủy / Xóa kèo này (Kèm hộp kháng cáo nếu sát giờ)"
               >
                 <Trash2 className="w-3.5 h-3.5 text-red-600" />
@@ -566,7 +566,7 @@ export function MatchFeedCard({
           <ClickSpark sparkColor={["#f97316", "#fbbf24", "#ef4444"]} sparkCount={8}>
             <Button
               onClick={() => onSelectMatch(match)}
-              className="ticket-stub h-9 px-4 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-xs gap-1.5 shadow-md shadow-orange-900/20 active:scale-95 transition-all"
+              className="ticket-stub btn-paper-tactile h-9 px-4 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-xs gap-1.5 shadow-md shadow-orange-900/20 active:scale-95 transition-all"
             >
               <Handshake className="w-4 h-4 stroke-[2.5]" />
               <span>Nhận Kèo</span>
