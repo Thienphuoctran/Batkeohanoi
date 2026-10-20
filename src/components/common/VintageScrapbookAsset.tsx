@@ -43,10 +43,10 @@ const ASSET_SPECS: Record<
     alt: "Tờ báo nếp gấp Bản tin bóng đá phủi GiaoHuu.vn",
   },
   "torn-banner": {
-    // Dải báo rách ngang phía trên: "KÈO GAY CẤN TỐI NAY MƯA PHÙN..."
-    bgSize: "360%",
-    bgPos: "62% 6%",
-    aspectRatio: "3.2 / 1",
+    // Dải báo rách ngang phía trên: "KÈO GAY CẤN TỐI NAY MƯA PHÙN KHÔNG CẢN ĐƯỢC ĐAM MÊ"
+    bgSize: "375%",
+    bgPos: "61.5% 4.8%",
+    aspectRatio: "2.1 / 1",
     title: "Kèo Gay Cấn Tối Nay Mưa Phùn Không Cản Được Đam Mê",
     alt: "Dải báo rách Kèo gay cấn tối nay",
   },
@@ -92,9 +92,9 @@ const ASSET_SPECS: Record<
   },
   "ticket-stub": {
     // Cuống vé cọc 200k có mã vạch
-    bgSize: "390%",
-    bgPos: "59% 90%",
-    aspectRatio: "2.4 / 1",
+    bgSize: "395%",
+    bgPos: "59% 89.5%",
+    aspectRatio: "2.05 / 1",
     title: "Vé Đá Bóng Giao Hữu - Cọc Bảo Đảm",
     alt: "Cuống vé giao hữu có mã vạch bảo chứng 200k",
   },
