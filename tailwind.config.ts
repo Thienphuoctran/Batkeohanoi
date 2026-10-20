@@ -70,6 +70,31 @@ const config: Config = {
           dark: "#0b1329",
           cardDark: "#111c38",
         },
+        kraft: {
+          50: "#fbf9f4",
+          100: "#f5f0e4",
+          200: "#ede8dc",
+          300: "#e0d6c3",
+          400: "#cfc5b3",
+          700: "#786c55",
+          900: "#3c3223",
+        },
+      },
+      fontFamily: {
+        headline: ["Georgia", "Cambria", "Times New Roman", "serif"],
+      },
+      boxShadow: {
+        paper: "0 1px 3px rgba(60, 50, 35, 0.06), 0 4px 16px -2px rgba(60, 50, 35, 0.08)",
+        "paper-hover": "0 4px 6px -1px rgba(60, 50, 35, 0.08), 0 12px 24px -3px rgba(60, 50, 35, 0.12)",
+        stamp: "inset 0 0 0 1px rgba(220, 38, 38, 0.25), 0 2px 6px rgba(220, 38, 38, 0.15)",
+        "stamp-gold": "inset 0 0 0 1px rgba(217, 119, 6, 0.25), 0 2px 6px rgba(217, 119, 6, 0.15)",
+      },
+      transitionTimingFunction: {
+        spring: "cubic-bezier(0.16, 1, 0.3, 1)",
+        tactile: "cubic-bezier(0.4, 0, 0.2, 1)",
+      },
+      transitionDuration: {
+        "220": "220ms",
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -24,6 +24,25 @@
     --input: 220 13% 90%;
     --ring: 152 69% 38%;
     --radius: 0.75rem;
+
+    /* Emil Kowalski Spring Physics Tokens */
+    --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-tactile: cubic-bezier(0.4, 0, 0.2, 1);
+    --duration-fast: 160ms;
+    --duration-normal: 220ms;
+
+    /* Taste Skill & Impeccable Design: Retro Newspaper & Gazette Tokens */
+    --kraft-bg: #ede8dc;
+    --paper-card: #fbf9f4;
+    --paper-card-subtle: #f5f0e4;
+    --paper-border: rgba(168, 150, 128, 0.45);
+    --paper-border-strong: rgba(120, 108, 85, 0.6);
+    --ink-black: #1c1917;
+    --ink-body: #292524;
+    --ink-muted: #78716c;
+    --stamp-red: #dc2626;
+    --stamp-green: #15803d;
+    --stamp-gold: #d97706;
   }
 
   .dark {
@@ -315,11 +334,19 @@
   background-size: 24px 24px, 48px 48px, 48px 48px;
 }
 
-/* Thẻ giấy gập nếp kem sáng (Creased Paper Card) */
+/* Thẻ giấy gập nếp kem sáng (Creased Paper Card) - Impeccable & Emil Kowalski Spring */
 .card-retro-paper {
-  background: #fbf9f4;
-  border: 1px solid rgba(168, 150, 128, 0.45);
-  box-shadow: 0 4px 20px -2px rgba(60, 50, 35, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: var(--paper-card, #fbf9f4);
+  border: 1px solid var(--paper-border, rgba(168, 150, 128, 0.45));
+  box-shadow: 0 1px 3px rgba(60, 50, 35, 0.05), 0 4px 16px -2px rgba(60, 50, 35, 0.08);
+  transition: transform 220ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1)),
+              box-shadow 220ms ease,
+              border-color 220ms ease;
+}
+
+.card-retro-paper:hover {
+  box-shadow: 0 4px 8px -1px rgba(60, 50, 35, 0.08), 0 12px 24px -3px rgba(60, 50, 35, 0.12);
+  border-color: var(--paper-border-strong, rgba(120, 108, 85, 0.6));
 }
 
 /* Cuống vé xem bóng đá có răng cưa & lỗ bấm tròn (Perforated Match Ticket Stub) */
@@ -335,7 +362,7 @@
   width: 12px;
   height: 12px;
   border-radius: 9999px;
-  background-color: #ede8dc;
+  background-color: var(--kraft-bg, #ede8dc);
   transform: translateY(-50%);
   z-index: 10;
 }
@@ -346,15 +373,36 @@
   right: -6px;
 }
 
-/* Con dấu mộc đỏ cao su (Rubber Red Ink Stamp) */
+/* Con dấu mộc đỏ cao su (Rubber Red Ink Stamp) - Tactile Feedback */
 .rubber-stamp {
-  border: 2.5px dashed #dc2626;
+  border: 2px dashed #dc2626;
   color: #dc2626;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.25), 0 1px 3px rgba(220, 38, 38, 0.12);
+  transition: transform 180ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.rubber-stamp:hover {
+  transform: scale(1.03) rotate(0deg);
+}
+
+/* Con dấu mộc xanh lá bảo chứng cọc thành công (Rubber Green Stamp) */
+.rubber-stamp-green {
+  border: 2px dashed #15803d;
+  color: #15803d;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow: inset 0 0 0 1px rgba(21, 128, 61, 0.25), 0 1px 3px rgba(21, 128, 61, 0.12);
+  transition: transform 180ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.rubber-stamp-green:hover {
+  transform: scale(1.03) rotate(0deg);
 }
 
 /* Băng dính giấy dán góc (Washi Tape) */
@@ -362,12 +410,50 @@
   position: absolute;
   width: 56px;
   height: 16px;
-  background: rgba(245, 230, 195, 0.78);
+  background: rgba(245, 230, 195, 0.82);
   backdrop-filter: blur(2px);
-  border: 1px solid rgba(215, 195, 155, 0.65);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(215, 195, 155, 0.7);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   pointer-events: none;
   z-index: 20;
+}
+
+/* Đường kẻ đôi nhật báo cổ điển (Taste Skill Editorial Double Rule) */
+.newspaper-double-rule {
+  border-top: 3px double rgba(168, 150, 128, 0.65);
+}
+
+/* Nút bấm xúc giác phản hồi tự nhiên (Emil Kowalski Tactile Button) */
+.btn-paper-tactile {
+  transition: transform 160ms var(--ease-spring, cubic-bezier(0.16, 1, 0.3, 1)),
+              box-shadow 160ms ease,
+              filter 160ms ease;
+  user-select: none;
+}
+
+.btn-paper-tactile:hover {
+  transform: translateY(-1px);
+}
+
+.btn-paper-tactile:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Modal Spring Physics (Emil Kowalski Modal Enter) */
+@keyframes modalSpringIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-spring-enter {
+  animation: modalSpringIn 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
 }
 
 /* Tối ưu hóa hiệu năng render danh sách & cuộn mượt 60fps trên di động */
