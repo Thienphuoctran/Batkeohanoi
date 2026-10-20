@@ -1109,10 +1109,10 @@ export default function HanoiMatchmakingPlatform() {
       <PhuiStickerCanvas />
 
       <div
-        className={`w-full mx-auto transition-all duration-300 relative z-10 ${
+        className={`w-full mx-auto transition-all duration-250 ease-spring relative z-10 ${
           isWideLayout
             ? "max-w-6xl"
-            : "max-w-md border-x border-stone-300 shadow-2xl bg-[#fbf9f4]/95"
+            : "max-w-md border-x border-stone-300/80 shadow-paper bg-[#fbf9f4]/95"
         }`}
       >
         {/* Thanh Header + Marquee + Radar Thời Tiết Sân */}
