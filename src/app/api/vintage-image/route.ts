@@ -2,9 +2,10 @@ import fs from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-static";
+export const revalidate = 86400;
+
 export async function GET() {
-  const sourcePath =
-    "C:\\Users\\phuoc\\.gemini\\antigravity\\brain\\44f7361c-6a99-4c1f-bcd3-4c918f4055c2\\.user_uploaded\\media_1792397232695_2e72c5fe.jpg";
   const publicDest = path.join(
     process.cwd(),
     "public",
@@ -13,21 +14,9 @@ export async function GET() {
   );
 
   try {
-    if (fs.existsSync(sourcePath)) {
-      const buffer = fs.readFileSync(sourcePath);
-      // Automatically copy to public/images/vintage-scrapbook.jpg if not exists
-      try {
-        const dir = path.dirname(publicDest);
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true });
-        }
-        if (!fs.existsSync(publicDest)) {
-          fs.writeFileSync(publicDest, buffer);
-        }
-      } catch (copyErr) {
-        console.error("[API vintage-image] Could not copy to public:", copyErr);
-      }
-
+    // 1. Ưu tiên đọc trực tiếp từ thư mục public/images/ chuẩn production
+    if (fs.existsSync(publicDest)) {
+      const buffer = fs.readFileSync(publicDest);
       return new NextResponse(buffer, {
         headers: {
           "Content-Type": "image/jpeg",
@@ -36,9 +25,14 @@ export async function GET() {
       });
     }
 
-    // Fallback if publicDest already exists
-    if (fs.existsSync(publicDest)) {
-      const buffer = fs.readFileSync(publicDest);
+    // 2. Dự phòng trong trường hợp đường dẫn tĩnh khác
+    const altFallback = path.join(
+      process.cwd(),
+      "public",
+      "vintage-scrapbook.jpg"
+    );
+    if (fs.existsSync(altFallback)) {
+      const buffer = fs.readFileSync(altFallback);
       return new NextResponse(buffer, {
         headers: {
           "Content-Type": "image/jpeg",

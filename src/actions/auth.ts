@@ -757,6 +757,14 @@ export async function adminMergeOrPenalizeSmurfAction({
   }
 }
 
+function sanitizeText(input?: string | null, maxLen = 150): string {
+  if (!input) return "";
+  return input
+    .replace(/<[^>]*>?/gm, "")
+    .trim()
+    .slice(0, maxLen);
+}
+
 // 6. Lưu kèo đấu thật vào bảng public.matches trên Supabase khi Đội trưởng tạo kèo
 const matchCreationRateLimitMap = new Map<string, number[]>();
 
@@ -800,6 +808,16 @@ export async function createMatchInDatabaseAction(payload: {
     }
     recent.push(now);
     matchCreationRateLimitMap.set(payload.hostTeamId, recent);
+
+    // 3. Chuẩn hóa & Làm sạch dữ liệu đầu vào (Zero-Trust Input Sanitization)
+    const sanitizedPitchName = sanitizeText(payload.pitchCustomName, 100) || "Sân Bóng Đá";
+    const sanitizedDistrict = sanitizeText(payload.district, 60) || "Cầu Giấy";
+    const sanitizedTimeSlot = sanitizeText(payload.timeSlotLabel, 50) || "19:00 - 20:30";
+    const sanitizedNotes = sanitizeText(payload.notes, 500);
+    const sanitizedAddress = sanitizeText(payload.pitchAddress, 200);
+    const validTotalFee = Math.max(0, Math.min(20000000, Math.round(Number(payload.totalFee) || 850000)));
+    const validSplitFee = Math.max(0, Math.min(10000000, Math.round(Number(payload.splitFee) || 425000)));
+    const validSkillTier = [1, 2, 3].includes(Number(payload.skillTier)) ? Number(payload.skillTier) : 2;
 
     const adminClient = getAdminClient();
     const parsedKickoff = payload.kickoffTimeIso
@@ -877,9 +895,10 @@ export async function createMatchInDatabaseAction(payload: {
           error: "Yêu cầu đăng nhập tài khoản Đội Trưởng để đăng kèo đấu chính chủ lên hệ thống.",
         };
       }
-      const teamName = payload.hostTeamName?.trim() || "FC Phủi Hà Nội";
-      const captainName = payload.captainName?.trim() || "Đội Trưởng";
-      const phone = payload.captainPhone?.trim() || "0988666888";
+      const teamName = sanitizeText(payload.hostTeamName, 60) || "FC Phủi Hà Nội";
+      const captainName = sanitizeText(payload.captainName, 50) || "Đội Trưởng";
+      const rawPhone = payload.captainPhone?.trim() || "0988666888";
+      const phone = normalizeVietnamPhone(rawPhone) || rawPhone;
       const { data: newTeam } = await adminClient
         .from("teams")
         .insert({
@@ -887,9 +906,9 @@ export async function createMatchInDatabaseAction(payload: {
           team_name: teamName,
           captain_name: captainName,
           captain_phone: phone,
-          captain_zalo: payload.captainZalo?.trim() || phone,
-          home_district: "CauGiay",
-          skill_tier: payload.skillTier || 2,
+          captain_zalo: payload.captainZalo ? normalizeVietnamPhone(payload.captainZalo) : phone,
+          home_district: sanitizedDistrict || "CauGiay",
+          skill_tier: validSkillTier,
           trust_score: 100,
         })
         .select("id")
@@ -902,25 +921,25 @@ export async function createMatchInDatabaseAction(payload: {
 
     // Đóng gói metadata địa chỉ, gmaps, expires_at, isSos vào notes an toàn (chống lỗi thiếu cột trên PostgreSQL)
     const extraMeta = {
-      address: payload.pitchAddress || undefined,
+      address: sanitizedAddress || undefined,
       gmapsUrl: payload.gmapsUrl || undefined,
       isGmapsIntegrated: payload.isGmapsIntegrated,
       expiresAt: expiresDate.toISOString(),
       isSos: Boolean(payload.isSos),
-      rawNotes: payload.notes || "",
+      rawNotes: sanitizedNotes,
     };
-    const combinedNotes = payload.notes
-      ? `${payload.notes} | meta:${JSON.stringify(extraMeta)}`
+    const combinedNotes = sanitizedNotes
+      ? `${sanitizedNotes} | meta:${JSON.stringify(extraMeta)}`
       : `meta:${JSON.stringify(extraMeta)}`;
 
     const insertObj: Record<string, any> = {
       host_team_id: hostTeamId,
-      pitch_custom_name: payload.pitchCustomName || "Sân Bóng Đá",
-      district: payload.district || "Cầu Giấy",
+      pitch_custom_name: sanitizedPitchName,
+      district: sanitizedDistrict,
       kickoff_time: kickoffDate.toISOString(),
-      time_slot_label: payload.timeSlotLabel || "19:00 - 20:30",
-      total_fee: payload.totalFee || 850000,
-      split_fee: payload.splitFee || 425000,
+      time_slot_label: sanitizedTimeSlot,
+      total_fee: validTotalFee,
+      split_fee: validSplitFee,
       is_sos: Boolean(payload.isSos),
       notes: combinedNotes,
       status: "open",
@@ -1542,6 +1561,8 @@ export async function getRealtimeMatchesFromDatabaseAction() {
 }
 
 // 14. Khóa Kèo / Xác nhận bắt kèo lưu trạng thái kiên cố vào Supabase
+const challengeRateLimitMap = new Map<string, number[]>();
+
 export async function confirmMatchChallengeAction(payload: {
   matchId: string;
   guestTeamName: string;
@@ -1550,10 +1571,49 @@ export async function confirmMatchChallengeAction(payload: {
   guestTrustScore?: number;
 }) {
   try {
+    if (!payload.matchId) {
+      return { success: false, error: "Thiếu mã nhận diện trận đấu." };
+    }
+
+    // Rate Limiting: Chống spam click liên tục (Tối đa 3 lần/30s)
+    const rateLimitKey = payload.guestCaptainPhone || payload.matchId;
+    const now = Date.now();
+    const timestamps = challengeRateLimitMap.get(rateLimitKey) || [];
+    const recent = timestamps.filter((t) => now - t < 30000);
+    if (recent.length >= 3) {
+      return {
+        success: false,
+        error: "Bạn đang thao tác quá nhanh. Vui lòng chờ 30 giây trước khi thử lại!",
+      };
+    }
+    recent.push(now);
+    challengeRateLimitMap.set(rateLimitKey, recent);
+
     const adminClient = getAdminClient();
     const user = await getAuthenticatedUser();
 
+    // 1. Kiểm tra trạng thái hiện tại của trận đấu
+    const { data: currentMatch } = await adminClient
+      .from("matches")
+      .select("id, host_team_id, status, pitch_custom_name, district, time_slot_label")
+      .eq("id", payload.matchId)
+      .maybeSingle();
+
+    if (!currentMatch) {
+      return { success: false, error: "Không tìm thấy thông tin trận đấu trên hệ thống." };
+    }
+
+    if (currentMatch.status !== "open") {
+      return {
+        success: false,
+        error: "Kèo đấu này vừa có đội khác nhận trước bạn hoặc đã đóng. Vui lòng chọn kèo khác nhé!",
+      };
+    }
+
     let guestTeamId: string | null = null;
+    let guestTeamName = sanitizeText(payload.guestTeamName, 60) || "Đội Khách";
+    let guestPhone = normalizeVietnamPhone(payload.guestCaptainPhone || "") || payload.guestCaptainPhone;
+
     if (user?.id) {
       const { data: userTeam } = await adminClient
         .from("teams")
@@ -1562,33 +1622,59 @@ export async function confirmMatchChallengeAction(payload: {
         .maybeSingle();
 
       if (userTeam) {
+        // Chống đội chủ nhà tự nhận kèo của chính mình
+        if (userTeam.id === currentMatch.host_team_id) {
+          return {
+            success: false,
+            error: "Bạn không thể tự nhận kèo do chính đội bóng của mình đăng tải!",
+          };
+        }
         guestTeamId = userTeam.id;
-        payload.guestTeamName = userTeam.team_name;
-        payload.guestCaptainPhone = userTeam.captain_phone;
+        guestTeamName = userTeam.team_name;
+        guestPhone = userTeam.captain_phone;
         payload.guestCaptainZalo = userTeam.captain_zalo || userTeam.captain_phone;
         payload.guestTrustScore = userTeam.trust_score;
       }
     }
 
+    // 2. Atomic Conditional Update: Chỉ nhận kèo khi status vẫn đang là 'open' (Chống Race Condition)
     const updateObj: Record<string, any> = {
       status: "matched",
       is_sos: false,
-      notes: `[Đã bắt kèo bởi ${payload.guestTeamName} - ${payload.guestCaptainPhone}]`,
+      notes: `[Đã bắt kèo bởi ${guestTeamName} - ${guestPhone}]`,
     };
 
     if (guestTeamId) {
       updateObj.guest_team_id = guestTeamId;
     }
 
-    const { error } = await adminClient
+    const { data: updatedRows, error } = await adminClient
       .from("matches")
       .update(updateObj)
-      .eq("id", payload.matchId);
+      .eq("id", payload.matchId)
+      .eq("status", "open")
+      .select("id");
 
     if (error) {
       console.warn("[confirmMatchChallengeAction Error]", error.message);
       return { success: false, error: error.message };
     }
+
+    if (!updatedRows || updatedRows.length === 0) {
+      return {
+        success: false,
+        error: "Kèo đấu vừa được một đội bóng khác chốt trước bạn trong tích tắc!",
+      };
+    }
+
+    // Gửi cảnh báo Telegram BQT tức thời để giám sát
+    await sendTelegramAlert(
+      `🤝 <b>CHỐT KÈO THÀNH CÔNG: ĐÃ CÓ ĐỐI THỦ NHẬN KÈO</b>\n` +
+      `• Đội nhận kèo (Khách): <b>${guestTeamName}</b> (${guestPhone})\n` +
+      `• Sân thi đấu: <b>${currentMatch.pitch_custom_name}</b> (${currentMatch.district})\n` +
+      `• Khung giờ: <b>${currentMatch.time_slot_label}</b>\n` +
+      `👉 <i>Hai đội trưởng hãy liên hệ Zalo/SĐT để xác nhận trang phục thi đấu!</i>`
+    );
 
     revalidatePath("/");
     return { success: true };

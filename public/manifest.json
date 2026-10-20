@@ -1,28 +1,41 @@
 {
-  "name": "BắtKèo7 - Ghép Trận Sân 7 Hà Nội",
-  "short_name": "BắtKèo7",
-  "description": "Nền tảng ghép đối bóng đá sân 7 văn minh, chống bùng cọc tại Cầu Giấy & Nam Từ Liêm",
+  "name": "GiaoHuu.vn — Sàn Bắt Kèo & Sân Bóng Hà Nội",
+  "short_name": "GiaoHuu.vn",
+  "description": "Nền tảng ghép đối bóng đá sân 7 văn minh, bảo chứng cọc 200k, chống bùng kèo và danh mục 65+ sân bóng tại Hà Nội",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#060911",
-  "theme_color": "#16a34a",
+  "background_color": "#18181b",
+  "theme_color": "#ede8dc",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/api/logo",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Bảng Tin Kèo Đấu",
+      "url": "/?tab=feed",
+      "description": "Xem danh sách các trận đấu đang tìm đối"
+    },
+    {
+      "name": "Bản Đồ 65+ Sân Bóng",
+      "url": "/?tab=pitch-map",
+      "description": "Tìm kiếm sân bóng và hotline đặt sân trực tiếp"
+    },
+    {
+      "name": "Chợ Cầu & Đội Tìm Quân",
+      "url": "/?tab=sub-market",
+      "description": "Tìm cầu thủ tự do hoặc xin ghép đội đá ngay"
     }
   ]
 }

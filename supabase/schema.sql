@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.teams (
   captain_name VARCHAR(80) NOT NULL,
   captain_phone VARCHAR(20) NOT NULL,
   captain_zalo VARCHAR(20),
-  district VARCHAR(40) NOT NULL CHECK (district IN ('Cầu Giấy', 'Nam Từ Liêm')),
+  district VARCHAR(60) NOT NULL,
   home_pitch VARCHAR(120),
   skill_tier INT NOT NULL CHECK (skill_tier IN (1, 2, 3)),
   avg_age NUMERIC(4, 1) DEFAULT 26.0,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS public.pitches (
   id VARCHAR(64) PRIMARY KEY,
   name VARCHAR(120) NOT NULL,
   short_name VARCHAR(60) NOT NULL,
-  district VARCHAR(40) NOT NULL CHECK (district IN ('Cầu Giấy', 'Nam Từ Liêm')),
+  district VARCHAR(60) NOT NULL,
   address TEXT NOT NULL,
   total_fields_7 INT NOT NULL DEFAULT 6,
   surface_quality VARCHAR(80) DEFAULT 'Cỏ nhân tạo sợi đúc mới',
@@ -119,6 +119,10 @@ CREATE TABLE IF NOT EXISTS public.matches (
 
 CREATE INDEX IF NOT EXISTS idx_matches_status_district ON public.matches(status, district);
 CREATE INDEX IF NOT EXISTS idx_matches_date_time ON public.matches(match_date, start_time);
+CREATE INDEX IF NOT EXISTS idx_matches_host_team ON public.matches(host_team_id);
+CREATE INDEX IF NOT EXISTS idx_matches_guest_team ON public.matches(guest_team_id);
+CREATE INDEX IF NOT EXISTS idx_matches_created_desc ON public.matches(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_teams_credit_score ON public.teams(credit_score);
 
 -- 2.4 Bảng Chợ Cầu 2 Chiều: Cầu Thủ Tự Do Tìm Đội (Free Agent Posts)
 CREATE TABLE IF NOT EXISTS public.free_agent_posts (
