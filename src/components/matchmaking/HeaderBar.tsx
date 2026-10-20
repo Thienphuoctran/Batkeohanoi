@@ -139,14 +139,14 @@ export function HeaderBar({
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-stone-300/80 bg-[#fbf9f4]/95 backdrop-blur-xl shadow-sm">
+    <header className="sticky top-0 z-40 border-b border-stone-300/90 bg-[#fbf9f4]/95 backdrop-blur-xl shadow-paper">
       {/* 1. News Marquee Ticker */}
       <div className="bg-[#18181b] border-b border-stone-800 py-1.5 px-3 overflow-hidden flex items-center gap-2">
-        <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-600 text-[10px] font-black text-white uppercase tracking-wider">
+        <span className="shrink-0 inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-red-600 text-[10px] font-black text-white uppercase tracking-wider shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
           LIVE HN
         </span>
-        <div className="overflow-hidden whitespace-nowrap w-full text-[11px] text-stone-200 font-semibold">
+        <div className="overflow-hidden whitespace-nowrap w-full text-[11px] text-stone-200 font-semibold select-none">
           <div className="animate-marquee inline-flex items-center gap-8">
             <span>⚡ FC Vinaconex vừa mở kèo Sân Thành Phát (19:00 hôm nay)</span>
             <span>🛡️ Quy chế v2.0: Hủy sát giờ &lt;1h lần 2 gắn nhãn đỏ &amp; cọc 100%</span>
@@ -158,26 +158,26 @@ export function HeaderBar({
         </div>
       </div>
 
-      {/* 2. Main Top Bar */}
-      <div className="px-4 pt-3 pb-2.5 space-y-2.5">
+      {/* 2. Main Top Bar - Taste Skill & Impeccable Design */}
+      <div className="px-3.5 sm:px-4 pt-3 pb-2.5 space-y-2.5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5">
             {/* Logo Thương Hiệu GiaoHuu.vn với Badge 7v7 (Phong cách Báo Giấy) */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="w-8 h-8 rounded-lg bg-[#15803d] text-white font-black text-xs flex items-center justify-center shadow-sm shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 select-none">
+              <span className="w-8 h-8 rounded-lg bg-[#15803d] text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0 tracking-wider">
                 7v7
               </span>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h1 className="font-black text-base sm:text-lg tracking-tight text-stone-900 flex items-center">
+                  <h1 className="font-headline font-black text-base sm:text-lg tracking-tight text-stone-900 flex items-center">
                     <span>GiaoHuu</span>
                     <span className="text-[#15803d]">.vn</span>
                   </h1>
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-stone-200 text-stone-800 border border-stone-300">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#ede8dc] text-stone-800 border border-stone-300/80 shadow-2xs">
                     Hà Nội V2.0
                   </span>
                 </div>
-                <p className="text-[11px] text-stone-600 font-bold hidden sm:block">
+                <p className="text-[11px] text-stone-600 font-semibold hidden sm:block">
                   Toàn Hà Nội - Ghép Đối Sân 7 &amp; Chống Bùng Kèo
                 </p>
               </div>
@@ -188,23 +188,23 @@ export function HeaderBar({
             <button
               onClick={onToggleWideLayout}
               title="Chuyển đổi khung nhìn Mobile / Bento Dashboard"
-              className="hidden md:inline-flex items-center justify-center w-9 h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-700 transition"
+              className="hidden md:inline-flex items-center justify-center w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-700/80 transition-all duration-160 ease-spring active:scale-95 shadow-xs"
             >
               {isWideLayout ? (
                 <Minimize2 className="w-4 h-4 text-emerald-400" />
               ) : (
-                <Maximize2 className="w-4 h-4" />
+                <Maximize2 className="w-4 h-4 text-stone-300" />
               )}
             </button>
 
             <button
               onClick={onOpenBotDrawer}
               title="Telegram Bot Webhook Logs (@GiaohuuHanoi_bot)"
-              className="relative inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-700 transition shrink-0"
+              className="relative inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-700/80 transition-all duration-160 ease-spring active:scale-95 shrink-0 shadow-xs"
             >
               <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400" />
               {unreadBotCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center shadow-xs">
                   {unreadBotCount}
                 </span>
               )}
@@ -214,7 +214,7 @@ export function HeaderBar({
               <button
                 onClick={onOpenRules}
                 title="Bảng Nội Quy & Quy Chế Kỷ Luật GiaoHuu.vn"
-                className="inline-flex items-center justify-center w-8 h-8 sm:w-auto px-0 sm:px-2.5 h-8 sm:h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-300 border border-stone-700 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shrink-0"
+                className="inline-flex items-center justify-center w-8 h-8 sm:w-auto px-0 sm:px-2.5 h-8 sm:h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-300 border border-stone-700/80 text-xs font-bold gap-1.5 transition-all duration-160 ease-spring active:scale-95 shadow-xs shrink-0"
               >
                 <Scale className="w-3.5 h-3.5 text-amber-400" />
                 <span className="hidden sm:inline">Nội Quy</span>
@@ -225,7 +225,7 @@ export function HeaderBar({
               <button
                 onClick={onOpenGuide}
                 title="Cẩm Nang Hướng Dẫn Sử Dụng GiaoHuu.vn"
-                className="inline-flex items-center justify-center w-8 h-8 sm:w-auto px-0 sm:px-2.5 h-8 sm:h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-700 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shrink-0"
+                className="inline-flex items-center justify-center w-8 h-8 sm:w-auto px-0 sm:px-2.5 h-8 sm:h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-700/80 text-xs font-bold gap-1.5 transition-all duration-160 ease-spring active:scale-95 shadow-xs shrink-0"
               >
                 <BookOpen className="w-3.5 h-3.5 text-sky-400" />
                 <span className="hidden sm:inline">Hướng Dẫn</span>
@@ -236,7 +236,7 @@ export function HeaderBar({
               <button
                 onClick={onOpenSupport}
                 title="Tư Vấn Khách Hàng & AI Trợ Lý GiaoHuu.vn"
-                className="relative inline-flex items-center justify-center w-8 h-8 sm:w-auto px-0 sm:px-2.5 h-8 sm:h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-emerald-400 border border-stone-700 text-xs font-bold gap-1.5 transition active:scale-95 shadow-sm shrink-0"
+                className="relative inline-flex items-center justify-center w-8 h-8 sm:w-auto px-0 sm:px-2.5 h-8 sm:h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-emerald-400 border border-stone-700/80 text-xs font-bold gap-1.5 transition-all duration-160 ease-spring active:scale-95 shadow-xs shrink-0"
               >
                 <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
                 <span className="hidden sm:inline">Tư Vấn</span>
@@ -247,7 +247,7 @@ export function HeaderBar({
             {!isAuthenticated ? (
               <button
                 onClick={onOpenAuthModal}
-                className="h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-300 border border-stone-700 font-extrabold text-xs inline-flex items-center gap-1 sm:gap-1.5 transition whitespace-nowrap shrink-0"
+                className="h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-300 border border-stone-700/80 font-extrabold text-xs inline-flex items-center gap-1 sm:gap-1.5 transition-all duration-160 ease-spring active:scale-95 whitespace-nowrap shrink-0 shadow-xs"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span className="sm:hidden">Đăng nhập</span>
@@ -257,7 +257,7 @@ export function HeaderBar({
               <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 <button
                   onClick={onOpenTeamOnboarding}
-                  className="h-8 sm:h-9 px-2 sm:px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-400 font-extrabold text-xs inline-flex items-center gap-1 sm:gap-1.5 transition animate-pulse whitespace-nowrap shrink-0"
+                  className="h-8 sm:h-9 px-2 sm:px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-400/80 font-extrabold text-xs inline-flex items-center gap-1 sm:gap-1.5 transition-all duration-160 ease-spring animate-pulse whitespace-nowrap shrink-0 shadow-xs"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                   <span className="sm:hidden">Tạo Đội</span>
@@ -272,7 +272,7 @@ export function HeaderBar({
                       }
                     }}
                     title="Đăng xuất tài khoản"
-                    className="h-8 sm:h-9 w-8 sm:w-auto px-0 sm:px-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-rose-700 border border-stone-300 text-xs font-bold inline-flex items-center justify-center gap-1 transition active:scale-95 shrink-0"
+                    className="h-8 sm:h-9 w-8 sm:w-auto px-0 sm:px-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-rose-700 border border-stone-300 text-xs font-bold inline-flex items-center justify-center gap-1 transition-all duration-160 ease-spring active:scale-95 shrink-0"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Đăng xuất</span>
@@ -283,7 +283,7 @@ export function HeaderBar({
               <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 <button
                   onClick={() => setActiveTab("trust-profile")}
-                  className="h-8 sm:h-9 px-2 sm:px-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-emerald-300 border border-stone-700 font-extrabold text-xs inline-flex items-center gap-1 sm:gap-1.5 transition max-w-[110px] sm:max-w-[140px]"
+                  className="h-8 sm:h-9 px-2 sm:px-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-emerald-300 border border-stone-700/80 font-extrabold text-xs inline-flex items-center gap-1 sm:gap-1.5 transition-all duration-160 ease-spring active:scale-95 max-w-[110px] sm:max-w-[140px] shadow-xs"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span className="truncate">{currentTeamName}</span>
@@ -297,7 +297,7 @@ export function HeaderBar({
                       }
                     }}
                     title="Đăng xuất tài khoản"
-                    className="h-8 sm:h-9 w-8 sm:w-auto px-0 sm:px-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-rose-700 border border-stone-300 text-xs font-bold inline-flex items-center justify-center gap-1 transition active:scale-95 shrink-0"
+                    className="h-8 sm:h-9 w-8 sm:w-auto px-0 sm:px-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-rose-700 border border-stone-300 text-xs font-bold inline-flex items-center justify-center gap-1 transition-all duration-160 ease-spring active:scale-95 shrink-0"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Đăng xuất</span>
@@ -306,11 +306,11 @@ export function HeaderBar({
               </div>
             )}
 
-            {/* Quick Pill Ví Ký Quỹ */}
+            {/* Quick Pill Ví Ký Quỹ - Impeccable Design */}
             <button
               onClick={onOpenEscrowModal}
               title="Ví Ký Quỹ Nội Bộ (Bảo chứng 200k & Hoàn tiền tự động)"
-              className="h-9 px-2.5 sm:px-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-300 border border-stone-700 font-extrabold text-xs inline-flex items-center gap-1.5 transition"
+              className="h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-300 border border-stone-700/80 font-extrabold text-xs inline-flex items-center gap-1.5 transition-all duration-160 ease-spring active:scale-95 shadow-xs"
             >
               <Wallet className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="hidden sm:inline">Ví:</span>
@@ -325,10 +325,10 @@ export function HeaderBar({
               )}
             </button>
 
-            {/* Nút Tạo Kèo Cam Lửa Bắt Mắt */}
+            {/* Nút Tạo Kèo Cam Lửa Bắt Mắt - Emil Kowalski Tactile Button */}
             <Button
               onClick={onOpenCreateModal}
-              className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-xs gap-1.5 shadow-md shadow-orange-900/20 active:scale-95 transition-all"
+              className="btn-paper-tactile h-8 sm:h-9 px-3 sm:px-3.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-xs gap-1.5 shadow-md shadow-orange-900/25 active:scale-95 transition-all"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Tạo Kèo</span>
@@ -336,16 +336,16 @@ export function HeaderBar({
           </div>
         </div>
 
-        {/* 3. Hyper-Local Pitch Weather Radar Selector (Vintage Paper Style) */}
-        <div className="rounded-xl bg-[#f4f0e6] border border-stone-300/90 px-2.5 sm:px-3 py-1.5 sm:py-2 flex flex-col gap-1 sm:gap-1.5 shadow-xs">
+        {/* 3. Hyper-Local Pitch Weather Radar Selector (Vintage Paper Style - Taste Skill) */}
+        <div className="rounded-xl bg-[#f5f0e4] border border-stone-300/90 px-2.5 sm:px-3 py-1.5 sm:py-2 flex flex-col gap-1 sm:gap-1.5 shadow-xs">
           <div className="flex items-center justify-between gap-1.5 sm:gap-2">
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-              <CloudSun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 shrink-0" />
+              <CloudSun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-700 shrink-0" />
               <select
                 value={selectedPitch}
                 onChange={(e) => setSelectedPitch(e.target.value)}
                 aria-label="Chọn cụm sân xem thời tiết"
-                className="bg-transparent text-[11px] font-black text-stone-900 focus:outline-none cursor-pointer truncate max-w-[130px] sm:max-w-none"
+                className="bg-transparent text-[11px] font-black text-stone-900 focus:outline-none cursor-pointer truncate max-w-[130px] sm:max-w-none hover:text-emerald-800 transition"
               >
                 {Object.keys(PITCH_WEATHER_DATA).map((pitch) => (
                   <option key={pitch} value={pitch} className="bg-white text-stone-900 font-semibold">
@@ -355,26 +355,26 @@ export function HeaderBar({
               </select>
             </div>
             <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-              <span className="text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">
+              <span className="text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300/80 whitespace-nowrap shadow-2xs">
                 {weather.status}
               </span>
-              <span className="text-[10px] sm:text-[11px] font-black text-amber-800 tabular-nums whitespace-nowrap">
+              <span className="text-[10px] sm:text-[11px] font-black text-amber-900 tabular-nums whitespace-nowrap">
                 {weather.temp}
               </span>
               <button
                 onClick={() => setActiveTab("trust-profile")}
-                className="sm:hidden ml-1 text-[10px] font-black text-stone-800 bg-stone-200 px-1.5 py-0.5 rounded border border-stone-300"
+                className="sm:hidden ml-1 text-[10px] font-black text-stone-800 bg-stone-200 px-1.5 py-0.5 rounded border border-stone-300/80 active:scale-95 transition"
                 title="Điểm tín nhiệm đội của bạn"
               >
                 ★{myTrustScore}đ
               </button>
             </div>
           </div>
-          <div className="hidden sm:flex items-center justify-between text-[10px] text-stone-600 border-t border-stone-200 pt-1">
+          <div className="hidden sm:flex items-center justify-between text-[10px] text-stone-600 border-t border-stone-200/90 pt-1">
             <span className="truncate font-medium">{weather.tip}</span>
             <button
               onClick={() => setActiveTab("trust-profile")}
-              className="shrink-0 ml-2 inline-flex items-center gap-1 font-bold text-stone-800 hover:text-emerald-700 transition"
+              className="shrink-0 ml-2 inline-flex items-center gap-1 font-bold text-stone-800 hover:text-emerald-700 transition active:scale-95"
             >
               <ShieldCheck className="w-3 h-3 text-emerald-600" />
               <span>Uy tín đội bạn: {myTrustScore}/100</span>
@@ -382,26 +382,26 @@ export function HeaderBar({
           </div>
         </div>
 
-        {/* 4. 5-Tab Navigation Bar (Vintage Newspaper Ink / Black Pill Active) */}
-        <div className="flex overflow-x-auto no-scrollbar sm:grid sm:grid-cols-5 gap-1 sm:gap-1.5 bg-[#ede8dc] p-1 sm:p-1.5 rounded-xl border border-stone-300/80 text-[11px] font-bold shadow-inner">
+        {/* 4. 5-Tab Navigation Bar - Emil Kowalski Spring Transitions */}
+        <div className="flex overflow-x-auto no-scrollbar sm:grid sm:grid-cols-5 gap-1 sm:gap-1.5 bg-[#ede8dc] p-1 sm:p-1.5 rounded-xl border border-stone-300/90 text-[11px] font-bold shadow-inner">
           {navTabs.map((tab) => {
             const active = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-1.5 sm:py-2 px-2.5 sm:px-1 rounded-lg flex items-center justify-center gap-1 transition-all flex-shrink-0 min-w-fit sm:min-w-0 ${
+                className={`py-1.5 sm:py-2 px-2.5 sm:px-1 rounded-lg flex items-center justify-center gap-1 transition-all duration-160 ease-spring active:scale-95 flex-shrink-0 min-w-fit sm:min-w-0 ${
                   active
-                    ? "bg-stone-900 text-white font-black shadow-sm"
+                    ? "bg-stone-900 text-white font-black shadow-paper"
                     : tab.isSos
-                    ? "text-red-700 hover:bg-stone-200 font-extrabold"
-                    : "text-stone-700 hover:text-stone-900 hover:bg-stone-200"
+                    ? "text-red-700 hover:bg-stone-200/90 font-extrabold"
+                    : "text-stone-700 hover:text-stone-900 hover:bg-stone-200/90"
                 }`}
               >
                 {tab.icon}
                 <span className="whitespace-nowrap">{tab.label}</span>
                 {tab.badge !== undefined && tab.badge > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-red-600 text-white font-black">
+                  <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-red-600 text-white font-black shadow-xs">
                     {tab.badge}
                   </span>
                 )}
@@ -410,10 +410,10 @@ export function HeaderBar({
           })}
           <button
             onClick={() => setActiveTab("trust-profile")}
-            className={`py-1.5 sm:py-2 px-2.5 sm:px-1 rounded-lg flex items-center justify-center gap-1 transition-all flex-shrink-0 min-w-fit sm:min-w-0 ${
+            className={`py-1.5 sm:py-2 px-2.5 sm:px-1 rounded-lg flex items-center justify-center gap-1 transition-all duration-160 ease-spring active:scale-95 flex-shrink-0 min-w-fit sm:min-w-0 ${
               activeTab === "trust-profile"
-                ? "bg-stone-900 text-white font-black shadow-sm"
-                : "text-stone-700 hover:text-stone-900 hover:bg-stone-200"
+                ? "bg-stone-900 text-white font-black shadow-paper"
+                : "text-stone-700 hover:text-stone-900 hover:bg-stone-200/90"
             }`}
           >
             <ShieldCheck className="w-3.5 h-3.5 text-current" />

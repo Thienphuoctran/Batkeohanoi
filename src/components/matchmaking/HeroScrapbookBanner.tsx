@@ -14,7 +14,7 @@ export const HeroScrapbookBanner: React.FC<HeroScrapbookBannerProps> = ({
 }) => {
   return (
     <div
-      className={`card-retro-paper relative rounded-3xl overflow-hidden border border-stone-300 p-4 sm:p-5 shadow-lg ${className}`}
+      className={`card-retro-paper relative rounded-3xl overflow-hidden border border-stone-300/90 p-4 sm:p-5 shadow-paper ${className}`}
     >
       {/* Washi Tape dán góc trang trí */}
       <div className="washi-tape -top-2.5 left-8 rotate-[-3deg]" />
@@ -32,7 +32,7 @@ export const HeroScrapbookBanner: React.FC<HeroScrapbookBannerProps> = ({
       <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-100 border border-red-300 text-[9px] sm:text-[10px] font-black text-red-700 uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-100 border border-red-300/80 text-[9px] sm:text-[10px] font-black text-red-700 uppercase tracking-wider shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping" />
               BẢN TIN NÓNG SÂN 7 HÀ NỘI
             </span>
@@ -43,7 +43,7 @@ export const HeroScrapbookBanner: React.FC<HeroScrapbookBannerProps> = ({
               KÈO UY TÍN
             </span>
           </div>
-          <h2 className="text-base sm:text-2xl font-black text-stone-900 tracking-tight flex items-center gap-2 flex-wrap">
+          <h2 className="font-headline text-base sm:text-2xl font-black text-stone-900 tracking-tight flex items-center gap-2 flex-wrap">
             <span>SÀN BẮT ĐỐI SÂN 7</span>
             <span className="text-red-700 underline decoration-stone-400">
               CHỐNG BÙNG KÈO
