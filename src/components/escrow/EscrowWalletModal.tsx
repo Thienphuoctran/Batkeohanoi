@@ -176,50 +176,50 @@ export function EscrowWalletModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4">
-      <div className="modal-spring-enter w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[#0f172a] border border-white/[0.1] shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <div className="modal-spring-enter card-retro-paper w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[#fbf9f4] border border-stone-300/90 shadow-paper overflow-hidden max-h-[92vh] flex flex-col text-stone-900">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.08] bg-slate-950/80">
+        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-stone-800/80 bg-[#ede8dc]">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-2xs">
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 shadow-2xs">
               <Wallet className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800">
                 Tài Chính &amp; Bảo Chứng Thi Đấu
               </span>
-              <h3 className="font-headline text-base font-extrabold text-white mt-0.5">
+              <h3 className="font-headline text-base font-extrabold text-stone-900 mt-0.5">
                 Ví Ký Quỹ Nội Bộ (In-App Escrow)
               </h3>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-160 ease-spring active:scale-95"
+            className="w-8 h-8 rounded-lg bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-stone-600 hover:text-stone-900 transition-all duration-160 ease-spring active:scale-95"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="p-5 overflow-y-auto space-y-4 text-xs">
-          {/* Card Số Dư */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-white/[0.1] p-4 shadow-xl">
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+        <div className="p-5 overflow-y-auto space-y-4 text-xs bg-[#fbf9f4]">
+          {/* Card Số Dư - Phiếu Ký Quỹ Tài Chính */}
+          <div className="relative overflow-hidden rounded-2xl bg-[#ede8dc] border-2 border-dashed border-stone-400 p-4 shadow-2xs text-stone-900">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-300">
               <div>
-                <span className="text-[10px] text-slate-400 uppercase font-semibold">
+                <span className="text-[10px] text-stone-600 uppercase font-semibold">
                   Số Dư Khả Dụng Trong Ví
                 </span>
-                <div className="text-2xl font-black text-white mt-0.5">
+                <div className="text-2xl font-black text-stone-900 mt-0.5 font-mono">
                   {wallet.availableBalance.toLocaleString("vi-VN")}
-                  <span className="text-sm font-bold text-emerald-400 ml-1">VNĐ</span>
+                  <span className="text-sm font-bold text-emerald-800 ml-1">VNĐ</span>
                 </div>
               </div>
               <div className="text-right">
-                <span className="text-[10px] text-slate-400 block">Điểm Uy Tín</span>
+                <span className="text-[10px] text-stone-600 block">Điểm Uy Tín</span>
                 <span
                   className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black ${
                     trustScore >= 70
-                      ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
-                      : "bg-rose-500/15 text-rose-300 border border-rose-500/30"
+                      ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                      : "bg-rose-100 text-rose-800 border border-rose-300"
                   }`}
                 >
                   <Sparkles className="w-3 h-3 fill-current" />
@@ -230,14 +230,14 @@ export function EscrowWalletModal({
 
             <div className="grid grid-cols-2 gap-2 pt-3 text-[11px]">
               <div>
-                <span className="text-slate-400 block text-[10px]">Đang Ký Quỹ Kèo:</span>
-                <span className="font-mono font-bold text-amber-300">
+                <span className="text-stone-600 block text-[10px]">Đang Ký Quỹ Kèo:</span>
+                <span className="font-mono font-bold text-amber-800">
                   {wallet.lockedAmount.toLocaleString("vi-VN")}đ
                 </span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[10px]">Tổng Tài Sản:</span>
-                <span className="font-mono font-bold text-white">
+                <span className="text-stone-600 block text-[10px]">Tổng Tài Sản:</span>
+                <span className="font-mono font-bold text-stone-900">
                   {wallet.balance.toLocaleString("vi-VN")}đ
                 </span>
               </div>
@@ -245,13 +245,13 @@ export function EscrowWalletModal({
           </div>
 
           {/* DÒNG LƯU Ý CỐ ĐỊNH CỌC SÂN CHỈ 200.000Đ */}
-          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-sky-500/10 border border-emerald-500/30 flex items-start gap-2.5 shadow-sm">
-            <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+          <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 flex items-start gap-2.5 shadow-2xs">
+            <Sparkles className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
             <div className="space-y-0.5 text-xs">
-              <div className="font-black text-emerald-300 uppercase tracking-wide flex items-center gap-1.5">
+              <div className="font-black text-emerald-900 uppercase tracking-wide flex items-center gap-1.5">
                 <span>🛡️ LƯU Ý QUAN TRỌNG: TIỀN CỌC SÂN CỐ ĐỊNH CHỈ LÀ 200.000Đ</span>
               </div>
-              <p className="text-[11px] text-slate-200 leading-relaxed">
+              <p className="text-[11px] text-stone-700 leading-relaxed">
                 Hệ thống GiaoHuu.vn áp dụng mức cọc bảo chứng duy nhất <strong>200.000đ/trận</strong> (không thu thêm bất kỳ chi phí nào). Số tiền này dùng để cam kết chống bùng kèo và sẽ được <strong>hoàn trả 100% về tài khoản ngân hàng của bạn</strong> ngay sau khi hoàn tất trận đấu!
               </p>
             </div>
@@ -259,17 +259,17 @@ export function EscrowWalletModal({
 
           {/* THÔNG BÁO / BIÊN LAI HOÀN TIỀN CỌC THÀNH CÔNG KHI BQT CHUYỂN KHOẢN */}
           {refundReceipt && (
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-teal-950/90 border-2 border-emerald-500/70 shadow-2xl space-y-3 animate-in zoom-in-95 duration-200">
-              <div className="flex items-start justify-between gap-2 border-b border-emerald-500/30 pb-2.5">
+            <div className="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-500 shadow-md space-y-3 animate-in zoom-in-95 duration-200 text-stone-900">
+              <div className="flex items-start justify-between gap-2 border-b border-emerald-300 pb-2.5">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/20">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  <div className="w-8 h-8 rounded-xl bg-emerald-100 border border-emerald-400 flex items-center justify-center text-emerald-800 shadow-2xs">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-700" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 block">
                       GIAO DỊCH HOÀN TẤT
                     </span>
-                    <h4 className="text-sm font-black text-white">
+                    <h4 className="text-sm font-black text-emerald-950 font-headline">
                       ✅ ĐÃ HOÀN TIỀN CỌC THÀNH CÔNG!
                     </h4>
                   </div>
@@ -280,39 +280,39 @@ export function EscrowWalletModal({
                     clearLatestRefundReceipt();
                     setRefundReceipt(null);
                   }}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white"
+                  className="p-1 rounded-lg text-stone-500 hover:text-stone-900"
                   title="Đóng thông báo"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-emerald-500/30 space-y-2 text-xs">
+              <div className="p-3 rounded-xl bg-[#ede8dc] border border-emerald-300 space-y-2 text-xs">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Số tiền BQT đã hoàn:</span>
-                  <span className="text-base font-black text-emerald-400 font-mono">
+                  <span className="text-stone-600">Số tiền BQT đã hoàn:</span>
+                  <span className="text-base font-black text-emerald-800 font-mono">
                     +{refundReceipt.amount.toLocaleString("vi-VN")} VNĐ
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-slate-300">
-                  <span className="text-slate-400">Ngân hàng nhận:</span>
-                  <strong className="text-white">{refundReceipt.bankShortName || "MBBank"}</strong>
+                <div className="flex justify-between items-center text-stone-800">
+                  <span className="text-stone-600">Ngân hàng nhận:</span>
+                  <strong className="text-stone-900">{refundReceipt.bankShortName || "MBBank"}</strong>
                 </div>
-                <div className="flex justify-between items-center text-slate-300">
-                  <span className="text-slate-400">Số tài khoản:</span>
-                  <strong className="text-white font-mono">{refundReceipt.bankAccountNo || "—"}</strong>
+                <div className="flex justify-between items-center text-stone-800">
+                  <span className="text-stone-600">Số tài khoản:</span>
+                  <strong className="text-stone-900 font-mono">{refundReceipt.bankAccountNo || "—"}</strong>
                 </div>
-                <div className="flex justify-between items-center text-slate-300">
-                  <span className="text-slate-400">Chủ tài khoản:</span>
-                  <strong className="text-white uppercase">{refundReceipt.bankAccountName || "CHỦ TÀI KHOẢN"}</strong>
+                <div className="flex justify-between items-center text-stone-800">
+                  <span className="text-stone-600">Chủ tài khoản:</span>
+                  <strong className="text-stone-900 uppercase">{refundReceipt.bankAccountName || "CHỦ TÀI KHOẢN"}</strong>
                 </div>
-                <div className="flex justify-between items-center text-slate-300 border-t border-slate-800 pt-1.5">
-                  <span className="text-slate-400">Thời gian BQT gửi:</span>
-                  <span className="text-slate-300">{refundReceipt.refundedAt}</span>
+                <div className="flex justify-between items-center text-stone-800 border-t border-stone-300 pt-1.5">
+                  <span className="text-stone-600">Thời gian BQT gửi:</span>
+                  <span className="text-stone-800">{refundReceipt.refundedAt}</span>
                 </div>
               </div>
 
-              <p className="text-[11px] text-emerald-200/90 leading-relaxed italic">
+              <p className="text-[11px] text-emerald-900 leading-relaxed italic">
                 💬 {refundReceipt.note || "BQT GiaoHuu.vn đã hoàn tất chuyển khoản 200.000đ trả về số tài khoản của bạn qua Napas247. Vui lòng kiểm tra biến động số dư trên App Ngân Hàng của bạn!"}
               </p>
 
@@ -323,7 +323,7 @@ export function EscrowWalletModal({
                     clearLatestRefundReceipt();
                     setRefundReceipt(null);
                   }}
-                  className="w-full h-9 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20"
+                  className="btn-paper-tactile w-full h-9 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs shadow-2xs"
                 >
                   <Check className="w-3.5 h-3.5 mr-1" />
                   Đã Nhận Được Tiền Hoàn Cọc
@@ -334,33 +334,33 @@ export function EscrowWalletModal({
 
           {/* Cảnh Báo Nếu Tín Nhiệm Dưới 70 Điểm */}
           {isRestricted ? (
-            <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/40 space-y-2">
-              <div className="flex items-center gap-2 text-rose-300 font-extrabold text-xs">
-                <ShieldAlert className="w-4 h-4 shrink-0 text-rose-400" />
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-300 space-y-2 text-rose-950">
+              <div className="flex items-center gap-2 text-rose-900 font-extrabold text-xs">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-rose-700" />
                 <span>Cần duy trì 200.000đ Ký Quỹ (Điểm tín nhiệm: {trustScore}★ &lt; 70★)</span>
               </div>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                Đội bạn cần tích lũy thêm <strong className="text-amber-300">+{pointsNeeded} điểm</strong> (bằng cách đá đẹp 3-5 trận liên tiếp) để được miễn cọc và mở khóa rút tiền về tài khoản ngân hàng.
+              <p className="text-[11px] text-stone-700 leading-relaxed">
+                Đội bạn cần tích lũy thêm <strong className="text-amber-800">+{pointsNeeded} điểm</strong> (bằng cách đá đẹp 3-5 trận liên tiếp) để được miễn cọc và mở khóa rút tiền về tài khoản ngân hàng.
               </p>
             </div>
           ) : (
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-[11px] text-emerald-200">
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-300 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+              <span className="text-[11px] text-emerald-950">
                 Tín nhiệm cao ({trustScore}★ ≥ 70★): Được <strong>miễn cọc</strong> khi tạo kèo và <strong>toàn quyền rút tiền</strong> về ngân hàng bất cứ lúc nào!
               </span>
             </div>
           )}
 
           {/* 3 Tabs Điều Khiển */}
-          <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-slate-950 border border-white/[0.08]">
+          <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-[#ede8dc] border border-stone-300">
             <button
               type="button"
               onClick={() => setActiveTab("deposit")}
-              className={`py-2 rounded-lg font-extrabold text-xs flex items-center justify-center gap-1.5 transition ${
+              className={`btn-paper-tactile py-2 rounded-lg font-extrabold text-xs flex items-center justify-center gap-1.5 transition ${
                 activeTab === "deposit"
-                  ? "bg-emerald-500 text-slate-950 font-black shadow-md"
-                  : "bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300"
+                  ? "bg-stone-900 text-emerald-300 font-black shadow-2xs"
+                  : "bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 text-emerald-900"
               }`}
             >
               <ArrowDownLeft className="w-3.5 h-3.5" />
@@ -370,12 +370,12 @@ export function EscrowWalletModal({
               type="button"
               disabled={!canWithdraw}
               onClick={() => setActiveTab("withdraw")}
-              className={`py-2 rounded-lg font-extrabold text-xs flex items-center justify-center gap-1.5 transition ${
+              className={`btn-paper-tactile py-2 rounded-lg font-extrabold text-xs flex items-center justify-center gap-1.5 transition ${
                 activeTab === "withdraw"
-                  ? "bg-amber-500 text-slate-950 font-black shadow-md"
+                  ? "bg-stone-900 text-amber-300 font-black shadow-2xs"
                   : canWithdraw
-                  ? "bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300"
-                  : "bg-slate-900 border border-white/[0.05] text-slate-500 cursor-not-allowed"
+                  ? "bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-900"
+                  : "bg-stone-200 border border-stone-300 text-stone-400 cursor-not-allowed"
               }`}
             >
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -385,20 +385,20 @@ export function EscrowWalletModal({
 
           {/* TAB 1: NẠP TIỀN VIETQR */}
           {activeTab === "deposit" && (
-            <div className="p-4 rounded-2xl bg-slate-950 border border-white/[0.08] space-y-3">
+            <div className="p-4 rounded-2xl bg-[#ede8dc] border border-stone-300 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">
                   Nạp Ký Quỹ Tự Động (VietQR Napas247)
                 </span>
-                <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-mono font-bold">
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-mono font-bold">
                   Khớp Lệnh 3 Giây
                 </span>
               </div>
 
               {/* LƯU Ý MỨC CỌC CỐ ĐỊNH 200K NGAY TRONG TAB NẠP */}
-              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-200 flex items-center justify-between">
+              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-[11px] text-emerald-950 flex items-center justify-between">
                 <span>📌 Mức cọc quy định chống bùng kèo:</span>
-                <strong className="text-white font-mono font-black text-xs">200.000 VNĐ / Trận</strong>
+                <strong className="text-stone-900 font-mono font-black text-xs">200.000 VNĐ / Trận</strong>
               </div>
 
               {/* Chọn số tiền nạp */}
@@ -412,10 +412,10 @@ export function EscrowWalletModal({
                     key={amt}
                     type="button"
                     onClick={() => setDepositAmount(amt)}
-                    className={`py-2 px-1 rounded-xl text-[11px] font-bold border transition text-center ${
+                    className={`btn-paper-tactile py-2 px-1 rounded-xl text-[11px] font-bold border transition text-center ${
                       depositAmount === amt
-                        ? "bg-emerald-500 text-slate-950 border-emerald-400 font-black shadow-md shadow-emerald-500/20"
-                        : "bg-slate-900 border-white/[0.08] text-slate-300 hover:text-white"
+                        ? "bg-stone-900 text-emerald-300 border-stone-950 font-black shadow-2xs"
+                        : "bg-[#fbf9f4] border-stone-300 text-stone-800 hover:bg-stone-200"
                     }`}
                   >
                     <div>{amt.toLocaleString("vi-VN")}đ</div>
@@ -425,29 +425,29 @@ export function EscrowWalletModal({
               </div>
 
               {/* Mã VietQR */}
-              <div className="p-3 bg-white rounded-2xl flex flex-col items-center justify-center gap-2">
+              <div className="p-3 bg-white rounded-2xl flex flex-col items-center justify-center gap-2 border border-stone-300">
                 <img
                   src={depositQrUrl}
                   alt="Mã VietQR Nạp Ký Quỹ"
                   className="w-48 h-48 object-contain rounded-xl"
                 />
-                <span className="text-[10px] font-bold text-slate-800 text-center font-mono">
+                <span className="text-[10px] font-bold text-stone-700 text-center font-mono">
                   Quét mã Napas247 bằng bất kỳ app ngân hàng nào (MB, VCB, Tech, BIDV...)
                 </span>
               </div>
 
-              <div className="text-[11px] text-slate-400 space-y-1 bg-slate-900/80 p-2.5 rounded-xl border border-white/[0.05]">
+              <div className="text-[11px] text-stone-600 space-y-1 bg-[#fbf9f4] p-2.5 rounded-xl border border-stone-300">
                 <div className="flex justify-between">
                   <span>Số tài khoản:</span>
-                  <strong className="text-white font-mono">07440948327598</strong>
+                  <strong className="text-stone-900 font-mono">07440948327598</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Ngân hàng:</span>
-                  <strong className="text-white">MB Bank (Ngân Hàng Quân Đội)</strong>
+                  <strong className="text-stone-900">MB Bank (Ngân Hàng Quân Đội)</strong>
                 </div>
                 <div className="flex justify-between">
                   <span>Chủ tài khoản:</span>
-                  <strong className="text-white uppercase">TRAN QUOC THIEN PHUOC</strong>
+                  <strong className="text-stone-900 uppercase">TRAN QUOC THIEN PHUOC</strong>
                 </div>
               </div>
 
@@ -455,7 +455,7 @@ export function EscrowWalletModal({
                 type="button"
                 disabled={mockDepositing}
                 onClick={handleSimulateDeposit}
-                className="w-full h-10 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-emerald-500/20"
+                className="btn-paper-tactile w-full h-10 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs gap-1.5 shadow-2xs"
               >
                 {mockDepositing ? "Đang Khớp Lệnh..." : `Xác Nhận Đã Chuyển Khoản ${depositAmount.toLocaleString("vi-VN")}đ`}
               </Button>
@@ -464,39 +464,39 @@ export function EscrowWalletModal({
 
           {/* TAB 2: RÚT TIỀN VỀ NGÂN HÀNG & TÍCH HỢP ẢNH STK CHỦ VÍ */}
           {activeTab === "withdraw" && (
-            <div className="p-4 rounded-2xl bg-slate-950 border border-white/[0.08] space-y-3">
+            <div className="p-4 rounded-2xl bg-[#ede8dc] border border-stone-300 space-y-3">
               {!canWithdraw ? (
-                <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-center space-y-2">
-                  <Lock className="w-6 h-6 mx-auto text-rose-400" />
+                <div className="p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 text-center space-y-2">
+                  <Lock className="w-6 h-6 mx-auto text-rose-700" />
                   <div className="font-bold text-xs">Chức năng rút tiền đang tạm khóa</div>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-stone-600">
                     Cần đạt điểm uy tín ≥ 70★ để rút tiền ký quỹ về tài khoản ngân hàng cá nhân.
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleWithdrawSubmit} className="space-y-3">
                   <div>
-                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider">
                       Rút Số Dư Ví Ký Quỹ Về Tài Khoản Ngân Hàng
                     </span>
-                    <h4 className="text-sm font-extrabold text-white mt-0.5">
+                    <h4 className="font-headline text-sm font-extrabold text-stone-900 mt-0.5">
                       Rút {wallet.availableBalance.toLocaleString("vi-VN")}đ
                     </h4>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 leading-relaxed">
+                  <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-[11px] text-amber-950 leading-relaxed">
                     ⏱️ <strong>Thời gian hoạt động rút tiền từ ví:</strong> Trước 22h mỗi ngày. BQT sẽ chuyển khoản trả về STK của bạn trong 5-15 phút, muộn nhất là 8h tối mỗi ngày.
                   </div>
 
                   {/* 1. CHỌN NGÂN HÀNG THỤ HƯỞNG (ĐẦY ĐỦ CÁC NGÂN HÀNG VN) */}
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">
+                    <label className="block text-stone-700 font-semibold mb-1">
                       1. Ngân hàng thụ hưởng:
                     </label>
                     <select
                       value={withdrawBankCode}
                       onChange={(e) => setWithdrawBankCode(e.target.value)}
-                      className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white text-xs focus:border-amber-400 focus:outline-none"
+                      className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 text-xs focus:border-stone-800 focus:outline-none"
                     >
                       {VIETNAM_BANKS.map((b) => (
                         <option key={b.code} value={b.code}>
@@ -508,7 +508,7 @@ export function EscrowWalletModal({
 
                   {/* 2. SỐ TÀI KHOẢN NHẬN TIỀN */}
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">
+                    <label className="block text-stone-700 font-semibold mb-1">
                       2. Số tài khoản nhận tiền:
                     </label>
                     <input
@@ -517,13 +517,13 @@ export function EscrowWalletModal({
                       value={withdrawAccount}
                       onChange={(e) => setWithdrawAccount(e.target.value)}
                       placeholder="Nhập số tài khoản ngân hàng chính chủ"
-                      className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white font-mono text-xs focus:outline-none focus:border-amber-400"
+                      className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 font-mono text-xs focus:outline-none focus:border-stone-800"
                     />
                   </div>
 
                   {/* 3. TÊN CHỦ TÀI KHOẢN */}
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">
+                    <label className="block text-stone-700 font-semibold mb-1">
                       3. Tên chủ tài khoản (Viết hoa không dấu):
                     </label>
                     <input
@@ -532,32 +532,32 @@ export function EscrowWalletModal({
                       value={withdrawName}
                       onChange={(e) => setWithdrawName(e.target.value.toUpperCase())}
                       placeholder="VD: NGUYEN VAN A"
-                      className="w-full h-9 px-3 rounded-xl bg-slate-900 border border-white/[0.1] text-white uppercase text-xs focus:outline-none focus:border-amber-400"
+                      className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 uppercase text-xs focus:outline-none focus:border-stone-800"
                     />
                   </div>
 
                   {/* 4. TÍCH HỢP GỬI ẢNH STK NGÂN HÀNG CỦA CHỦ VÍ */}
-                  <div className="p-3 rounded-xl bg-slate-900 border border-white/[0.08] space-y-2.5">
+                  <div className="p-3 rounded-xl bg-[#fbf9f4] border border-stone-300 space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-200 flex items-center gap-1.5">
-                        <Camera className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="font-bold text-stone-800 flex items-center gap-1.5">
+                        <Camera className="w-3.5 h-3.5 text-amber-700" />
                         <span>Ảnh Mã QR STK Ngân Hàng Của Chủ Ví:</span>
                       </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
                         Bắn Sang Telegram Admin
                       </span>
                     </div>
 
                     {/* Hiển thị ảnh QR (Tải lên hoặc Tự động sinh) */}
                     {customQrImage ? (
-                      <div className="flex flex-col items-center gap-2 p-2 bg-slate-950 rounded-xl border border-white/10">
+                      <div className="flex flex-col items-center gap-2 p-2 bg-[#ede8dc] rounded-xl border border-stone-300">
                         <img
                           src={customQrImage}
                           alt="Ảnh QR Tải Lên"
                           className="w-36 h-36 object-contain rounded-lg bg-white p-1"
                         />
                         <div className="flex items-center gap-2">
-                          <label className="cursor-pointer text-[11px] font-bold text-sky-400 hover:text-sky-300 inline-flex items-center gap-1">
+                          <label className="cursor-pointer text-[11px] font-bold text-sky-800 hover:underline inline-flex items-center gap-1">
                             <Upload className="w-3 h-3" />
                             <span>Đổi ảnh khác</span>
                             <input
@@ -570,7 +570,7 @@ export function EscrowWalletModal({
                           <button
                             type="button"
                             onClick={() => setCustomQrImage("")}
-                            className="text-[11px] font-bold text-rose-400 hover:text-rose-300 inline-flex items-center gap-1"
+                            className="text-[11px] font-bold text-rose-700 hover:underline inline-flex items-center gap-1"
                           >
                             <Trash2 className="w-3 h-3" />
                             <span>Gỡ ảnh</span>
@@ -578,16 +578,16 @@ export function EscrowWalletModal({
                         </div>
                       </div>
                     ) : autoGeneratedQrUrl ? (
-                      <div className="flex flex-col items-center gap-2 p-2 bg-slate-950 rounded-xl border border-white/10">
+                      <div className="flex flex-col items-center gap-2 p-2 bg-[#ede8dc] rounded-xl border border-stone-300">
                         <img
                           src={autoGeneratedQrUrl}
                           alt="Mã VietQR Tự Động"
                           className="w-36 h-36 object-contain rounded-lg bg-white p-1"
                         />
-                        <span className="text-[10px] text-emerald-300 font-medium text-center">
+                        <span className="text-[10px] text-emerald-800 font-medium text-center">
                           ✓ Đã tự động tạo mã VietQR theo STK {withdrawAccount} ({currentBank.name.split('(')[0]}).
                         </span>
-                        <label className="cursor-pointer text-[11px] font-bold text-amber-400 hover:text-amber-300 inline-flex items-center gap-1 border border-amber-500/30 px-2 py-1 rounded-lg bg-amber-500/10">
+                        <label className="cursor-pointer text-[11px] font-bold text-amber-900 hover:text-amber-950 inline-flex items-center gap-1 border border-amber-300 px-2 py-1 rounded-lg bg-amber-100">
                           <Upload className="w-3 h-3" />
                           <span>Tải ảnh QR riêng từ máy lên (tùy chọn)</span>
                           <input
@@ -599,12 +599,12 @@ export function EscrowWalletModal({
                         </label>
                       </div>
                     ) : (
-                      <label className="border-2 border-dashed border-white/15 hover:border-amber-400/50 bg-slate-950/60 p-4 rounded-xl flex flex-col items-center justify-center cursor-pointer transition space-y-1">
-                        <Upload className="w-5 h-5 text-amber-400" />
-                        <span className="font-bold text-amber-300 text-[11px]">
+                      <label className="border-2 border-dashed border-stone-300 hover:border-amber-500 bg-[#ede8dc] p-4 rounded-xl flex flex-col items-center justify-center cursor-pointer transition space-y-1">
+                        <Upload className="w-5 h-5 text-amber-700" />
+                        <span className="font-bold text-amber-900 text-[11px]">
                           Tải ảnh chụp mã QR từ app ngân hàng của bạn
                         </span>
-                        <span className="text-[10px] text-slate-400 text-center">
+                        <span className="text-[10px] text-stone-500 text-center">
                           (Hoặc chỉ cần nhập STK ở trên, hệ thống sẽ tự động tạo mã VietQR chuẩn)
                         </span>
                         <input
@@ -616,20 +616,20 @@ export function EscrowWalletModal({
                       </label>
                     )}
 
-                    <p className="text-[10px] text-slate-400 italic leading-relaxed">
+                    <p className="text-[10px] text-stone-500 italic leading-relaxed">
                       💡 <strong>Cơ chế tự động:</strong> Ảnh mã QR tài khoản của bạn sẽ được gửi thẳng vào cuộc trò chuyện Telegram của Ban Quản Trị. Quản trị viên chỉ cần quét mã là chuyển khoản hoàn tiền cho bạn trong ít phút!
                     </p>
                   </div>
 
                   {withdrawSuccessMsg && (
-                    <div className="rounded-lg bg-emerald-500/15 border border-emerald-500/40 p-2.5 text-emerald-300 font-bold text-center text-xs space-y-1">
+                    <div className="rounded-lg bg-emerald-100 border border-emerald-300 p-2.5 text-emerald-900 font-bold text-center text-xs space-y-1">
                       <div>✅ Đã gửi lệnh rút 200.000đ tới Ban Quản Trị! BQT sẽ chuyển khoản trả về STK của bạn trong 5-15 phút. Muộn nhất là 8h tối mỗi ngày ( thời gian hoạt động rút tiền từ ví là trước 22h nha )</div>
                     </div>
                   )}
 
                   <Button
                     type="submit"
-                    className="w-full h-10 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs gap-1.5 shadow-lg shadow-amber-500/20"
+                    className="btn-paper-tactile w-full h-10 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-black text-xs gap-1.5 shadow-2xs"
                   >
                     <ArrowUpRight className="w-4 h-4" />
                     <span>Xác Nhận Rút Tiền Về Ngân Hàng</span>

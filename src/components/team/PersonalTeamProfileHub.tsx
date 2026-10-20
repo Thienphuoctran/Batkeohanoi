@@ -619,11 +619,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* 1. THẺ CĂN CƯỚC BÓNG ĐÁ SỐ CHÍNH CHỦ (DIGITAL TEAM ID CARD) */}
-      <div className="relative overflow-hidden rounded-3xl border border-emerald-500/35 bg-gradient-to-br from-slate-900 via-[#0B132B] to-slate-950 p-5 sm:p-6 shadow-2xl space-y-4">
-        {/* Glow hiệu ứng sân cỏ */}
-        <div className="pointer-events-none absolute -right-8 -bottom-8 w-48 h-48 rounded-full bg-emerald-500/15 blur-3xl" />
-        <div className="pointer-events-none absolute -left-8 -top-8 w-40 h-40 rounded-full bg-sky-500/10 blur-3xl" />
+      {/* 1. THẺ CĂN CƯỚC BÓNG ĐÁ SỐ CHÍNH CHỦ (DIGITAL TEAM ID CARD - VINTAGE PAPER SCRAPBOOK) */}
+      <div className="card-retro-paper rounded-3xl border border-stone-300/90 bg-[#fbf9f4] p-5 sm:p-6 shadow-paper space-y-4 relative overflow-hidden">
+        {/* Washi tape trang trí phong cách báo phủi */}
+        <div className="washi-tape -top-2 left-8 rotate-[-2deg]" />
+        <div className="washi-tape -top-2 right-8 rotate-[2deg]" />
 
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 relative z-10">
           <div className="flex items-start space-x-3.5">
@@ -633,7 +633,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
               <button
                 type="button"
                 onClick={() => setIsLogoModalOpen(true)}
-                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-slate-950/90 hover:bg-emerald-500 border border-white/20 hover:border-emerald-400 text-slate-300 hover:text-slate-950 flex items-center justify-center text-xs shadow-md transition-all active:scale-95"
+                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-stone-900 hover:bg-emerald-600 border border-stone-400 text-stone-200 hover:text-white flex items-center justify-center text-xs shadow-md transition-all active:scale-95"
                 title="Thay đổi ảnh Logo đội bóng"
               >
                 <Camera className="w-3.5 h-3.5" />
@@ -643,41 +643,39 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-1.5">
                 {matchStats.total < 3 ? (
-                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-extrabold uppercase tracking-wider">
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 font-extrabold uppercase tracking-wider shadow-2xs">
                     🌱 Đội Mới ({matchStats.total} Trận)
                   </span>
                 ) : (
-                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40 font-extrabold uppercase tracking-wider">
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-900 border border-sky-300 font-extrabold uppercase tracking-wider shadow-2xs">
                     ⭐ Đã Xác Thực ({matchStats.total} Trận)
                   </span>
                 )}
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold shadow-2xs">
                   ★ Bảo Chứng GiaoHuu.vn
                 </span>
               </div>
 
               <div className="flex items-center space-x-2 pt-0.5">
-                <ShinyText
-                  text={teamName || "Chưa đặt tên đội"}
-                  speed={3}
-                  className="text-xl sm:text-2xl font-black text-white tracking-tight"
-                />
-                <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
+                <h2 className="font-headline text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
+                  {teamName || "Chưa đặt tên đội"}
+                </h2>
+                <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0" />
               </div>
 
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-stone-700">
                 Đội trưởng:{" "}
-                <strong className="text-white font-bold">{captainName}</strong>
+                <strong className="text-stone-900 font-bold">{captainName}</strong>
                 {captainPhone ? (
                   <>
                     {" "}
                     •{" "}
-                    <span className="font-mono text-emerald-300 font-bold">
+                    <span className="font-mono text-emerald-800 font-bold">
                       {captainPhone}
                     </span>
                   </>
                 ) : (
-                  <span className="text-slate-500 italic ml-1">
+                  <span className="text-stone-500 italic ml-1">
                     (Chưa có SĐT)
                   </span>
                 )}
@@ -685,16 +683,16 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
               <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
                 <span
-                  className={`px-2.5 py-0.5 rounded-lg text-[11px] font-extrabold border ${tierInfo.badgeColor}`}
+                  className={`px-2.5 py-0.5 rounded-lg text-[11px] font-extrabold border shadow-2xs ${tierInfo.badgeColor}`}
                 >
                   Tier {skillTier}: {tierInfo.name}
                 </span>
-                <span className="text-slate-400 font-medium text-[11px]">
-                  Tuổi TB: <strong className="text-slate-200">{avgAge}t</strong>
+                <span className="text-stone-600 font-medium text-[11px]">
+                  Tuổi TB: <strong className="text-stone-800">{avgAge}t</strong>
                 </span>
-                <span className="text-slate-400 font-medium text-[11px]">
+                <span className="text-stone-600 font-medium text-[11px]">
                   • Áo chính:{" "}
-                  <strong className="text-emerald-300">
+                  <strong className="text-emerald-800">
                     {jerseyColor || "Chưa cập nhật"}
                   </strong>
                 </span>
@@ -702,53 +700,53 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             </div>
           </div>
 
-          {/* Khối Điểm Tín Nhiệm & Trạng thái cọc */}
-          <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 p-3 rounded-2xl bg-slate-950/80 border border-white/10 shrink-0">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+          {/* Khối Điểm Tín Nhiệm & Trạng thái cọc (Phong cách Tem Nhãn Báo Phủi) */}
+          <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 p-3 rounded-2xl bg-[#ede8dc] border border-stone-300/80 shrink-0 shadow-2xs">
+            <span className="text-[10px] font-black uppercase tracking-wider text-stone-600">
               Điểm Tín Nhiệm
             </span>
-            <div className="text-2xl sm:text-3xl font-mono font-black text-emerald-400">
+            <div className="text-2xl sm:text-3xl font-mono font-black text-emerald-800">
               <CountUpNumber end={team.trust_score} duration={1200} />
-              <span className="text-xs text-slate-500 font-bold">/100</span>
+              <span className="text-xs text-stone-500 font-bold">/100</span>
             </div>
-            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-2xs">
               {team.trust_score >= 70 ? "Miễn cọc 100%" : "Cọc 200k"}
             </span>
           </div>
         </div>
 
         {/* 3 Thẻ Thông Tin Nhanh */}
-        <div className="grid grid-cols-3 gap-2.5 bg-slate-950/70 p-3 rounded-2xl border border-white/[0.08] text-center text-xs relative z-10">
+        <div className="grid grid-cols-3 gap-2.5 bg-[#ede8dc] p-3 rounded-2xl border border-stone-300/80 text-center text-xs relative z-10 shadow-inner">
           <div>
-            <span className="text-[10px] text-slate-400 block font-medium">
+            <span className="text-[10px] text-stone-600 block font-semibold">
               Địa bàn sinh hoạt
             </span>
-            <span className="font-extrabold text-white text-xs sm:text-sm">
+            <span className="font-headline font-black text-stone-900 text-xs sm:text-sm">
               {homeDistrict || "Chưa cập nhật"}
             </span>
           </div>
           <div>
-            <span className="text-[10px] text-slate-400 block font-medium">
+            <span className="text-[10px] text-stone-600 block font-semibold">
               Đánh giá văn minh
             </span>
-            <span className="font-extrabold text-emerald-400 text-xs sm:text-sm flex items-center justify-center gap-1">
+            <span className="font-headline font-black text-emerald-800 text-xs sm:text-sm flex items-center justify-center gap-1">
               {matchStats.total > 0 ? (
                 <>
-                  <Star className="w-3.5 h-3.5 fill-current" />
+                  <Star className="w-3.5 h-3.5 fill-current text-amber-600" />
                   5.0 ★ Chuẩn Phủi
                 </>
               ) : (
-                <span className="text-slate-400 font-bold text-xs">
+                <span className="text-stone-600 font-bold text-xs">
                   ★ Đội Mới
                 </span>
               )}
             </span>
           </div>
           <div>
-            <span className="text-[10px] text-slate-400 block font-medium">
+            <span className="text-[10px] text-stone-600 block font-semibold">
               Quân số đội
             </span>
-            <span className="font-extrabold text-amber-300 text-xs sm:text-sm">
+            <span className="font-headline font-black text-amber-900 text-xs sm:text-sm">
               {members.length} Cầu thủ
             </span>
           </div>
@@ -756,29 +754,29 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
         {/* Lộ Trình Đá Đẹp Xóa Án Tích & Phục Hồi 100 Điểm (Nếu bị trừ điểm) */}
         {team.trust_score < 100 && (
-          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs relative z-10">
+          <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs relative z-10 shadow-2xs">
             <div className="space-y-0.5">
-              <span className="font-extrabold text-amber-300 flex items-center gap-1.5">
-                <Flame className="w-4 h-4 text-amber-400" />
+              <span className="font-extrabold text-amber-900 flex items-center gap-1.5">
+                <Flame className="w-4 h-4 text-amber-600" />
                 Lộ Trình Đá Đẹp Xóa Án Tích &amp; Phục Hồi 100 Điểm
               </span>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                Mỗi trận hoàn thành qua Mã Bắt Tay được <strong className="text-emerald-400">+5đ</strong>. Chuỗi <strong className="text-white">5 trận Fair-play liên tiếp</strong> sẽ tự động xóa sạch nhãn đỏ vi phạm và phục hồi trọn vẹn 100/100 điểm tín nhiệm!
+              <p className="text-[11px] text-stone-700 leading-relaxed">
+                Mỗi trận hoàn thành qua Mã Bắt Tay được <strong className="text-emerald-800">+5đ</strong>. Chuỗi <strong className="text-stone-900">5 trận Fair-play liên tiếp</strong> sẽ tự động xóa sạch nhãn đỏ vi phạm và phục hồi trọn vẹn 100/100 điểm tín nhiệm!
               </p>
             </div>
-            <div className="flex items-center sm:flex-col items-end gap-1 shrink-0 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-amber-500/20">
-              <span className="text-[10px] text-slate-400 font-bold uppercase">Tiến Độ Xóa Phạt</span>
-              <span className="text-sm font-mono font-black text-amber-300">
+            <div className="flex items-center sm:flex-col items-end gap-1 shrink-0 bg-[#ede8dc] px-3 py-1.5 rounded-xl border border-amber-300">
+              <span className="text-[10px] text-stone-600 font-bold uppercase">Tiến Độ Xóa Phạt</span>
+              <span className="text-sm font-mono font-black text-amber-900">
                 {matchStats.total % 5}/5 Trận
               </span>
             </div>
           </div>
         )}
 
-        {/* Thanh công cụ quản trị đội bóng */}
-        <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 relative z-10">
-          <span className="text-[11px] font-mono text-slate-400 flex items-center">
-            <QrCode className="w-3.5 h-3.5 mr-1 text-emerald-400" />
+        {/* Thanh công cụ quản trị đội bóng - Emil Kowalski Tactile Buttons */}
+        <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 relative z-10 border-t border-stone-200/80">
+          <span className="text-[11px] font-mono text-stone-600 flex items-center">
+            <QrCode className="w-3.5 h-3.5 mr-1 text-emerald-700" />
             <span>ID: #{team.id.slice(0, 8).toUpperCase()}</span>
           </span>
 
@@ -786,18 +784,18 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             {/* Nút Sửa Hồ Sơ */}
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white rounded-xl text-xs font-bold border border-amber-500/30 flex items-center space-x-1.5 transition-all shadow-sm active:scale-95"
+              className="btn-paper-tactile px-3 py-1.5 bg-[#ede8dc] hover:bg-stone-200 text-stone-800 hover:text-stone-900 rounded-xl text-xs font-bold border border-stone-300/90 flex items-center space-x-1.5 transition-all shadow-2xs active:scale-95"
             >
-              <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+              <Edit3 className="w-3.5 h-3.5 text-amber-700" />
               <span>Sửa Hồ Sơ</span>
             </button>
 
             {/* TÍNH NĂNG 3: Nút Mời Vào Đội (Mã QR & Link Zalo) */}
             <button
               onClick={handleOpenJoinLinkModal}
-              className="px-3 py-1.5 bg-gradient-to-r from-sky-500/20 to-blue-500/20 hover:from-sky-500/30 hover:to-blue-500/30 text-sky-300 border border-sky-400/40 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm active:scale-95"
+              className="btn-paper-tactile px-3 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-900 border border-sky-300/80 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all shadow-2xs active:scale-95"
             >
-              <QrCode className="w-3.5 h-3.5 text-sky-400" />
+              <QrCode className="w-3.5 h-3.5 text-sky-700" />
               <span>QR &amp; Link Zalo Đội</span>
             </button>
 
@@ -805,7 +803,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             {onQuickCreateMatch && (
               <button
                 onClick={onQuickCreateMatch}
-                className="px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black flex items-center space-x-1.5 transition-all shadow-md shadow-emerald-500/20 active:scale-95"
+                className="btn-paper-tactile px-3.5 py-1.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white rounded-xl text-xs font-black flex items-center space-x-1.5 transition-all shadow-md shadow-orange-900/20 active:scale-95"
               >
                 <PlusCircle className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>Mở Kèo Đội Tôi</span>
@@ -815,16 +813,16 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             {/* Nút Chia Sẻ Zalo */}
             <button
               onClick={handleCopyCardText}
-              className="px-3 py-1.5 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-slate-200 rounded-xl text-xs font-bold border border-white/10 flex items-center space-x-1.5 transition-all"
+              className="btn-paper-tactile px-3 py-1.5 bg-[#ede8dc] hover:bg-stone-200 active:scale-95 text-stone-800 rounded-xl text-xs font-bold border border-stone-300/90 flex items-center space-x-1.5 transition-all shadow-2xs"
             >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-300">Đã chép thẻ!</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-700" />
+                  <span className="text-emerald-800">Đã chép thẻ!</span>
                 </>
               ) : (
                 <>
-                  <Share2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <Share2 className="w-3.5 h-3.5 text-emerald-700" />
                   <span>Chia sẻ Zalo</span>
                 </>
               )}
@@ -840,7 +838,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   }
                 }}
                 title="Đăng xuất tài khoản Đội trưởng"
-                className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 rounded-xl text-xs font-bold border border-rose-500/30 flex items-center space-x-1.5 transition-all shadow-sm active:scale-95"
+                className="btn-paper-tactile px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded-xl text-xs font-bold border border-rose-300/80 flex items-center space-x-1.5 transition-all shadow-2xs active:scale-95"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Đăng Xuất</span>
@@ -851,23 +849,23 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       </div>
 
       {/* 2. VÍ KÝ QUỸ NỘI BỘ & TÍCH HỢP TRỰC TIẾP CHO ĐỘI BÓNG */}
-      <div className="surface-card rounded-2xl border border-white/[0.08] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="card-retro-paper rounded-2xl border border-stone-300/90 bg-[#fbf9f4] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-paper">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-sky-100 border border-sky-300 flex items-center justify-center text-sky-800 shrink-0">
             <Wallet className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-extrabold text-white">
+              <h3 className="font-headline text-sm font-extrabold text-stone-900">
                 Ví Ký Quỹ Nội Bộ Đội {teamName || "Bóng Đá"}
               </h3>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 font-bold border border-emerald-500/30">
+              <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
                 {team.trust_score >= 70 ? "Miễn cọc 100%" : "Cọc 200k"}
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-[11px] text-stone-600 mt-0.5">
               Số dư bảo chứng:{" "}
-              <strong className="text-emerald-400 font-mono">
+              <strong className="text-emerald-700 font-mono">
                 {(escrowWallet?.balance ?? 0).toLocaleString("vi-VN")}đ
               </strong>{" "}
               • Điểm uy tín {team.trust_score}/100 bảo chứng an toàn khi tạo và
@@ -880,7 +878,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
           <Button
             onClick={onOpenEscrowModal}
             variant="outline"
-            className="h-9 px-3.5 rounded-xl border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 font-bold text-xs gap-1.5 shrink-0"
+            className="btn-paper-tactile h-9 px-3.5 rounded-xl border-sky-300 bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold text-xs gap-1.5 shrink-0"
           >
             <Wallet className="w-3.5 h-3.5" />
             <span>Quản Lý Nạp / Rút Ví</span>
@@ -891,68 +889,68 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       {/* 3. LƯỚI 2 CỘT: SÂN NHÀ & BẢNG THÀNH TÍCH PHONG ĐỘ */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Cột Trái: Thông tin Sân Nhà, Giờ Đá & Triết Lý */}
-        <div className="surface-card rounded-2xl border border-white/[0.08] p-4 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
-            <h3 className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+        <div className="card-retro-paper rounded-2xl border border-stone-300/90 bg-[#fbf9f4] p-4 space-y-3 shadow-paper">
+          <div className="flex items-center justify-between pb-2 border-b border-stone-200">
+            <h3 className="font-headline text-xs font-black uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
               <MapPin className="w-4 h-4" />
               <span>Sân Nhà &amp; Lịch Sinh Hoạt</span>
             </h3>
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="text-[11px] font-bold text-amber-400 hover:underline"
+              className="text-[11px] font-bold text-amber-700 hover:underline"
             >
               Chỉnh sửa
             </button>
           </div>
 
           <div className="space-y-2 text-xs">
-            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/80 border border-white/[0.05]">
-              <span className="text-slate-400 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="flex items-center justify-between p-2 rounded-xl bg-[#ede8dc] border border-stone-300/80">
+              <span className="text-stone-600 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-emerald-700" />
                 Sân hay đá nhất:
               </span>
               {homePitch ? (
-                <strong className="text-white">{homePitch}</strong>
+                <strong className="text-stone-900">{homePitch}</strong>
               ) : (
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(true)}
-                  className="text-slate-500 hover:text-amber-300 italic text-[11px]"
+                  className="text-stone-500 hover:text-amber-700 italic text-[11px]"
                 >
                   + Bấm để cập nhật sân nhà
                 </button>
               )}
             </div>
 
-            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/80 border border-white/[0.05]">
-              <span className="text-slate-400 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-amber-400" />
+            <div className="flex items-center justify-between p-2 rounded-xl bg-[#ede8dc] border border-stone-300/80">
+              <span className="text-stone-600 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-amber-700" />
                 Lịch đá cố định:
               </span>
               {fixedSchedule ? (
-                <strong className="text-amber-300 font-mono">
+                <strong className="text-amber-800 font-mono">
                   {fixedSchedule}
                 </strong>
               ) : (
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(true)}
-                  className="text-slate-500 hover:text-amber-300 italic text-[11px]"
+                  className="text-stone-500 hover:text-amber-700 italic text-[11px]"
                 >
                   + Bấm để cập nhật lịch đá
                 </button>
               )}
             </div>
 
-            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/80 border border-white/[0.05]">
-              <span className="text-slate-400 flex items-center gap-1.5">
-                <Shirt className="w-3.5 h-3.5 text-sky-400" />
+            <div className="flex items-center justify-between p-2 rounded-xl bg-[#ede8dc] border border-stone-300/80">
+              <span className="text-stone-600 flex items-center gap-1.5">
+                <Shirt className="w-3.5 h-3.5 text-sky-700" />
                 Màu áo chính / phụ:
               </span>
-              <span className="text-slate-200">
+              <span className="text-stone-800">
                 {jerseyColor || awayJerseyColor ? (
                   <>
-                    <strong className="text-emerald-300">
+                    <strong className="text-emerald-800">
                       {jerseyColor || "Chưa chọn"}
                     </strong>{" "}
                     / {awayJerseyColor || "Chưa chọn"}
@@ -961,7 +959,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsEditModalOpen(true)}
-                    className="text-slate-500 hover:text-amber-300 italic text-[11px]"
+                    className="text-stone-500 hover:text-amber-700 italic text-[11px]"
                   >
                     + Cập nhật màu áo
                   </button>
@@ -971,18 +969,18 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
           </div>
 
           {/* Slogan đội */}
-          <div className="rounded-xl bg-slate-950/80 border border-white/[0.06] p-3">
-            <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">
+          <div className="rounded-xl bg-[#ede8dc] border border-stone-300/80 p-3">
+            <span className="text-[10px] text-stone-500 font-bold block uppercase tracking-wider">
               Khẩu hiệu / Triết lý bóng đá
             </span>
             {slogan ? (
-              <p className="text-xs text-slate-200 italic mt-1 font-medium">
+              <p className="text-xs text-stone-800 italic mt-1 font-medium">
                 “{slogan}”
               </p>
             ) : (
               <p
                 onClick={() => setIsEditModalOpen(true)}
-                className="text-xs text-slate-500 italic mt-1 cursor-pointer hover:text-amber-300"
+                className="text-xs text-stone-500 italic mt-1 cursor-pointer hover:text-amber-700"
               >
                 Chưa có khẩu hiệu. Bấm "Chỉnh sửa" để thêm triết lý bóng đá của
                 đội bạn!
@@ -992,16 +990,16 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
         </div>
 
         {/* Cột Phải: Bảng Phong Độ & Thành Tích Thật */}
-        <div className="surface-card rounded-2xl border border-white/[0.08] p-4 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
-            <h3 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+        <div className="card-retro-paper rounded-2xl border border-stone-300/90 bg-[#fbf9f4] p-4 space-y-3 shadow-paper">
+          <div className="flex items-center justify-between pb-2 border-b border-stone-200">
+            <h3 className="font-headline text-xs font-black uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
               <Trophy className="w-4 h-4" />
               <span>Phong Độ &amp; Thành Tích Giao Lưu</span>
             </h3>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsLogMatchModalOpen(true)}
-                className="text-[11px] font-extrabold text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+                className="text-[11px] font-extrabold text-emerald-800 hover:text-emerald-700 flex items-center gap-1"
               >
                 <Plus className="w-3 h-3 stroke-[2.5]" />
                 <span>+ Ghi Nhận Trận</span>
@@ -1010,7 +1008,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                 <button
                   onClick={handleResetMatchStats}
                   title="Đặt lại thành tích về 0"
-                  className="text-slate-500 hover:text-rose-400 transition"
+                  className="text-stone-400 hover:text-rose-600 transition"
                 >
                   <RotateCcw className="w-3 h-3" />
                 </button>
@@ -1020,41 +1018,41 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
           {/* Thống kê tỷ lệ Thắng - Hòa - Thua */}
           <div className="grid grid-cols-4 gap-2 text-center text-xs">
-            <div className="p-2 rounded-xl bg-slate-950/80 border border-white/[0.05]">
-              <span className="text-[10px] text-slate-400 block">Tổng trận</span>
-              <span className="text-base font-black text-white">
+            <div className="p-2 rounded-xl bg-[#ede8dc] border border-stone-300/80">
+              <span className="text-[10px] text-stone-600 block">Tổng trận</span>
+              <span className="text-base font-black text-stone-900">
                 {matchStats.total}
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-[10px] text-emerald-400 block font-bold">
+            <div className="p-2 rounded-xl bg-emerald-100/90 border border-emerald-300">
+              <span className="text-[10px] text-emerald-800 block font-bold">
                 Thắng
               </span>
-              <span className="text-base font-black text-emerald-300">
+              <span className="text-base font-black text-emerald-900">
                 {matchStats.wins}
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <span className="text-[10px] text-amber-400 block font-bold">
+            <div className="p-2 rounded-xl bg-amber-100/90 border border-amber-300">
+              <span className="text-[10px] text-amber-800 block font-bold">
                 Hòa
               </span>
-              <span className="text-base font-black text-amber-300">
+              <span className="text-base font-black text-amber-900">
                 {matchStats.draws}
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20">
-              <span className="text-[10px] text-rose-400 block font-bold">
+            <div className="p-2 rounded-xl bg-rose-100/90 border border-rose-300">
+              <span className="text-[10px] text-rose-800 block font-bold">
                 Thua
               </span>
-              <span className="text-base font-black text-rose-300">
+              <span className="text-base font-black text-rose-900">
                 {matchStats.losses}
               </span>
             </div>
           </div>
 
           {/* Chuỗi 5 trận gần nhất */}
-          <div className="p-2.5 rounded-xl bg-slate-950/80 border border-white/[0.05] flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">
+          <div className="p-2.5 rounded-xl bg-[#ede8dc] border border-stone-300/80 flex items-center justify-between">
+            <span className="text-xs text-stone-600 font-medium">
               Phong độ 5 trận gần nhất:
             </span>
             <div className="flex items-center gap-1.5">
@@ -1064,17 +1062,17 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     key={idx}
                     className={`w-6 h-6 rounded-lg text-xs font-black flex items-center justify-center ${
                       f === "W"
-                        ? "bg-emerald-500 text-slate-950 shadow-sm shadow-emerald-500/30"
+                        ? "bg-emerald-600 text-white shadow-2xs"
                         : f === "D"
-                        ? "bg-amber-400 text-slate-950"
-                        : "bg-rose-500 text-white"
+                        ? "bg-amber-500 text-stone-900"
+                        : "bg-rose-600 text-white"
                     }`}
                   >
                     {f}
                   </span>
                 ))
               ) : (
-                <span className="text-slate-500 text-[11px] italic">
+                <span className="text-stone-500 text-[11px] italic">
                   Chưa có trận đấu nào
                 </span>
               )}
@@ -1083,38 +1081,38 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
           {/* 3 Cam kết văn minh */}
           <div className="grid grid-cols-3 gap-2 text-center text-[10px] pt-1">
-            <div className="p-1.5 rounded-lg bg-slate-950 border border-slate-800">
-              <span className="text-slate-400 block">Đúng giờ</span>
-              <strong className="text-emerald-400 text-xs">
+            <div className="p-1.5 rounded-lg bg-[#ede8dc] border border-stone-300/80">
+              <span className="text-stone-600 block">Đúng giờ</span>
+              <strong className="text-emerald-800 text-xs">
                 {matchStats.total > 0 ? "100%" : "Mới"}
               </strong>
             </div>
-            <div className="p-1.5 rounded-lg bg-slate-950 border border-slate-800">
-              <span className="text-slate-400 block">Không bỏ cuộc</span>
-              <strong className="text-emerald-400 text-xs">100%</strong>
+            <div className="p-1.5 rounded-lg bg-[#ede8dc] border border-stone-300/80">
+              <span className="text-stone-600 block">Không bỏ cuộc</span>
+              <strong className="text-emerald-800 text-xs">100%</strong>
             </div>
-            <div className="p-1.5 rounded-lg bg-slate-950 border border-slate-800">
-              <span className="text-slate-400 block">Trả sân sòng phẳng</span>
-              <strong className="text-emerald-400 text-xs">100%</strong>
+            <div className="p-1.5 rounded-lg bg-[#ede8dc] border border-stone-300/80">
+              <span className="text-stone-600 block">Trả sân sòng phẳng</span>
+              <strong className="text-emerald-800 text-xs">100%</strong>
             </div>
           </div>
         </div>
       </div>
 
       {/* TÍNH NĂNG 2: TỦ CÚP & HUY HIỆU DANH DỰ (TROPHY CABINET & RECORD BADGES) */}
-      <div className="surface-card rounded-2xl border border-amber-500/30 bg-gradient-to-br from-slate-900/90 via-[#181308]/60 to-slate-950 p-4 sm:p-5 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-amber-500/20">
+      <div className="card-retro-paper rounded-2xl border border-amber-300/80 bg-[#fbf9f4] p-4 sm:p-5 space-y-4 shadow-paper">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-amber-200">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Trophy className="w-4 h-4 text-amber-400" />
+              <h3 className="font-headline text-sm font-black text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
+                <Trophy className="w-4 h-4 text-amber-700" />
                 <span>Tủ Cúp &amp; Huy Hiệu Danh Dự Của Đội</span>
               </h3>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
                 {trophies.length} Cúp / Danh hiệu
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-[11px] text-stone-600 mt-0.5">
               Vinh danh các danh hiệu cúp giao lưu, giải phủi và huy hiệu uy tín
               của đội
             </p>
@@ -1122,7 +1120,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
           <Button
             onClick={() => setIsAddTrophyModalOpen(true)}
-            className="h-8 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs gap-1 shadow-sm shadow-amber-500/20 active:scale-95"
+            className="btn-paper-tactile h-8 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-black text-xs gap-1 shadow-2xs active:scale-95"
           >
             <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>+ Thêm Cúp / Danh Hiệu</span>
@@ -1131,7 +1129,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
         {/* 1. Các Huy Hiệu Kỷ Lục Tự Động */}
         <div className="space-y-1.5">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+          <span className="text-[10px] font-bold text-stone-600 uppercase tracking-wider block">
             ⭐ Huy Hiệu Kỷ Lục Uy Tín (Bảo Chứng BắtKèo7):
           </span>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
@@ -1140,19 +1138,19 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                 key={idx}
                 className={`p-2.5 rounded-xl border text-center transition flex flex-col items-center justify-center space-y-1 ${
                   badge.achieved
-                    ? "bg-slate-950/80 border-amber-500/35 text-white"
-                    : "bg-slate-950/40 border-white/[0.05] text-slate-600 opacity-60"
+                    ? "bg-[#ede8dc] border-amber-300 text-stone-900 shadow-2xs"
+                    : "bg-[#f5f1e8] border-stone-200 text-stone-500 opacity-60"
                 }`}
               >
                 <span className="text-2xl">{badge.icon}</span>
                 <span className="text-xs font-bold leading-tight line-clamp-1">
                   {badge.title}
                 </span>
-                <span className="text-[9px] text-slate-400 leading-tight line-clamp-1">
+                <span className="text-[9px] text-stone-500 leading-tight line-clamp-1">
                   {badge.desc}
                 </span>
                 {badge.achieved && (
-                  <span className="text-[8px] font-black uppercase text-amber-400 mt-0.5">
+                  <span className="text-[8px] font-black uppercase text-amber-800 mt-0.5">
                     ✓ Đã Mở Khóa
                   </span>
                 )}
@@ -1162,8 +1160,8 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
         </div>
 
         {/* 2. Danh Sách Cúp Giao Lưu Do Đội Tự Thêm */}
-        <div className="space-y-2 pt-2 border-t border-white/[0.06]">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+        <div className="space-y-2 pt-2 border-t border-stone-200">
+          <span className="text-[10px] font-bold text-stone-600 uppercase tracking-wider block">
             🏆 Cúp &amp; Giải Đấu Từng Đạt Được:
           </span>
 
@@ -1172,17 +1170,17 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
               {trophies.map((trophy) => (
                 <div
                   key={trophy.id}
-                  className="p-3 rounded-xl bg-slate-950/90 border border-amber-500/30 flex items-center justify-between gap-2.5 shadow-sm"
+                  className="p-3 rounded-xl bg-[#ede8dc] border border-amber-300/80 flex items-center justify-between gap-2.5 shadow-2xs"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span className="text-2xl shrink-0">
                       {getTrophyIcon(trophy.type)}
                     </span>
                     <div className="min-w-0">
-                      <h4 className="text-xs font-black text-white truncate">
+                      <h4 className="text-xs font-black text-stone-900 truncate">
                         {trophy.name}
                       </h4>
-                      <p className="text-[10px] text-amber-300 font-bold">
+                      <p className="text-[10px] text-amber-800 font-bold">
                         Năm {trophy.year}
                         {trophy.notes ? ` • ${trophy.notes}` : ""}
                       </p>
@@ -1191,7 +1189,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   <button
                     type="button"
                     onClick={() => handleDeleteTrophy(trophy.id)}
-                    className="p-1 text-slate-500 hover:text-rose-400 transition shrink-0"
+                    className="p-1 text-stone-400 hover:text-rose-600 transition shrink-0"
                     title="Xóa danh hiệu"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -1200,13 +1198,13 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
               ))}
             </div>
           ) : (
-            <div className="p-4 rounded-xl border border-dashed border-amber-500/20 bg-slate-950/40 text-center space-y-1">
-              <p className="text-xs text-amber-200/80 font-bold">
+            <div className="p-4 rounded-xl border border-dashed border-amber-300 bg-[#ede8dc]/50 text-center space-y-1">
+              <p className="text-xs text-amber-900 font-bold">
                 Tủ cúp của đội hiện đang chờ chiếc cúp đầu tiên!
               </p>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-stone-600">
                 Hãy bấm{" "}
-                <strong className="text-amber-300">
+                <strong className="text-amber-800">
                   + Thêm Cúp / Danh Hiệu
                 </strong>{" "}
                 để ghi danh cúp tứ hùng, giải phong trào hoặc kỷ niệm chương của
@@ -1218,19 +1216,19 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       </div>
 
       {/* 4. QUẢN LÝ ĐỘI HÌNH & DANH SÁCH CẦU THỦ */}
-      <div className="surface-card rounded-2xl border border-white/[0.08] p-4 sm:p-5 space-y-3.5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-white/[0.07]">
+      <div className="card-retro-paper rounded-2xl border border-stone-300/90 bg-[#fbf9f4] p-4 sm:p-5 space-y-3.5 shadow-paper">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-stone-200">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-emerald-400" />
+              <h3 className="font-headline text-sm font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-emerald-700" />
                 <span>Danh Sách Cầu Thủ Đội Bóng ({members.length})</span>
               </h3>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-200 text-stone-700 border border-stone-300">
                 {gkCount} GK • {dfCount} DF • {mfCount} MF • {fwCount} FW
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-[11px] text-stone-600 mt-0.5">
               Quản lý danh sách cầu thủ chính thức, số áo và vị trí thi đấu
             </p>
           </div>
@@ -1239,14 +1237,14 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             <Button
               onClick={handleOpenJoinLinkModal}
               variant="outline"
-              className="h-8 px-3 rounded-xl border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 font-bold text-xs gap-1"
+              className="btn-paper-tactile h-8 px-3 rounded-xl border-sky-300 bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold text-xs gap-1"
             >
               <Link2 className="w-3.5 h-3.5" />
               <span>QR &amp; Link Zalo Đội</span>
             </Button>
             <Button
               onClick={() => setIsAddMemberModalOpen(true)}
-              className="h-8 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs gap-1 shadow-sm active:scale-95"
+              className="btn-paper-tactile h-8 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs gap-1 shadow-2xs active:scale-95"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Thêm Cầu Thủ</span>
@@ -1259,41 +1257,41 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
           {members.map((mem) => (
             <div
               key={mem.id}
-              className="p-3 rounded-xl bg-slate-950/80 border border-white/[0.06] hover:border-emerald-500/30 transition flex items-center justify-between gap-2"
+              className="p-3 rounded-xl bg-[#ede8dc] border border-stone-300/80 hover:border-emerald-600/40 transition flex items-center justify-between gap-2 text-stone-900"
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 {/* Số áo */}
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono font-black text-xs flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-800 font-mono font-black text-xs flex items-center justify-center shrink-0">
                   #{mem.number}
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-white truncate">
+                    <span className="text-xs font-bold text-stone-900 truncate">
                       {mem.name}
                     </span>
                     {mem.role === "Đội trưởng" && (
-                      <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-amber-400 text-slate-950 shrink-0">
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-amber-400 text-stone-950 shrink-0">
                         C
                       </span>
                     )}
                   </div>
-                  <div className="text-[10px] text-slate-400 flex items-center gap-1.5">
+                  <div className="text-[10px] text-stone-600 flex items-center gap-1.5">
                     <span
                       className={`font-black ${
                         mem.position === "GK"
-                          ? "text-amber-300"
+                          ? "text-amber-700"
                           : mem.position === "DF"
-                          ? "text-blue-300"
+                          ? "text-blue-700"
                           : mem.position === "MF"
-                          ? "text-emerald-300"
-                          : "text-rose-300"
+                          ? "text-emerald-700"
+                          : "text-rose-700"
                       }`}
                     >
                       {mem.position}
                     </span>
                     <span>• {mem.role}</span>
                     {mem.phone && (
-                      <span className="font-mono text-slate-500">
+                      <span className="font-mono text-stone-500">
                         • {mem.phone}
                       </span>
                     )}
@@ -1305,7 +1303,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                 <button
                   type="button"
                   onClick={() => handleDeleteMember(mem.id)}
-                  className="p-1 text-slate-500 hover:text-rose-400 transition"
+                  className="p-1 text-stone-400 hover:text-rose-600 transition"
                   title="Gỡ cầu thủ"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -1315,20 +1313,20 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
           ))}
 
           {members.length <= 1 && (
-            <div className="col-span-full p-4 rounded-xl border border-dashed border-white/10 bg-slate-950/40 text-center space-y-1.5">
-              <p className="text-xs text-slate-300 font-bold">
+            <div className="col-span-full p-4 rounded-xl border border-dashed border-stone-300 bg-[#ede8dc]/40 text-center space-y-1.5">
+              <p className="text-xs text-stone-800 font-bold">
                 Đội hiện chỉ có Đội trưởng trong danh sách
               </p>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-stone-600">
                 Hãy bấm{" "}
-                <strong className="text-emerald-400 font-semibold">
+                <strong className="text-emerald-700 font-semibold">
                   + Thêm Cầu Thủ
                 </strong>{" "}
                 hoặc bấm{" "}
                 <button
                   type="button"
                   onClick={handleOpenJoinLinkModal}
-                  className="text-sky-400 font-bold underline hover:text-sky-300"
+                  className="text-sky-700 font-bold underline hover:text-sky-800"
                 >
                   Cài Đặt QR &amp; Link Zalo
                 </button>{" "}
@@ -1340,13 +1338,13 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       </div>
 
       {/* 5. DNA & VĂN HÓA GIAO LƯU CỦA ĐỘI (1-CLICK PRESET PICKER & CUSTOM) */}
-      <div className="surface-card rounded-2xl border border-white/[0.08] p-4 space-y-3">
+      <div className="card-retro-paper rounded-2xl border border-stone-300/90 bg-[#fbf9f4] p-4 space-y-3 shadow-paper">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <h3 className="font-headline text-xs font-black uppercase tracking-wider text-stone-800 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-amber-700" />
             <span>DNA &amp; Văn Hóa Giao Lưu Của Đội</span>
           </h3>
-          <span className="text-[11px] text-slate-400">
+          <span className="text-[11px] text-stone-500">
             {dnaTags.length} nét văn hóa
           </span>
         </div>
@@ -1357,13 +1355,13 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             {dnaTags.map((tag, idx) => (
               <span
                 key={idx}
-                className="px-3 py-1.5 rounded-xl bg-slate-950/90 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5 shadow-sm"
+                className="px-3 py-1.5 rounded-xl bg-[#ede8dc] border border-emerald-400 text-emerald-900 text-xs font-bold flex items-center gap-1.5 shadow-2xs"
               >
                 <span>{tag}</span>
                 <button
                   type="button"
                   onClick={() => handleToggleDnaTag(tag)}
-                  className="w-4 h-4 rounded-full hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-rose-400 transition ml-0.5"
+                  className="w-4 h-4 rounded-full hover:bg-stone-300 flex items-center justify-center text-stone-500 hover:text-rose-600 transition ml-0.5"
                   title="Gỡ tag này"
                 >
                   <X className="w-3 h-3" />
@@ -1372,15 +1370,15 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             ))}
           </div>
         ) : (
-          <div className="p-3.5 rounded-xl border border-dashed border-white/10 bg-slate-950/40 text-center text-xs text-slate-400">
+          <div className="p-3.5 rounded-xl border border-dashed border-stone-300 bg-[#ede8dc]/40 text-center text-xs text-stone-500">
             Chưa thiết lập DNA văn hóa đội bóng. Hãy bấm chọn nhanh các nét đặc
             trưng dưới đây:
           </div>
         )}
 
         {/* Thư viện Tag Gợi Ý 1-Chạm (Quick Preset Chips) */}
-        <div className="pt-2 border-t border-white/[0.05] space-y-2">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+        <div className="pt-2 border-t border-stone-200 space-y-2">
+          <span className="text-[10px] font-bold text-stone-600 uppercase tracking-wider block">
             💡 Gợi ý văn hóa bóng đá phủi (Bấm để thêm vào đội):
           </span>
           <div className="flex flex-wrap gap-1.5">
@@ -1390,9 +1388,9 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   key={idx}
                   type="button"
                   onClick={() => handleToggleDnaTag(tag)}
-                  className="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-white/10 text-[11px] text-slate-300 hover:text-white font-medium flex items-center gap-1 transition active:scale-95"
+                  className="px-2.5 py-1 rounded-lg bg-stone-200 hover:bg-stone-300 border border-stone-300 text-[11px] text-stone-800 font-medium flex items-center gap-1 transition active:scale-95"
                 >
-                  <Plus className="w-3 h-3 text-emerald-400" />
+                  <Plus className="w-3 h-3 text-emerald-700" />
                   <span>{tag}</span>
                 </button>
               )
@@ -1410,11 +1408,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             value={customTagInput}
             onChange={(e) => setCustomTagInput(e.target.value)}
             placeholder="Tự nhập nét văn hóa riêng (VD: Team U30 văn phòng, Thứ 5 hàng tuần...)"
-            className="flex-1 h-8 px-3 rounded-xl bg-slate-950 border border-white/10 text-white text-xs placeholder:text-slate-500"
+            className="flex-1 h-8 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 text-xs placeholder:text-stone-400"
           />
           <Button
             type="submit"
-            className="h-8 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-bold shrink-0"
+            className="btn-paper-tactile h-8 px-3 rounded-xl bg-stone-800 hover:bg-stone-900 text-emerald-300 text-xs font-bold shrink-0"
           >
             + Thêm
           </Button>
@@ -1424,19 +1422,19 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       {/* MODAL 1: CHỈNH SỬA HỒ SƠ ĐỘI BÓNG CHÍNH CHỦ */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4">
-          <div className="w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[#0f172a] border border-white/10 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-slate-950/80">
+          <div className="modal-spring-enter card-retro-paper w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-[#fbf9f4] border border-stone-300/90 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col text-stone-900">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-stone-300 bg-[#ede8dc]">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
+                <span className="text-[10px] font-black uppercase tracking-wider text-amber-800">
                   Quản Trị Hồ Sơ Chính Chủ
                 </span>
-                <h3 className="text-base font-extrabold text-white mt-0.5">
+                <h3 className="font-headline text-base font-extrabold text-stone-900 mt-0.5">
                   Chỉnh Sửa Thông Tin Đội Bóng
                 </h3>
               </div>
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white"
+                className="w-8 h-8 rounded-lg bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-stone-600 hover:text-stone-900 transition-all active:scale-95"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1448,7 +1446,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Tên Đội Bóng
                   </label>
                   <input
@@ -1457,11 +1455,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={teamName}
                     onChange={(e) => setTeamName(e.target.value)}
                     placeholder="VD: FC Tấu Hề"
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white font-bold"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 font-bold focus:border-stone-800 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Tên Đội Trưởng
                   </label>
                   <input
@@ -1470,14 +1468,14 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={captainName}
                     onChange={(e) => setCaptainName(e.target.value)}
                     placeholder="VD: Anh Tuấn"
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     SĐT Zalo Đội Trưởng
                   </label>
                   <input
@@ -1486,11 +1484,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={captainPhone}
                     onChange={(e) => setCaptainPhone(e.target.value)}
                     placeholder="VD: 0988.234.567"
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-emerald-300 font-mono font-bold"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-emerald-800 font-mono font-bold focus:border-stone-800 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Địa Bàn Quận
                   </label>
                   <input
@@ -1498,11 +1496,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={homeDistrict}
                     onChange={(e) => setHomeDistrict(e.target.value)}
                     placeholder="VD: Cầu Giấy, Nam Từ Liêm..."
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Tuổi Trung Bình
                   </label>
                   <input
@@ -1511,14 +1509,14 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     max={60}
                     value={avgAge}
                     onChange={(e) => setAvgAge(Number(e.target.value))}
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Phân Tầng Trình Độ
                   </label>
                   <select
@@ -1526,7 +1524,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     onChange={(e) =>
                       setSkillTier(Number(e.target.value) as SkillTier)
                     }
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white font-bold"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 font-bold focus:border-stone-800 focus:outline-none"
                   >
                     <option value={1}>Tier 1: Dưỡng sinh (Cấm va chạm)</option>
                     <option value={2}>Tier 2: Phong trào</option>
@@ -1534,7 +1532,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Màu Áo Đấu Chính
                   </label>
                   <input
@@ -1542,14 +1540,14 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={jerseyColor}
                     onChange={(e) => setJerseyColor(e.target.value)}
                     placeholder="VD: Đỏ truyền thống, Xanh rêu..."
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="sm:col-span-1">
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Màu Áo Phụ (Dự phòng)
                   </label>
                   <input
@@ -1557,11 +1555,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={awayJerseyColor}
                     onChange={(e) => setAwayJerseyColor(e.target.value)}
                     placeholder="VD: Trắng, Xanh..."
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                   />
                 </div>
                 <div className="sm:col-span-1">
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Sân Nhà Hay Đá
                   </label>
                   <input
@@ -1569,11 +1567,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={homePitch}
                     onChange={(e) => setHomePitch(e.target.value)}
                     placeholder="VD: Sân Thành Phát, Sân Mễ Trì..."
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                   />
                 </div>
                 <div className="sm:col-span-1">
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Lịch Đá Quen Thuộc
                   </label>
                   <input
@@ -1581,13 +1579,13 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={fixedSchedule}
                     onChange={(e) => setFixedSchedule(e.target.value)}
                     placeholder="VD: Tối Thứ 3 & Thứ 5 (19h00)"
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-300 mb-1">
+                <label className="block font-semibold text-stone-700 mb-1">
                   Slogan / Triết Lý Bóng Đá
                 </label>
                 <textarea
@@ -1595,22 +1593,22 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   value={slogan}
                   onChange={(e) => setSlogan(e.target.value)}
                   placeholder="VD: Đá bóng vui vẻ sau giờ làm, văn minh không quẹt bóng, có nước mía giao lưu..."
-                  className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs"
+                  className="w-full p-2.5 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 text-xs focus:border-stone-800 focus:outline-none"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-stone-200">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="h-9 text-xs text-slate-400"
+                  className="h-9 text-xs text-stone-600 hover:text-stone-900"
                 >
                   Hủy
                 </Button>
                 <Button
                   type="submit"
-                  className="h-9 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs"
+                  className="btn-paper-tactile h-9 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs shadow-2xs"
                 >
                   Lưu Thay Đổi
                 </Button>
@@ -1623,14 +1621,14 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       {/* MODAL 2: THÊM CẦU THỦ VÀO ĐỘI HÌNH */}
       {isAddMemberModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-[#0f172a] border border-white/10 shadow-2xl p-5 space-y-3.5 text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
-              <h3 className="text-sm font-extrabold text-white">
+          <div className="modal-spring-enter card-retro-paper w-full max-w-sm rounded-2xl bg-[#fbf9f4] border border-stone-300/90 shadow-2xl p-5 space-y-3.5 text-xs text-stone-900">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-200">
+              <h3 className="font-headline text-sm font-extrabold text-stone-900">
                 Thêm Cầu Thủ Vào Đội {teamName || "Bóng Đá"}
               </h3>
               <button
                 onClick={() => setIsAddMemberModalOpen(false)}
-                className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"
+                className="w-7 h-7 rounded-lg bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-stone-600 hover:text-stone-900 transition-all active:scale-95"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1638,7 +1636,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
             <form onSubmit={handleAddMember} className="space-y-3">
               <div>
-                <label className="block font-semibold text-slate-300 mb-1">
+                <label className="block font-semibold text-stone-700 mb-1">
                   Tên / Biệt danh cầu thủ
                 </label>
                 <input
@@ -1647,13 +1645,13 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   value={newMemberName}
                   onChange={(e) => setNewMemberName(e.target.value)}
                   placeholder="VD: Tuấn 'Cò', Văn Hải..."
-                  className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                  className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Số áo
                   </label>
                   <input
@@ -1663,11 +1661,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     required
                     value={newMemberNumber}
                     onChange={(e) => setNewMemberNumber(Number(e.target.value))}
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-emerald-400 font-mono font-bold"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-emerald-800 font-mono font-bold focus:border-stone-800 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Vị trí
                   </label>
                   <select
@@ -1677,7 +1675,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                         e.target.value as "GK" | "DF" | "MF" | "FW"
                       )
                     }
-                    className="w-full h-9 px-2 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-2 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                   >
                     <option value="GK">🧤 Thủ môn (GK)</option>
                     <option value="DF">🛡️ Hậu vệ (DF)</option>
@@ -1689,7 +1687,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Vai trò
                   </label>
                   <select
@@ -1699,7 +1697,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                         e.target.value as "Đội trưởng" | "Đội phó" | "Thành viên"
                       )
                     }
-                    className="w-full h-9 px-2 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-2 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                   >
                     <option value="Thành viên">Thành viên</option>
                     <option value="Đội phó">Đội phó</option>
@@ -1707,7 +1705,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     SĐT / Zalo (Tùy chọn)
                   </label>
                   <input
@@ -1715,7 +1713,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={newMemberPhone}
                     onChange={(e) => setNewMemberPhone(e.target.value)}
                     placeholder="VD: 0912..."
-                    className="w-full h-9 px-2.5 rounded-xl bg-slate-950 border border-white/10 text-white font-mono text-[11px]"
+                    className="w-full h-9 px-2.5 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 font-mono text-[11px] focus:border-stone-800 focus:outline-none"
                   />
                 </div>
               </div>
@@ -1725,13 +1723,13 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   type="button"
                   variant="ghost"
                   onClick={() => setIsAddMemberModalOpen(false)}
-                  className="h-8 text-xs text-slate-400"
+                  className="h-8 text-xs text-stone-600 hover:text-stone-900"
                 >
                   Hủy
                 </Button>
                 <Button
                   type="submit"
-                  className="h-8 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs"
+                  className="btn-paper-tactile h-8 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs shadow-2xs"
                 >
                   Thêm Cầu Thủ
                 </Button>
@@ -1744,19 +1742,19 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       {/* MODAL 3: GHI NHẬN KẾT QUẢ TRẬN ĐẤU (MATCH RESULT LOGGER) */}
       {isLogMatchModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-[#0f172a] border border-white/10 shadow-2xl p-5 space-y-3.5 text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+          <div className="modal-spring-enter card-retro-paper w-full max-w-sm rounded-2xl bg-[#fbf9f4] border border-stone-300/90 shadow-2xl p-5 space-y-3.5 text-xs text-stone-900">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-200">
               <div>
-                <span className="text-[10px] font-black uppercase text-amber-400">
+                <span className="text-[10px] font-black uppercase text-amber-800">
                   Ghi Nhận Phong Độ Thật
                 </span>
-                <h3 className="text-sm font-extrabold text-white mt-0.5">
+                <h3 className="font-headline text-sm font-extrabold text-stone-900 mt-0.5">
                   Cập Nhật Trận Đấu Mới
                 </h3>
               </div>
               <button
                 onClick={() => setIsLogMatchModalOpen(false)}
-                className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"
+                className="w-7 h-7 rounded-lg bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-stone-600 hover:text-stone-900 transition-all active:scale-95"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1764,7 +1762,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
             <form onSubmit={handleSaveMatchLog} className="space-y-3">
               <div>
-                <label className="block font-semibold text-slate-300 mb-1.5">
+                <label className="block font-semibold text-stone-700 mb-1.5">
                   Kết quả trận đấu
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -1773,8 +1771,8 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     onClick={() => setLogResult("W")}
                     className={`py-2 rounded-xl text-xs font-black border transition ${
                       logResult === "W"
-                        ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow-md shadow-emerald-500/20"
-                        : "bg-slate-950 text-emerald-400 border-white/10"
+                        ? "bg-emerald-700 text-white border-emerald-800 shadow-2xs"
+                        : "bg-[#ede8dc] text-emerald-900 border-stone-300"
                     }`}
                   >
                     🟢 Thắng (W)
@@ -1784,8 +1782,8 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     onClick={() => setLogResult("D")}
                     className={`py-2 rounded-xl text-xs font-black border transition ${
                       logResult === "D"
-                        ? "bg-amber-400 text-slate-950 border-amber-300 shadow-md shadow-amber-500/20"
-                        : "bg-slate-950 text-amber-400 border-white/10"
+                        ? "bg-amber-500 text-stone-950 border-amber-600 shadow-2xs"
+                        : "bg-[#ede8dc] text-amber-900 border-stone-300"
                     }`}
                   >
                     🟡 Hòa (D)
@@ -1795,8 +1793,8 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     onClick={() => setLogResult("L")}
                     className={`py-2 rounded-xl text-xs font-black border transition ${
                       logResult === "L"
-                        ? "bg-rose-500 text-white border-rose-400 shadow-md shadow-rose-500/20"
-                        : "bg-slate-950 text-rose-400 border-white/10"
+                        ? "bg-rose-700 text-white border-rose-800 shadow-2xs"
+                        : "bg-[#ede8dc] text-rose-900 border-stone-300"
                     }`}
                   >
                     🔴 Thua (L)
@@ -1805,7 +1803,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-300 mb-1">
+                <label className="block font-semibold text-stone-700 mb-1">
                   Tên đội đối thủ (Tùy chọn)
                 </label>
                 <input
@@ -1813,12 +1811,12 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   value={logOpponent}
                   onChange={(e) => setLogOpponent(e.target.value)}
                   placeholder="VD: FC Giao Thông, FC Vinaconex..."
-                  className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                  className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-300 mb-1">
+                <label className="block font-semibold text-stone-700 mb-1">
                   Tỷ số trận đấu (Tùy chọn)
                 </label>
                 <input
@@ -1826,22 +1824,22 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   value={logScore}
                   onChange={(e) => setLogScore(e.target.value)}
                   placeholder="VD: 4 - 2, 3 - 3..."
-                  className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white font-mono"
+                  className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 font-mono focus:border-stone-800 focus:outline-none"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-stone-200">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setIsLogMatchModalOpen(false)}
-                  className="h-8 text-xs text-slate-400"
+                  className="h-8 text-xs text-stone-600 hover:text-stone-900"
                 >
                   Hủy
                 </Button>
                 <Button
                   type="submit"
-                  className="h-8 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs"
+                  className="btn-paper-tactile h-8 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs shadow-2xs"
                 >
                   Lưu Kết Quả
                 </Button>
@@ -1854,30 +1852,30 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       {/* TÍNH NĂNG 1: MODAL ĐỔI ẢNH LOGO / AVATAR ĐỘI BÓNG */}
       {isLogoModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-[#0f172a] border border-white/10 shadow-2xl p-5 space-y-4 text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+          <div className="modal-spring-enter card-retro-paper w-full max-w-md rounded-2xl bg-[#fbf9f4] border border-stone-300/90 shadow-2xl p-5 space-y-4 text-xs text-stone-900">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-200">
               <div>
-                <span className="text-[10px] font-black uppercase text-emerald-400">
+                <span className="text-[10px] font-black uppercase text-emerald-800">
                   Nhận Diện Đội Bóng
                 </span>
-                <h3 className="text-sm font-extrabold text-white mt-0.5">
+                <h3 className="font-headline text-sm font-extrabold text-stone-900 mt-0.5">
                   Đổi Ảnh Logo / Avatar Đội
                 </h3>
               </div>
               <button
                 onClick={() => setIsLogoModalOpen(false)}
-                className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"
+                className="w-7 h-7 rounded-lg bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-stone-600 hover:text-stone-900 transition-all active:scale-95"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Xem trước Logo hiện tại */}
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-950 border border-white/10">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-[#ede8dc] border border-stone-300/80">
               {renderTeamLogo()}
               <div>
-                <h4 className="text-xs font-bold text-white">Logo hiện tại</h4>
-                <p className="text-[10px] text-slate-400">
+                <h4 className="text-xs font-bold text-stone-900">Logo hiện tại</h4>
+                <p className="text-[10px] text-stone-600">
                   Logo hiển thị trên Thẻ Căn Cước, Thẻ Ghép Kèo và BXH
                 </p>
                 {logoUrl && (
@@ -1887,7 +1885,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                       setLogoUrl("");
                       persistData({ logoUrl: "" });
                     }}
-                    className="text-[10px] text-rose-400 hover:underline mt-1 font-bold"
+                    className="text-[10px] text-rose-700 hover:underline mt-1 font-bold"
                   >
                     Gỡ logo (Dùng 2 chữ cái đầu)
                   </button>
@@ -1897,15 +1895,15 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
             {/* Cách 1: Tải ảnh từ thiết bị */}
             <div className="space-y-1.5">
-              <label className="block font-semibold text-slate-300">
+              <label className="block font-semibold text-stone-700">
                 1. Tải ảnh từ điện thoại / máy tính:
               </label>
-              <label className="flex flex-col items-center justify-center p-4 rounded-xl border border-dashed border-emerald-500/40 bg-emerald-500/5 hover:bg-emerald-500/10 cursor-pointer transition text-center space-y-1">
-                <Upload className="w-5 h-5 text-emerald-400" />
-                <span className="text-xs font-bold text-white">
+              <label className="flex flex-col items-center justify-center p-4 rounded-xl border border-dashed border-emerald-600/40 bg-emerald-50 hover:bg-emerald-100 cursor-pointer transition text-center space-y-1">
+                <Upload className="w-5 h-5 text-emerald-700" />
+                <span className="text-xs font-bold text-stone-900">
                   Chọn tệp ảnh logo (PNG, JPG, WebP)
                 </span>
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[10px] text-stone-500">
                   Tối đa 2MB • Tỉ lệ vuông đẹp nhất
                 </span>
                 <input
@@ -1918,8 +1916,8 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             </div>
 
             {/* Cách 2: Chọn từ Bộ Huy Hiệu Phủi Có Sẵn */}
-            <div className="space-y-1.5 pt-2 border-t border-white/10">
-              <label className="block font-semibold text-slate-300">
+            <div className="space-y-1.5 pt-2 border-t border-stone-200">
+              <label className="block font-semibold text-stone-700">
                 2. Hoặc chọn nhanh từ Bộ Huy Hiệu Phủi Độc Quyền:
               </label>
               <div className="grid grid-cols-5 gap-2">
@@ -1928,13 +1926,13 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     key={b.id}
                     type="button"
                     onClick={() => handleSelectPresetBadge(b)}
-                    className="p-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-white/10 hover:border-amber-400/50 flex flex-col items-center justify-center gap-1 transition active:scale-95 group"
+                    className="p-2 rounded-xl bg-[#ede8dc] hover:bg-stone-200 border border-stone-300/80 hover:border-amber-500 flex flex-col items-center justify-center gap-1 transition active:scale-95 group"
                     title={b.label}
                   >
                     <span className="text-2xl group-hover:scale-110 transition">
                       {b.icon}
                     </span>
-                    <span className="text-[9px] font-bold text-slate-300 text-center leading-tight">
+                    <span className="text-[9px] font-bold text-stone-800 text-center leading-tight">
                       {b.label}
                     </span>
                   </button>
@@ -1942,12 +1940,12 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
               </div>
             </div>
 
-            <div className="flex justify-end pt-2 border-t border-slate-800">
+            <div className="flex justify-end pt-2 border-t border-stone-200">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setIsLogoModalOpen(false)}
-                className="h-8 text-xs text-slate-400"
+                className="h-8 text-xs text-stone-600 hover:text-stone-900"
               >
                 Đóng
               </Button>
@@ -1959,19 +1957,19 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       {/* TÍNH NĂNG 2: MODAL THÊM CÚP / DANH HIỆU */}
       {isAddTrophyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-[#0f172a] border border-amber-500/30 shadow-2xl p-5 space-y-3.5 text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+          <div className="modal-spring-enter card-retro-paper w-full max-w-sm rounded-2xl bg-[#fbf9f4] border border-amber-300 shadow-2xl p-5 space-y-3.5 text-xs text-stone-900">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-200">
               <div>
-                <span className="text-[10px] font-black uppercase text-amber-400">
+                <span className="text-[10px] font-black uppercase text-amber-800">
                   Vinh Danh Thành Tích
                 </span>
-                <h3 className="text-sm font-extrabold text-white mt-0.5">
+                <h3 className="font-headline text-sm font-extrabold text-stone-900 mt-0.5">
                   Thêm Cúp / Danh Hiệu
                 </h3>
               </div>
               <button
                 onClick={() => setIsAddTrophyModalOpen(false)}
-                className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"
+                className="w-7 h-7 rounded-lg bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-stone-600 hover:text-stone-900 transition-all active:scale-95"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1979,7 +1977,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
             <form onSubmit={handleAddTrophy} className="space-y-3">
               <div>
-                <label className="block font-semibold text-slate-300 mb-1">
+                <label className="block font-semibold text-stone-700 mb-1">
                   Biểu tượng danh hiệu
                 </label>
                 <div className="grid grid-cols-5 gap-1.5">
@@ -1998,8 +1996,8 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                       }
                       className={`p-2 rounded-xl border text-center transition ${
                         newTrophyType === item.type
-                          ? "bg-amber-500/25 border-amber-400 text-amber-300 font-bold ring-1 ring-amber-400"
-                          : "bg-slate-950 border-white/10 text-slate-400 hover:text-white"
+                          ? "bg-amber-200 border-amber-500 text-amber-950 font-bold ring-1 ring-amber-500"
+                          : "bg-[#ede8dc] border-stone-300 text-stone-600 hover:text-stone-900"
                       }`}
                     >
                       <div className="text-xl">{item.icon}</div>
@@ -2010,7 +2008,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-300 mb-1">
+                <label className="block font-semibold text-stone-700 mb-1">
                   Tên giải đấu / Cúp đạt được
                 </label>
                 <input
@@ -2019,13 +2017,13 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   value={newTrophyName}
                   onChange={(e) => setNewTrophyName(e.target.value)}
                   placeholder="VD: Vô Địch Giải Tứ Hùng Cầu Giấy..."
-                  className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                  className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Năm / Mùa giải
                   </label>
                   <input
@@ -2034,11 +2032,11 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={newTrophyYear}
                     onChange={(e) => setNewTrophyYear(e.target.value)}
                     placeholder="VD: 2026, Mùa Hè 2025"
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white font-mono"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 font-mono focus:border-stone-800 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
+                  <label className="block font-semibold text-stone-700 mb-1">
                     Ghi chú thêm (Tùy chọn)
                   </label>
                   <input
@@ -2046,23 +2044,23 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={newTrophyNotes}
                     onChange={(e) => setNewTrophyNotes(e.target.value)}
                     placeholder="VD: Bất bại 5 trận..."
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-white"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-stone-900 focus:border-stone-800 focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-stone-200">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setIsAddTrophyModalOpen(false)}
-                  className="h-8 text-xs text-slate-400"
+                  className="h-8 text-xs text-stone-600 hover:text-stone-900"
                 >
                   Hủy
                 </Button>
                 <Button
                   type="submit"
-                  className="h-8 px-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs"
+                  className="btn-paper-tactile h-8 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-black text-xs shadow-2xs"
                 >
                   Lưu Vào Tủ Cúp
                 </Button>
@@ -2075,19 +2073,19 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
       {/* TÍNH NĂNG 3: MODAL MÃ QR & LINK NHÓM ZALO DO CHỦ ĐỘI TỰ TẢI LÊN */}
       {isJoinLinkModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-[#0f172a] border border-sky-500/40 shadow-2xl p-5 space-y-4 text-xs max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+          <div className="modal-spring-enter card-retro-paper w-full max-w-md rounded-2xl bg-[#fbf9f4] border border-sky-300 shadow-2xl p-5 space-y-4 text-xs text-stone-900 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-200">
               <div>
-                <span className="text-[10px] font-black uppercase text-sky-400">
+                <span className="text-[10px] font-black uppercase text-sky-800">
                   Kết Nối Anh Em Đội Bóng
                 </span>
-                <h3 className="text-sm font-extrabold text-white mt-0.5">
+                <h3 className="font-headline text-sm font-extrabold text-stone-900 mt-0.5">
                   Mã QR &amp; Link Tham Gia Nhóm Zalo Đội
                 </h3>
               </div>
               <button
                 onClick={() => setIsJoinLinkModalOpen(false)}
-                className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"
+                className="w-7 h-7 rounded-lg bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-stone-600 hover:text-stone-900 transition-all active:scale-95"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2096,24 +2094,24 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             {/* CHẾ ĐỘ 1: FORM CÀI ĐẶT / TẢI LÊN MÃ QR & LINK ZALO */}
             {isEditingZaloInvite || (!zaloQrImage && !zaloGroupLink) ? (
               <form onSubmit={handleSaveZaloInvite} className="space-y-3.5">
-                <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 text-[11px] text-sky-200 leading-relaxed">
+                <div className="p-3 rounded-xl bg-sky-50 border border-sky-200 text-[11px] text-sky-900 leading-relaxed">
                   📢 <strong>Chủ đội tự tải lên:</strong> Hãy tải ảnh mã QR nhóm Zalo thật của đội bạn và dán link mời Zalo vào bên dưới để anh em có thể quét mã hoặc bấm link tham gia đội nhé!
                 </div>
 
                 {/* 1. Tải ảnh mã QR Nhóm Zalo */}
                 <div className="space-y-1.5">
-                  <label className="block font-bold text-slate-200">
+                  <label className="block font-bold text-stone-800">
                     1. Tải lên ảnh mã QR Nhóm Zalo của đội:
                   </label>
                   {tempZaloQr ? (
-                    <div className="p-3 rounded-xl bg-slate-950 border border-white/10 flex flex-col items-center justify-center gap-2">
+                    <div className="p-3 rounded-xl bg-[#ede8dc] border border-stone-300 flex flex-col items-center justify-center gap-2">
                       <img
                         src={tempZaloQr}
                         alt="Ảnh QR Zalo Đội"
-                        className="w-40 h-40 rounded-xl p-1.5 bg-white border border-sky-400/40 shadow-md object-contain"
+                        className="w-40 h-40 rounded-xl p-1.5 bg-white border border-sky-300 shadow-md object-contain"
                       />
                       <div className="flex items-center gap-2">
-                        <label className="cursor-pointer px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 font-bold text-xs inline-flex items-center gap-1">
+                        <label className="cursor-pointer px-3 py-1.5 rounded-lg bg-stone-200 hover:bg-stone-300 text-sky-900 font-bold text-xs inline-flex items-center gap-1 border border-stone-300">
                           <Upload className="w-3.5 h-3.5" />
                           <span>Đổi ảnh QR khác</span>
                           <input
@@ -2126,7 +2124,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                         <button
                           type="button"
                           onClick={() => setTempZaloQr("")}
-                          className="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold text-xs inline-flex items-center gap-1"
+                          className="px-2.5 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold text-xs inline-flex items-center gap-1 border border-rose-300"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           <span>Gỡ</span>
@@ -2134,14 +2132,14 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <label className="border-2 border-dashed border-sky-500/40 hover:border-sky-400 bg-slate-950/70 p-5 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition space-y-1.5">
-                      <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center">
+                    <label className="border-2 border-dashed border-sky-300 hover:border-sky-400 bg-sky-50/50 p-5 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition space-y-1.5">
+                      <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center">
                         <Upload className="w-5 h-5" />
                       </div>
-                      <span className="font-bold text-sky-300 text-xs">
+                      <span className="font-bold text-sky-900 text-xs">
                         Bấm để chọn ảnh mã QR Zalo từ máy
                       </span>
-                      <span className="text-[10px] text-slate-400 text-center">
+                      <span className="text-[10px] text-stone-500 text-center">
                         Hỗ trợ PNG, JPG, WebP tối đa 2MB
                       </span>
                       <input
@@ -2152,14 +2150,14 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                       />
                     </label>
                   )}
-                  <p className="text-[10px] text-slate-400 italic">
+                  <p className="text-[10px] text-stone-500 italic">
                     💡 <strong>Cách lấy mã QR Zalo:</strong> Vào app Zalo ➔ Vào Nhóm đội bóng ➔ Bấm Menu ☰ (góc trên phải) ➔ Chọn "Mã QR của nhóm" ➔ Bấm "Lưu ảnh" rồi tải lên đây.
                   </p>
                 </div>
 
                 {/* 2. Dán Link Tham Gia Nhóm Zalo */}
                 <div className="space-y-1.5">
-                  <label className="block font-bold text-slate-200">
+                  <label className="block font-bold text-stone-800">
                     2. Dán link mời tham gia Nhóm Zalo của đội:
                   </label>
                   <input
@@ -2167,28 +2165,28 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     value={tempZaloLink}
                     onChange={(e) => setTempZaloLink(e.target.value)}
                     placeholder="VD: https://zalo.me/g/abcdef123 (hoặc link Zalo Đội trưởng)"
-                    className="w-full h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-sky-300 placeholder:text-slate-500 font-mono text-xs focus:outline-none focus:border-sky-400"
+                    className="w-full h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-sky-900 placeholder:text-stone-400 font-mono text-xs focus:outline-none focus:border-sky-500"
                   />
-                  <p className="text-[10px] text-slate-400 italic">
+                  <p className="text-[10px] text-stone-500 italic">
                     💡 <strong>Cách lấy link Zalo:</strong> Vào Nhóm chat Zalo ➔ Chọn "Link tham gia nhóm" ➔ "Sao chép link" rồi dán vào ô trên.
                   </p>
                 </div>
 
                 {/* Nút bấm Lưu */}
-                <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+                <div className="flex justify-end gap-2 pt-2 border-t border-stone-200">
                   {(zaloQrImage || zaloGroupLink) && (
                     <Button
                       type="button"
                       variant="ghost"
                       onClick={() => setIsEditingZaloInvite(false)}
-                      className="h-9 text-xs text-slate-400"
+                      className="h-9 text-xs text-stone-600 hover:text-stone-900"
                     >
                       Hủy
                     </Button>
                   )}
                   <Button
                     type="submit"
-                    className="h-9 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs gap-1.5 shadow-md shadow-emerald-500/20"
+                    className="btn-paper-tactile h-9 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs gap-1.5 shadow-2xs"
                   >
                     <Check className="w-4 h-4 stroke-[3]" />
                     <span>Lưu Mã QR &amp; Link Zalo Đội</span>
@@ -2199,30 +2197,30 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
               /* CHẾ ĐỘ 2: HIỂN THỊ MÃ QR & LINK ZALO DO CHỦ ĐỘI TẢI LÊN */
               <div className="space-y-4">
                 {/* Khối hiển thị ảnh QR thật */}
-                <div className="p-4 rounded-2xl bg-slate-950 border border-white/10 text-center space-y-2">
+                <div className="p-4 rounded-2xl bg-[#ede8dc] border border-stone-300/80 text-center space-y-2">
                   {zaloQrImage ? (
                     <>
                       <img
                         src={zaloQrImage}
                         alt="Mã QR Nhóm Zalo"
-                        className="w-44 h-44 rounded-2xl border-2 border-emerald-500/40 p-2 bg-white mx-auto shadow-2xl object-contain"
+                        className="w-44 h-44 rounded-2xl border-2 border-emerald-600/40 p-2 bg-white mx-auto shadow-md object-contain"
                       />
-                      <p className="text-xs font-bold text-white">
+                      <p className="text-xs font-bold text-stone-900">
                         Mã QR Nhóm Zalo: {teamName || "Đội Bóng"}
                       </p>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[10px] text-stone-600">
                         Mở camera Zalo trên điện thoại quét mã để vào thẳng nhóm chat của đội
                       </p>
                     </>
                   ) : (
                     <div className="py-6 space-y-2">
-                      <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-dashed border-white/20 text-slate-500 mx-auto flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-2xl bg-stone-200 border border-dashed border-stone-300 text-stone-500 mx-auto flex items-center justify-center">
                         <QrCode className="w-6 h-6" />
                       </div>
-                      <p className="text-xs font-bold text-slate-300">
+                      <p className="text-xs font-bold text-stone-800">
                         Chưa có ảnh mã QR Zalo
                       </p>
-                      <p className="text-[10px] text-slate-500">
+                      <p className="text-[10px] text-stone-500">
                         Chủ đội hãy bấm nút "Cài Đặt / Đổi QR &amp; Link" bên dưới để tải ảnh lên.
                       </p>
                     </div>
@@ -2231,7 +2229,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
                 {/* Khối hiển thị Link Zalo */}
                 <div className="space-y-1">
-                  <label className="block font-semibold text-slate-300">
+                  <label className="block font-semibold text-stone-800">
                     Link tham gia Nhóm Zalo:
                   </label>
                   {zaloGroupLink ? (
@@ -2240,12 +2238,12 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                         type="text"
                         readOnly
                         value={zaloGroupLink}
-                        className="flex-1 h-9 px-3 rounded-xl bg-slate-950 border border-white/10 text-sky-300 font-mono text-[11px] truncate"
+                        className="flex-1 h-9 px-3 rounded-xl bg-[#fbf9f4] border border-stone-300 text-sky-900 font-mono text-[11px] truncate"
                       />
                       <Button
                         type="button"
                         onClick={handleCopyZaloGroupLink}
-                        className="h-9 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs gap-1 shrink-0"
+                        className="btn-paper-tactile h-9 px-3 rounded-xl bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-900 font-bold text-xs gap-1 shrink-0"
                       >
                         {inviteLinkCopied ? (
                           <>
@@ -2270,29 +2268,29 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                       </a>
                     </div>
                   ) : (
-                    <div className="p-2.5 rounded-xl bg-slate-950 border border-dashed border-white/10 text-slate-500 text-[11px] text-center">
+                    <div className="p-2.5 rounded-xl bg-[#ede8dc] border border-dashed border-stone-300 text-stone-500 text-[11px] text-center">
                       Chủ đội chưa dán link Zalo
                     </div>
                   )}
                 </div>
 
                 {/* Soạn sẵn tin nhắn gửi anh em */}
-                <div className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-2">
-                  <span className="text-[10px] font-bold text-slate-300 flex items-center justify-between">
+                <div className="p-3 rounded-xl bg-[#ede8dc] border border-stone-300 space-y-2">
+                  <span className="text-[10px] font-bold text-stone-800 flex items-center justify-between">
                     <span>💬 Tin nhắn mẫu gửi anh em đội bóng:</span>
                     {inviteMsgCopied && (
-                      <span className="text-emerald-400 font-bold">
+                      <span className="text-emerald-700 font-bold">
                         ✓ Đã chép tin nhắn!
                       </span>
                     )}
                   </span>
-                  <p className="text-[11px] text-slate-300 italic bg-slate-900/80 p-2 rounded-lg border border-white/5">
+                  <p className="text-[11px] text-stone-700 italic bg-[#fbf9f4] p-2 rounded-lg border border-stone-300/80">
                     “⚽ Anh em ơi, đây là link tham gia Nhóm Zalo chính thức của đội {teamName}: {zaloGroupLink || "(Chưa có link)"}. Anh em bấm vào link hoặc quét mã QR nhóm để nhận thông báo lịch đá và điểm danh nhé!”
                   </p>
                   <Button
                     type="button"
                     onClick={handleCopyZaloInviteMsg}
-                    className="w-full h-8 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-extrabold text-xs gap-1.5 shadow-md shadow-blue-600/20"
+                    className="btn-paper-tactile w-full h-8 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white font-extrabold text-xs gap-1.5 shadow-2xs"
                   >
                     <Share2 className="w-3.5 h-3.5" />
                     <span>Sao Chép Tin Nhắn Mẫu Kèm Link Zalo</span>
@@ -2300,7 +2298,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                 </div>
 
                 {/* Footer Controls */}
-                <div className="flex items-center justify-between pt-1 border-t border-white/10">
+                <div className="flex items-center justify-between pt-1 border-t border-stone-200">
                   <button
                     type="button"
                     onClick={() => {
@@ -2308,7 +2306,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                       setTempZaloQr(zaloQrImage);
                       setIsEditingZaloInvite(true);
                     }}
-                    className="text-xs font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1"
+                    className="text-xs font-bold text-sky-800 hover:text-sky-900 hover:underline flex items-center gap-1"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                     <span>Cài Đặt / Đổi QR &amp; Link Zalo</span>
@@ -2317,7 +2315,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                     type="button"
                     variant="ghost"
                     onClick={() => setIsJoinLinkModalOpen(false)}
-                    className="h-8 text-xs text-slate-400"
+                    className="h-8 text-xs text-stone-600 hover:text-stone-900"
                   >
                     Đóng
                   </Button>

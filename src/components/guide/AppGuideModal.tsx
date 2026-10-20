@@ -48,37 +48,37 @@ export function AppGuideModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-[#0B1120] border border-slate-700/80 w-full max-w-2xl rounded-3xl overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
+      <div className="modal-spring-enter card-retro-paper bg-[#fbf9f4] border border-stone-300/90 w-full max-w-2xl rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col max-h-[90vh] shadow-paper text-stone-900">
         {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-800 bg-slate-900/80 flex items-center justify-between shrink-0">
+        <div className="px-5 py-4 border-b-2 border-stone-800/80 bg-[#ede8dc] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-slate-950 font-black flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-700 text-white font-black flex items-center justify-center border border-emerald-800 shadow-2xs">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-extrabold text-white">
+                <h2 className="font-headline text-base font-extrabold text-stone-900">
                   Cẩm Nang Hướng Dẫn GiaoHuu.vn
                 </h2>
-                <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px] font-bold">
+                <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] font-bold">
                   Bản Chuẩn v2.0
                 </Badge>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-stone-600">
                 Hiểu rõ quy chế ghép đối, ví cọc 200k &amp; chống bùng kèo trong 2 phút
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
+            className="w-8 h-8 rounded-full bg-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-300 flex items-center justify-center transition"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="px-4 py-2 border-b border-slate-800 bg-slate-950/60 overflow-x-auto flex gap-1.5 shrink-0 no-scrollbar">
+        <div className="px-4 py-2 border-b border-stone-300 bg-[#f5f1e8] overflow-x-auto flex gap-1.5 shrink-0 no-scrollbar">
           {[
             { id: "overview", label: "🌟 Giới Thiệu", icon: <Sparkles className="w-3.5 h-3.5" /> },
             { id: "flow", label: "🔄 Quy Trình 4 Bước", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
@@ -90,10 +90,10 @@ export function AppGuideModal({
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id as GuideSection)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition ${
+              className={`btn-paper-tactile px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition ${
                 activeSection === tab.id
-                  ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
-                  : "bg-slate-900/80 text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-slate-800/80"
+                  ? "bg-stone-900 text-amber-300 shadow-2xs font-black"
+                  : "bg-[#ede8dc] text-stone-700 hover:text-stone-950 hover:bg-stone-200 border border-stone-300"
               }`}
             >
               {tab.icon}
@@ -103,59 +103,59 @@ export function AppGuideModal({
         </div>
 
         {/* Content Area */}
-        <div className="p-5 overflow-y-auto space-y-4 text-xs text-slate-300 leading-relaxed flex-1">
+        <div className="p-5 overflow-y-auto space-y-4 text-xs text-stone-800 leading-relaxed flex-1 bg-[#fbf9f4]">
           {/* TAB 1: OVERVIEW */}
           {activeSection === "overview" && (
             <div className="space-y-4 animate-in fade-in duration-150">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/30 space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
+              <div className="p-4 rounded-2xl bg-[#ede8dc] border border-emerald-300 space-y-2 shadow-2xs">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800">
                   Sứ mệnh GiaoHuu.vn Hà Nội
                 </span>
-                <h3 className="text-sm font-extrabold text-white">
+                <h3 className="font-headline text-sm font-extrabold text-stone-900">
                   Chấm Dứt 100% Nạn "Bùng Kèo Phủi" &amp; Ghép Đối Chuẩn Trình Độ Sân 7
                 </h3>
-                <p className="text-slate-300">
+                <p className="text-stone-700">
                   GiaoHuu.vn là nền tảng công nghệ thể thao đầu tiên áp dụng cơ chế <strong>Bảo Chứng Ký Quỹ VietQR Napas247</strong> kết hợp <strong>Mã Bắt Tay 4 Số và Định Vị GPS</strong> tại các cụm sân cỏ nhân tạo Hà Nội.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2 text-emerald-400 font-bold">
-                    <ShieldCheck className="w-4 h-4" />
+                <div className="p-3.5 rounded-2xl bg-[#ede8dc] border border-stone-300/80 space-y-1.5">
+                  <div className="flex items-center gap-2 text-emerald-800 font-bold">
+                    <ShieldCheck className="w-4 h-4 text-emerald-700" />
                     <span>Chống Bùng Tuyệt Đối</span>
                   </div>
-                  <p className="text-slate-400 text-[11px]">
+                  <p className="text-stone-600 text-[11px]">
                     Đội bùng bị tịch thu 200k cọc. Đội bị bùng được đền bù trọn vẹn 200k để bù chi phí thuê sân.
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2 text-sky-400 font-bold">
-                    <Zap className="w-4 h-4" />
+                <div className="p-3.5 rounded-2xl bg-[#ede8dc] border border-stone-300/80 space-y-1.5">
+                  <div className="flex items-center gap-2 text-sky-800 font-bold">
+                    <Zap className="w-4 h-4 text-sky-700" />
                     <span>Lọc Tier Chuẩn Xác</span>
                   </div>
-                  <p className="text-slate-400 text-[11px]">
+                  <p className="text-stone-600 text-[11px]">
                     3 hạng trình độ: Tier 1 (dưỡng sinh văn phòng, cấm xoạc), Tier 2 (phong trào cứng), Tier 3 (bán chuyên).
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2 text-rose-400 font-bold">
-                    <Flame className="w-4 h-4" />
+                <div className="p-3.5 rounded-2xl bg-[#ede8dc] border border-stone-300/80 space-y-1.5">
+                  <div className="flex items-center gap-2 text-rose-800 font-bold">
+                    <Flame className="w-4 h-4 text-rose-700" />
                     <span>Kèo SOS Cứu Hộ</span>
                   </div>
-                  <p className="text-slate-400 text-[11px]">
+                  <p className="text-stone-600 text-[11px]">
                     Giải cứu trận đấu bị hủy sát giờ. Đội nhận kèo cứu hộ được cộng thưởng +8 điểm Uy Tín tín nhiệm.
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2 text-amber-400 font-bold">
-                    <Users className="w-4 h-4" />
+                <div className="p-3.5 rounded-2xl bg-[#ede8dc] border border-stone-300/80 space-y-1.5">
+                  <div className="flex items-center gap-2 text-amber-800 font-bold">
+                    <Users className="w-4 h-4 text-amber-700" />
                     <span>Chợ Cầu &amp; Thủ Môn GK</span>
                   </div>
-                  <p className="text-slate-400 text-[11px]">
+                  <p className="text-stone-600 text-[11px]">
                     Tuyển người đá thay và thuê thủ môn bắt gôn theo quận, chat Zalo 1-chạm chốt lịch ngay.
                   </p>
                 </div>
@@ -166,7 +166,7 @@ export function AppGuideModal({
           {/* TAB 2: FLOW */}
           {activeSection === "flow" && (
             <div className="space-y-3.5 animate-in fade-in duration-150">
-              <h3 className="font-extrabold text-white text-sm">
+              <h3 className="font-headline font-extrabold text-stone-900 text-sm">
                 Quy Trình 4 Bước Bắt Kèo Chuyên Nghiệp:
               </h3>
 
@@ -195,14 +195,14 @@ export function AppGuideModal({
                 ].map((item) => (
                   <div
                     key={item.step}
-                    className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-start gap-3.5"
+                    className="p-3.5 rounded-2xl bg-[#ede8dc] border border-stone-300/80 flex items-start gap-3.5 shadow-2xs"
                   >
-                    <div className="w-7 h-7 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black flex items-center justify-center shrink-0 text-xs">
+                    <div className="w-7 h-7 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-800 font-mono font-black flex items-center justify-center shrink-0 text-xs">
                       {item.step}
                     </div>
                     <div>
-                      <h4 className="font-bold text-white text-xs mb-0.5">{item.title}</h4>
-                      <p className="text-slate-400 text-[11px] leading-relaxed">{item.desc}</p>
+                      <h4 className="font-bold text-stone-900 text-xs mb-0.5">{item.title}</h4>
+                      <p className="text-stone-600 text-[11px] leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -213,32 +213,32 @@ export function AppGuideModal({
           {/* TAB 3: DEPOSIT RULES */}
           {activeSection === "deposit-rules" && (
             <div className="space-y-3.5 animate-in fade-in duration-150">
-              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-1.5">
-                <div className="flex items-center gap-2 text-amber-400 font-bold">
-                  <ShieldCheck className="w-4 h-4" />
+              <div className="p-4 rounded-2xl bg-[#ede8dc] border border-amber-300 space-y-1.5 shadow-2xs">
+                <div className="flex items-center gap-2 text-amber-900 font-bold">
+                  <ShieldCheck className="w-4 h-4 text-amber-700" />
                   <span>Quy Định Ký Quỹ 200.000đ Cố Định</span>
                 </div>
-                <p className="text-slate-300 text-[11px]">
+                <p className="text-stone-700 text-[11px]">
                   • Đội bóng có điểm Uy Tín <strong>100/100đ</strong> được <strong>MIỄN CỌC TIỀN MẶT</strong> khi tạo kèo thông thường.<br />
                   • Khi điểm Uy Tín <strong>dưới 70đ</strong> hoặc khi tham gia <strong>Kèo SOS</strong>: Hệ thống yêu cầu ký quỹ 200k để bảo vệ quyền lợi đôi bên.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-2">
-                <div className="flex items-center gap-2 text-rose-400 font-bold">
-                  <AlertTriangle className="w-4 h-4" />
+              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-2">
+                <div className="flex items-center gap-2 text-rose-900 font-bold">
+                  <AlertTriangle className="w-4 h-4 text-rose-700" />
                   <span>Cơ Chế Phạt Bùng &amp; Đền Bù Tiền Sân</span>
                 </div>
-                <ul className="space-y-1.5 text-slate-300 text-[11px]">
+                <ul className="space-y-1.5 text-stone-700 text-[11px]">
                   <li>• <strong>Đội bùng kèo (không đến sân hoặc hủy sát giờ &lt;1h):</strong> Bị tịch thu 100% tiền cọc 200.000đ + trừ -40đ Uy Tín (bị khóa tạo kèo). Đội muốn hủy kèo hợp lệ bắt buộc phải thông báo trước ít nhất <strong>1 tiếng</strong> trước giờ bóng lăn.</li>
                   <li>• <strong>Đội bị bùng (có mặt tại sân đúng hẹn):</strong> Nhận trọn vẹn 200.000đ tiền cọc của đội bùng để bù đắp chi phí thuê sân với chủ sân.</li>
                   <li>• <strong>Cách chứng minh:</strong> Định vị GPS tại sân (&lt;300m) + BQT gọi hotline chủ sân đối chứng.</li>
                 </ul>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-sky-500/10 border border-sky-500/30 space-y-1">
-                <div className="text-sky-300 font-bold text-xs">🌧️ Hộp Kháng Cáo Bất Khả Kháng (Giải Oan)</div>
-                <p className="text-slate-300 text-[11px]">
+              <div className="p-3.5 rounded-2xl bg-sky-50 border border-sky-200 space-y-1">
+                <div className="text-sky-900 font-bold text-xs">🌧️ Hộp Kháng Cáo Bất Khả Kháng (Giải Oan)</div>
+                <p className="text-stone-700 text-[11px]">
                   Nếu hủy kèo do mưa ngập sân, hỏng dàn đèn hoặc chủ sân thu hồi sân: Chọn <em>"Kháng Cáo Bất Khả Kháng"</em> và điền SĐT chủ sân. BQT duyệt 1-chạm sẽ khôi phục 100đ Uy Tín và bảo lưu cọc 100%!
                 </p>
               </div>
@@ -248,28 +248,28 @@ export function AppGuideModal({
           {/* TAB 4: SOS */}
           {activeSection === "sos" && (
             <div className="space-y-3.5 animate-in fade-in duration-150">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-950/40 to-slate-900 border border-rose-500/40 space-y-2">
-                <div className="flex items-center gap-2 text-rose-400 font-black">
-                  <Flame className="w-5 h-5" />
+              <div className="p-4 rounded-2xl bg-[#ede8dc] border border-rose-300 space-y-2 shadow-2xs">
+                <div className="flex items-center gap-2 text-rose-900 font-black">
+                  <Flame className="w-5 h-5 text-rose-700" />
                   <span>Kèo Cứu Hộ SOS - Cứu Tinh Khi Bể Kèo Giờ Vàng</span>
                 </div>
-                <p className="text-slate-300 text-[11px]">
+                <p className="text-stone-700 text-[11px]">
                   Đã bao giờ đội bạn đặt sân xong nhưng đối thủ phút chót thông báo không đá được? Tính năng <strong>Kèo SOS</strong> giúp đẩy trận đấu lên vị trí ưu tiên số 1 toàn Hà Nội!
                 </p>
               </div>
 
               <div className="space-y-2 text-[11px]">
-                <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                  <span className="text-slate-300">⭐ Thưởng điểm Uy Tín:</span>
-                  <span className="text-emerald-400 font-bold">+8 điểm tín nhiệm cộng thẳng vào hồ sơ</span>
+                <div className="p-3 rounded-xl bg-[#ede8dc] border border-stone-300/80 flex items-center justify-between">
+                  <span className="text-stone-700">⭐ Thưởng điểm Uy Tín:</span>
+                  <span className="text-emerald-800 font-bold">+8 điểm tín nhiệm cộng thẳng vào hồ sơ</span>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                  <span className="text-slate-300">⏱️ Thời gian cứu hộ:</span>
-                  <span className="text-amber-400 font-bold">Khẩn cấp trong vòng 60-90 phút trước trận</span>
+                <div className="p-3 rounded-xl bg-[#ede8dc] border border-stone-300/80 flex items-center justify-between">
+                  <span className="text-stone-700">⏱️ Thời gian cứu hộ:</span>
+                  <span className="text-amber-800 font-bold">Khẩn cấp trong vòng 60-90 phút trước trận</span>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                  <span className="text-slate-300">🛡️ Cam kết:</span>
-                  <span className="text-sky-400 font-bold">Khóa cọc 200k chống hủy lần 2</span>
+                <div className="p-3 rounded-xl bg-[#ede8dc] border border-stone-300/80 flex items-center justify-between">
+                  <span className="text-stone-700">🛡️ Cam kết:</span>
+                  <span className="text-sky-800 font-bold">Khóa cọc 200k chống hủy lần 2</span>
                 </div>
               </div>
             </div>
@@ -278,24 +278,24 @@ export function AppGuideModal({
           {/* TAB 5: SUB-MARKET */}
           {activeSection === "sub-market" && (
             <div className="space-y-3.5 animate-in fade-in duration-150">
-              <h3 className="font-extrabold text-white text-sm">
+              <h3 className="font-headline font-extrabold text-stone-900 text-sm">
                 Chợ Cầu Phủi &amp; Thuê Thủ Môn (GK) Chuyên Nghiệp:
               </h3>
-              <p className="text-slate-400 text-[11px]">
+              <p className="text-stone-600 text-[11px]">
                 Vào tab <strong>"Chợ Cầu"</strong> trên thanh điều hướng để tìm kiếm cầu thủ tự do và thủ môn bắt gôn:
               </p>
 
               <div className="space-y-2">
-                <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
-                  <h4 className="font-bold text-emerald-400 text-xs">🧤 Thuê Thủ Môn (GK):</h4>
-                  <p className="text-slate-400 text-[11px]">
+                <div className="p-3.5 rounded-2xl bg-[#ede8dc] border border-stone-300/80 space-y-1">
+                  <h4 className="font-bold text-emerald-800 text-xs">🧤 Thuê Thủ Môn (GK):</h4>
+                  <p className="text-stone-600 text-[11px]">
                     Giá thuê thông thường: 100k - 200k/trận (kèm tiền nước/trà đá). Thủ môn có thẻ hồ sơ, đánh giá phản xạ và kinh nghiệm bắt sân 7.
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
-                  <h4 className="font-bold text-sky-400 text-xs">👥 Lính Đánh Thuê / Cầu Thủ Tự Do:</h4>
-                  <p className="text-slate-400 text-[11px]">
+                <div className="p-3.5 rounded-2xl bg-[#ede8dc] border border-stone-300/80 space-y-1">
+                  <h4 className="font-bold text-sky-800 text-xs">👥 Lính Đánh Thuê / Cầu Thủ Tự Do:</h4>
+                  <p className="text-stone-600 text-[11px]">
                     Lọc theo vị trí (Hậu vệ cánh, Thòng quét, Tiền vệ, Tiền đạo) và Quận/Huyện. Bấm mở Zalo trao đổi màu áo và chốt giờ hẹn trong 30 giây!
                   </p>
                 </div>
@@ -322,13 +322,13 @@ export function AppGuideModal({
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1"
+                  className="p-3.5 rounded-2xl bg-[#ede8dc] border border-stone-300/80 space-y-1 shadow-2xs"
                 >
-                  <h4 className="font-bold text-white text-xs flex items-center gap-2">
-                    <span className="text-emerald-400">Q:</span>
+                  <h4 className="font-bold text-stone-900 text-xs flex items-center gap-2">
+                    <span className="text-emerald-800 font-black">Q:</span>
                     <span>{item.q}</span>
                   </h4>
-                  <p className="text-slate-400 text-[11px] pl-4">{item.a}</p>
+                  <p className="text-stone-600 text-[11px] pl-4">{item.a}</p>
                 </div>
               ))}
             </div>
@@ -336,13 +336,13 @@ export function AppGuideModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-slate-950 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
+        <div className="p-4 bg-[#ede8dc] border-t border-stone-300 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
           <div className="flex items-center gap-2">
             <a
               href={getZaloDeepLink(BQT_ZALO_PHONE)}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+              className="btn-paper-tactile px-3 py-1.5 rounded-xl bg-[#0068FF] hover:bg-[#0057D9] text-white text-xs font-bold flex items-center gap-1.5 transition shadow-2xs"
             >
               <span>Zalo BQT: 0393.407.855</span>
               <ExternalLink className="w-3 h-3 text-sky-200" />
@@ -354,9 +354,9 @@ export function AppGuideModal({
                   onClose();
                   onOpenSupport();
                 }}
-                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1.5 transition"
+                className="btn-paper-tactile px-3 py-1.5 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-800 border border-stone-300 text-xs font-bold flex items-center gap-1.5 transition"
               >
-                <Bot className="w-3.5 h-3.5 text-emerald-400" />
+                <Bot className="w-3.5 h-3.5 text-emerald-700" />
                 <span>Hỏi AI Trợ Lý</span>
               </button>
             )}
@@ -364,7 +364,7 @@ export function AppGuideModal({
 
           <Button
             onClick={onClose}
-            className="px-5 h-9 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-md shadow-emerald-500/20"
+            className="btn-paper-tactile px-5 h-9 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-300 font-black text-xs shadow-2xs"
           >
             <span>Đã Hiểu &amp; Trải Nghiệm Ngay</span>
           </Button>
