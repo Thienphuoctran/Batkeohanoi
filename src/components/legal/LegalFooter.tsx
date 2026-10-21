@@ -59,7 +59,7 @@ export const LegalFooter: React.FC<LegalFooterProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-stone-600 text-left">
         {/* Cột 1: Thông tin chủ thể vận hành */}
         <div className="space-y-1.5">
-          <span className="font-headline font-black text-stone-900 text-xs uppercase tracking-wider block flex items-center gap-1.5">
+          <span className="font-sans font-black text-stone-900 text-xs uppercase tracking-wider block flex items-center gap-1.5">
             <Building className="w-3.5 h-3.5 text-stone-700" />
             <span>Đơn Vị Vận Hành Nền Tảng</span>
           </span>
@@ -79,7 +79,7 @@ export const LegalFooter: React.FC<LegalFooterProps> = ({
 
         {/* Cột 2: Hotline & Hỗ trợ kỹ thuật */}
         <div className="space-y-1.5">
-          <span className="font-headline font-black text-stone-900 text-xs uppercase tracking-wider block flex items-center gap-1.5">
+          <span className="font-sans font-black text-stone-900 text-xs uppercase tracking-wider block flex items-center gap-1.5">
             <Phone className="w-3.5 h-3.5 text-stone-700" />
             <span>Kênh Tiếp Nhận &amp; Kháng Cáo</span>
           </span>
@@ -111,7 +111,7 @@ export const LegalFooter: React.FC<LegalFooterProps> = ({
 
         {/* Cột 3: Tuyên bố miễn trừ thể thao */}
         <div className="space-y-1.5 p-3 rounded-2xl bg-[#ede8dc] border border-stone-300 text-[11px] leading-relaxed">
-          <span className="font-headline font-black text-amber-900 uppercase tracking-wide block flex items-center gap-1">
+          <span className="font-sans font-black text-amber-900 uppercase tracking-wide block flex items-center gap-1">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-700" />
             <span>Miễn Trừ Trách Nhiệm Thể Thao</span>
           </span>

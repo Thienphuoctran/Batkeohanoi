@@ -81,7 +81,25 @@ const config: Config = {
         },
       },
       fontFamily: {
-        headline: ["Georgia", "Cambria", "Times New Roman", "serif"],
+        headline: [
+          "var(--font-headline)",
+          "'Playfair Display'",
+          "'Merriweather'",
+          "'Times New Roman'",
+          "Times",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "'Segoe UI'",
+          "sans-serif",
+        ],
+        serif: [
+          "var(--font-headline)",
+          "'Playfair Display'",
+          "'Merriweather'",
+          "'Times New Roman'",
+          "Times",
+          "serif",
+        ],
       },
       boxShadow: {
         paper: "0 1px 3px rgba(60, 50, 35, 0.06), 0 4px 16px -2px rgba(60, 50, 35, 0.08)",

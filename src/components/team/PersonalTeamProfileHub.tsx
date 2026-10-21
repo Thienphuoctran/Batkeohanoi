@@ -723,7 +723,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             <span className="text-[10px] text-stone-600 block font-semibold">
               Địa bàn sinh hoạt
             </span>
-            <span className="font-headline font-black text-stone-900 text-xs sm:text-sm">
+            <span className="font-sans font-black text-stone-900 text-xs sm:text-sm">
               {homeDistrict || "Chưa cập nhật"}
             </span>
           </div>
@@ -731,7 +731,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             <span className="text-[10px] text-stone-600 block font-semibold">
               Đánh giá văn minh
             </span>
-            <span className="font-headline font-black text-emerald-800 text-xs sm:text-sm flex items-center justify-center gap-1">
+            <span className="font-sans font-black text-emerald-800 text-xs sm:text-sm flex items-center justify-center gap-1">
               {matchStats.total > 0 ? (
                 <>
                   <Star className="w-3.5 h-3.5 fill-current text-amber-600" />
@@ -748,7 +748,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
             <span className="text-[10px] text-stone-600 block font-semibold">
               Quân số đội
             </span>
-            <span className="font-headline font-black text-amber-900 text-xs sm:text-sm">
+            <span className="font-sans font-black text-amber-900 text-xs sm:text-sm">
               {members.length} Cầu thủ
             </span>
           </div>

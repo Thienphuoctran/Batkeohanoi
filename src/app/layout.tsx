@@ -1,6 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { OfflineBanner } from "@/components/common/OfflineBanner";
+
+const headlineFont = Playfair_Display({
+  subsets: ["vietnamese", "latin"],
+  weight: ["600", "700", "800", "900"],
+  variable: "--font-headline",
+  display: "swap",
+});
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -81,7 +89,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="GiaoHuu.vn" />
       </head>
-      <body className="min-h-screen bg-kraft-newspaper text-stone-900 antialiased font-sans">
+      <body className={`${headlineFont.variable} min-h-screen bg-kraft-newspaper text-stone-900 antialiased font-sans`}>
         <OfflineBanner />
         {children}
         <script
