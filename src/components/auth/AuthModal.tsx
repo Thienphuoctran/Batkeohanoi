@@ -267,8 +267,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   />
                 </div>
                 <span className="text-[10px] text-amber-400/90 mt-1 block">
-                  * 1 Số điện thoại chỉ tạo được 1 đội bóng duy nhất để chống
-                  bùng kèo ảo.
+                  * Mục đích: 1 Số điện thoại chỉ tạo được 1 đội duy nhất để chống bùng kèo ảo &amp; kết nối Zalo ghép đối (Bảo mật theo NĐ 13).
                 </span>
               </div>
             </>
@@ -310,6 +309,65 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               />
             </div>
           </div>
+
+          {mode === "register" && (
+            <div className="flex items-start space-x-2 pt-1 text-[11px] text-slate-300">
+              <input
+                type="checkbox"
+                id="agreePrivacyCheckbox"
+                required
+                className="mt-0.5 rounded border-slate-700 bg-slate-950 text-emerald-500 focus:ring-emerald-500 cursor-pointer w-4 h-4 shrink-0"
+              />
+              <label
+                htmlFor="agreePrivacyCheckbox"
+                className="cursor-pointer leading-tight text-slate-400 select-none"
+              >
+                Tôi đồng ý với{" "}
+                <a
+                  href="/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-emerald-400 hover:underline font-bold"
+                >
+                  Điều khoản sử dụng
+                </a>{" "}
+                và{" "}
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-emerald-400 hover:underline font-bold"
+                >
+                  Chính sách bảo mật (Nghị định 13)
+                </a>{" "}
+                của GiaoHuu.VN.
+              </label>
+            </div>
+          )}
+
+          {mode === "login" && (
+            <p className="text-[10px] text-slate-500 text-center">
+              Bằng việc đăng nhập, bạn đồng ý với{" "}
+              <a
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-slate-400 underline hover:text-white"
+              >
+                Điều khoản
+              </a>{" "}
+              &amp;{" "}
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-slate-400 underline hover:text-white"
+              >
+                Chính sách bảo mật
+              </a>{" "}
+              của chúng tôi.
+            </p>
+          )}
 
           <button
             type="submit"

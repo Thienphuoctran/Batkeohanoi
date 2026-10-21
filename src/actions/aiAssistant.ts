@@ -382,6 +382,24 @@ function getSmartOfflineResponse(query: string): AiAssistantResponse {
     };
   }
 
+  // 22.5 Xóa dữ liệu cá nhân & Hủy tài khoản (Nghị định 13/2023/NĐ-CP)
+  if (
+    q.includes("xóa dữ liệu") ||
+    q.includes("xóa tài khoản") ||
+    q.includes("hủy tài khoản") ||
+    q.includes("nghị định 13") ||
+    q.includes("xóa data") ||
+    q.includes("quyền riêng tư")
+  ) {
+    return {
+      success: true,
+      reply: `🛡️ **Quyền Yêu Cầu Xóa Dữ Liệu (Nghị định 13/2023/NĐ-CP):**\n\n• Bạn có toàn quyền yêu cầu xóa vĩnh viễn dữ liệu tài khoản, SĐT Zalo và lịch sử đội bóng khỏi máy chủ GiaoHuu.VN.\n• **Cách 1:** Vào tab **Đội Tôi** ➔ Bấm nút **"Xóa Data (NĐ 13)"** ngay trên thẻ đội.\n• **Cách 2:** Gửi email tới **phuocct998@gmail.com** hoặc liên hệ Zalo BQT (0393.407.855). BQT cam kết xử lý dọn dẹp trong 72 giờ!`,
+      suggestedActions: [
+        { label: "💬 Nhắn Zalo BQT Xóa Data", actionType: "OPEN_ZALO" },
+      ],
+    };
+  }
+
   // 23. Danh sách sân bóng theo quận (Cầu Giấy, Nam Từ Liêm, Thanh Xuân, Đống Đa...)
   if (
     q.includes("sân") ||

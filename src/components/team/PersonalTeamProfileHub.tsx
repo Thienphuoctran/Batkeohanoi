@@ -38,6 +38,7 @@ import { SKILL_TIERS_CONFIG } from "@/constants/hanoiPitches";
 import { Button } from "@/components/ui/button";
 import { updateTeamProfileAction } from "@/actions/auth";
 import { ShinyText, CountUpNumber } from "@/components/reactbits";
+import { DataDeletionModal } from "@/components/legal/DataDeletionModal";
 
 export interface TeamMember {
   id: string;
@@ -142,6 +143,7 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
 
   // TÍNH NĂNG 1: Ảnh Logo / Avatar Đội Bóng
   const [logoUrl, setLogoUrl] = useState<string>("");
+  const [isDataDeletionOpen, setIsDataDeletionOpen] = useState(false);
 
   // Danh Sách Cầu Thủ Đội Bóng: Mặc định chỉ có DUY NHẤT 1 người là Đội trưởng chính chủ
   const [members, setMembers] = useState<TeamMember[]>([
@@ -826,6 +828,17 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
                   <span>Chia sẻ Zalo</span>
                 </>
               )}
+            </button>
+
+            {/* Nút Yêu Cầu Xóa Dữ Liệu (Nghị định 13) */}
+            <button
+              type="button"
+              onClick={() => setIsDataDeletionOpen(true)}
+              title="Quyền yêu cầu xóa dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP"
+              className="btn-paper-tactile px-3 py-1.5 bg-[#ede8dc] hover:bg-stone-200 text-stone-600 hover:text-stone-900 rounded-xl text-xs font-semibold border border-stone-300/90 flex items-center space-x-1.5 transition-all shadow-2xs active:scale-95"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-stone-500" />
+              <span>Xóa Data (NĐ 13)</span>
             </button>
 
             {/* Nút Đăng Xuất */}
@@ -2325,6 +2338,15 @@ export const PersonalTeamProfileHub: React.FC<PersonalTeamProfileHubProps> = ({
           </div>
         </div>
       )}
+
+      {/* Modal Yêu Cầu Xóa Dữ Liệu Cá Nhân (Nghị định 13/2023/NĐ-CP) */}
+      <DataDeletionModal
+        isOpen={isDataDeletionOpen}
+        onClose={() => setIsDataDeletionOpen(false)}
+        teamName={teamName}
+        captainPhone={captainPhone}
+        captainEmail={profile?.phone || ""}
+      />
     </div>
   );
 };

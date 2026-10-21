@@ -41,6 +41,7 @@ const QUICK_PROMPTS = [
   "🛡️ Cọc 200k rút thế nào?",
   "⚠️ Bị đối bùng ai đền tiền?",
   "🌧️ Mưa to hủy kèo sao?",
+  "🗑️ Xóa dữ liệu tài khoản (NĐ 13)",
   "🧤 Thuê thủ môn (GK) ở đâu?",
   "🏟️ Sân bóng nào ở Cầu Giấy?",
   "⚽ Luật ném biên hay đá biên sân 7?",
