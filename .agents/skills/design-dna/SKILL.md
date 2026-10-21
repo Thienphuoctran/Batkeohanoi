@@ -1,6 +1,6 @@
 ---
 name: design-dna
-description: Football Design DNA — Extract, define, and apply design DNA across three dimensions: design system (tokens), design style (football/stadium aesthetic), and visual effects (Pitch Canvas, GSAP Scoreboard, Glassmorphism).
+description: "Football Design DNA — Extract, define, and apply design DNA across three dimensions: design system (tokens), design style (football/stadium aesthetic), and visual effects (Pitch Canvas, GSAP Scoreboard, Glassmorphism)."
 ---
 
 # Football Pro Design DNA

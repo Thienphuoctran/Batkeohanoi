@@ -1418,6 +1418,35 @@ export default function HanoiMatchmakingPlatform() {
               <span>Quản trị</span>
             </Link>
           </div>
+          <div className="flex items-center justify-center gap-3 text-[11px] text-stone-500 flex-wrap pt-1 border-t border-stone-300/60">
+            <Link
+              href="/terms"
+              className="text-stone-600 hover:text-stone-950 transition-colors font-semibold hover:underline"
+            >
+              Điều khoản dịch vụ
+            </Link>
+            <span>•</span>
+            <Link
+              href="/privacy"
+              className="text-stone-600 hover:text-stone-950 transition-colors font-semibold hover:underline"
+            >
+              Chính sách bảo mật (NĐ 13)
+            </Link>
+            <span>•</span>
+            <Link
+              href="/cookies"
+              className="text-stone-600 hover:text-stone-950 transition-colors font-semibold hover:underline"
+            >
+              Chính sách Cookie
+            </Link>
+            <span>•</span>
+            <Link
+              href="/refund"
+              className="text-stone-600 hover:text-stone-950 transition-colors font-semibold hover:underline"
+            >
+              Quy chế hoàn cọc &amp; Ví
+            </Link>
+          </div>
         </footer>
       </div>
 
