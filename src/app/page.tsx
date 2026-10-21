@@ -68,6 +68,7 @@ import {
   PhuiStickerCanvas,
 } from "@/components/phui";
 import { VintageScrapbookAsset } from "@/components/common/VintageScrapbookAsset";
+import { LegalFooter } from "@/components/legal/LegalFooter";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { TeamOnboardingModal } from "@/components/team/TeamOnboardingModal";
 import {
@@ -1374,80 +1375,11 @@ export default function HanoiMatchmakingPlatform() {
           )}
         </main>
 
-        {/* Footer báo giấy & liên kết Quản trị ẩn */}
-        <footer className="mt-12 pb-8 border-t border-stone-300 pt-6 text-center text-xs text-stone-600 space-y-3">
-          <div className="flex items-center justify-center gap-2">
-            <span className="w-6 h-6 rounded bg-[#15803d] text-white font-black text-[10px] flex items-center justify-center shadow-xs">
-              7v7
-            </span>
-            <span className="font-black text-stone-900 text-sm tracking-tight">
-              GiaoHuu<span className="text-[#15803d]">.vn</span>
-            </span>
-          </div>
-          <p className="font-semibold text-stone-700">
-            © 2026 GiaoHuu.vn Hà Nội • Nền tảng Ghép Trận Sân 7 &amp; Chống Bùng Kèo
-          </p>
-          <div className="flex items-center justify-center gap-3 text-[11px] text-stone-600 flex-wrap">
-            <button
-              onClick={() => setIsRulesOpen(true)}
-              className="text-stone-800 hover:text-red-700 transition-colors inline-flex items-center gap-1 font-bold"
-              title="Bảng Nội Quy & Quy Chế Kỷ Luật GiaoHuu.vn"
-            >
-              <Scale className="w-3 h-3 text-amber-700" />
-              <span>Bảng Nội Quy &amp; Kỷ Luật</span>
-            </button>
-            <span>•</span>
-            <button
-              onClick={() => setIsGuideOpen(true)}
-              className="text-stone-800 hover:text-emerald-700 transition-colors inline-flex items-center gap-1 font-semibold"
-            >
-              <BookOpen className="w-2.5 h-2.5 text-stone-600" />
-              <span>Hướng dẫn sử dụng</span>
-            </button>
-            <span>•</span>
-            <span>Tiêu chuẩn Sân 7 Hà Nội</span>
-            <span>•</span>
-            <span>Bảo chứng VietQR Napas247</span>
-            <span>•</span>
-            <Link
-              href="/admin"
-              className="text-stone-500 hover:text-stone-900 transition-colors inline-flex items-center gap-1 opacity-70 hover:opacity-100 font-medium"
-              title="Quản trị hệ thống (Khóa PIN)"
-            >
-              <Lock className="w-2.5 h-2.5" />
-              <span>Quản trị</span>
-            </Link>
-          </div>
-          <div className="flex items-center justify-center gap-3 text-[11px] text-stone-500 flex-wrap pt-1 border-t border-stone-300/60">
-            <Link
-              href="/terms"
-              className="text-stone-600 hover:text-stone-950 transition-colors font-semibold hover:underline"
-            >
-              Điều khoản dịch vụ
-            </Link>
-            <span>•</span>
-            <Link
-              href="/privacy"
-              className="text-stone-600 hover:text-stone-950 transition-colors font-semibold hover:underline"
-            >
-              Chính sách bảo mật (NĐ 13)
-            </Link>
-            <span>•</span>
-            <Link
-              href="/cookies"
-              className="text-stone-600 hover:text-stone-950 transition-colors font-semibold hover:underline"
-            >
-              Chính sách Cookie
-            </Link>
-            <span>•</span>
-            <Link
-              href="/refund"
-              className="text-stone-600 hover:text-stone-950 transition-colors font-semibold hover:underline"
-            >
-              Quy chế hoàn cọc &amp; Ví
-            </Link>
-          </div>
-        </footer>
+        {/* Footer Chuẩn Pháp Lý TMĐT & Nghị Định 13 */}
+        <LegalFooter
+          onOpenRules={() => setIsRulesOpen(true)}
+          onOpenGuide={() => setIsGuideOpen(true)}
+        />
       </div>
 
       {/* Modal Khớp Kèo */}

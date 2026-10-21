@@ -4,7 +4,7 @@ import { HANOI_PITCHES } from "@/constants/hanoiPitches";
 import { getZaloDeepLink } from "@/lib/zalo";
 
 const SYSTEM_INSTRUCTION = `
-Bạn là Trợ Lý AI Chuyên Sâu của nền tảng GiaoHuu.vn (giaohuu.vn) - Nền tảng ghép đối sân 7 và chống bùng kèo bóng đá phủi số 1 Hà Nội.
+Bạn là Trợ Lý AI Chuyên Sâu của nền tảng GiaoHuu.vn (giaohuu.vn) - Nền tảng ghép đối sân 7 và chống bùng kèo bóng đá phủi hàng đầu Hà Nội.
 Bạn nói chuyện với phong cách anh em bóng đá phủi: chân thành, nhiệt huyết, am hiểu luật bóng đá sân 7, chiến thuật và nghiệp vụ nền tảng.
 
 Các quy chế nghiệp vụ cốt lõi của GiaoHuu.vn Hà Nội:

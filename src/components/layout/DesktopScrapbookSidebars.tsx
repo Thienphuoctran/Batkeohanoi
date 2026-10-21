@@ -43,7 +43,7 @@ export const DesktopScrapbookSidebars: React.FC<DesktopScrapbookSidebarsProps> =
             </div>
             <p className="text-[10px] text-stone-600 line-clamp-2 leading-relaxed">
               Các đội bóng phủi Thủ đô đang tích cực ghép kèo giao hữu sân 7. Hệ
-              thống cọc 200k giúp triệt tiêu 100% tình trạng bùng kèo.
+              thống cọc 200k giúp bảo chứng và giảm thiểu tối đa rủi ro bùng kèo.
             </p>
           </div>
           <div className="mt-2 pt-1.5 border-t border-stone-200 flex items-center justify-between">
